@@ -1,0 +1,93 @@
+	agent-runtime-lab/cmd/lab		coverage: 0.0% of statements
+	agent-runtime-lab/cmd/lab-probe		coverage: 0.0% of statements
+	agent-runtime-lab/cmd/lab-summary		coverage: 0.0% of statements
+	agent-runtime-lab/src/experiments		coverage: 0.0% of statements
+=== RUN   TestConfigRejectsUnsafeInputs
+--- PASS: TestConfigRejectsUnsafeInputs (0.00s)
+=== RUN   TestBackendSafetyAndExplicitRuntime
+--- PASS: TestBackendSafetyAndExplicitRuntime (0.00s)
+=== RUN   TestBoundedCaptureDrainsOutput
+--- PASS: TestBoundedCaptureDrainsOutput (0.00s)
+=== RUN   TestResourceSamplesAndUnavailable
+--- PASS: TestResourceSamplesAndUnavailable (0.00s)
+=== RUN   TestNonzeroExitIsCapturedAndSingleUse
+--- PASS: TestNonzeroExitIsCapturedAndSingleUse (0.00s)
+=== RUN   TestDeadlineAndParentCancellationKillWorkload
+=== RUN   TestDeadlineAndParentCancellationKillWorkload/false
+=== RUN   TestDeadlineAndParentCancellationKillWorkload/true
+--- PASS: TestDeadlineAndParentCancellationKillWorkload (0.01s)
+    --- PASS: TestDeadlineAndParentCancellationKillWorkload/false (0.01s)
+    --- PASS: TestDeadlineAndParentCancellationKillWorkload/true (0.00s)
+=== RUN   TestCleanupAfterCreateFailureUsesIndependentContext
+--- PASS: TestCleanupAfterCreateFailureUsesIndependentContext (0.00s)
+=== RUN   TestImageVolumesRejectedBeforeCreate
+--- PASS: TestImageVolumesRejectedBeforeCreate (0.00s)
+=== RUN   TestDestroyRefusesOwnershipMismatch
+--- PASS: TestDestroyRefusesOwnershipMismatch (0.00s)
+PASS
+coverage: 78.4% of statements
+ok  	agent-runtime-lab/src/sandbox	1.039s	coverage: 78.4% of statements
+=== RUN   TestRuntimeContract
+=== RUN   TestRuntimeContract/docker
+=== RUN   TestRuntimeContract/gvisor
+--- PASS: TestRuntimeContract (1.12s)
+    --- PASS: TestRuntimeContract/docker (0.59s)
+    --- PASS: TestRuntimeContract/gvisor (0.48s)
+=== RUN   TestExperiments
+=== RUN   TestExperiments/docker
+=== RUN   TestExperiments/docker/filesystem
+=== RUN   TestExperiments/docker/network
+    integration_test.go:72: error: no bridge address; runs=[]
+=== RUN   TestExperiments/docker/memory
+=== RUN   TestExperiments/docker/processes
+=== RUN   TestExperiments/docker/startup
+=== RUN   TestExperiments/docker/cleanup
+=== RUN   TestExperiments/gvisor
+=== RUN   TestExperiments/gvisor/filesystem
+=== RUN   TestExperiments/gvisor/network
+    integration_test.go:72: error: no bridge address; runs=[]
+=== RUN   TestExperiments/gvisor/memory
+=== RUN   TestExperiments/gvisor/processes
+    integration_test.go:72: failed: Observed behavior did not meet the stated expectation; inspect captured runs.; runs=[{Backend:gvisor Container:agent-runtime-lab-5a2de3058628721b4086736e45723730 ImageID:sha256:e8e17f520d0c5ef4cd9fd37b050fc38436e5580266d460f2b4040cac1815aa80 Stdout:{"creation_rejected":false,"error":"fork/exec /lab-probe: cannot allocate memory","limit_unit":"host tasks, including threads","spawned":12}
+         Stderr: StdoutDropped:0 StderrDropped:0 ExitCode:0xc000150298 TimedOut:false Cancelled:false CreateMS:110.369118 ExecMS:556.70807 WorkloadMS:0xc00011cc38 CleanupMS:68.511715 TotalMS:770.226169 Resources:{OOMKilled:0xc0001502a0 Samples:0 MaxObservedMemoryBytes:<nil> MaxObservedPIDs:<nil> MaxObservedCPUPercent:<nil> Note:Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable.}}]
+=== RUN   TestExperiments/gvisor/startup
+=== RUN   TestExperiments/gvisor/cleanup
+--- FAIL: TestExperiments (37.25s)
+    --- FAIL: TestExperiments/docker (18.47s)
+        --- PASS: TestExperiments/docker/filesystem (0.43s)
+        --- FAIL: TestExperiments/docker/network (6.87s)
+        --- PASS: TestExperiments/docker/memory (6.98s)
+        --- PASS: TestExperiments/docker/processes (0.90s)
+        --- PASS: TestExperiments/docker/startup (0.44s)
+        --- PASS: TestExperiments/docker/cleanup (2.84s)
+    --- FAIL: TestExperiments/gvisor (18.73s)
+        --- PASS: TestExperiments/gvisor/filesystem (0.45s)
+        --- FAIL: TestExperiments/gvisor/network (6.86s)
+        --- PASS: TestExperiments/gvisor/memory (7.24s)
+        --- FAIL: TestExperiments/gvisor/processes (0.80s)
+        --- PASS: TestExperiments/gvisor/startup (0.51s)
+        --- PASS: TestExperiments/gvisor/cleanup (2.88s)
+=== RUN   TestCancellationAndOutputBound
+=== RUN   TestCancellationAndOutputBound/docker
+=== RUN   TestCancellationAndOutputBound/gvisor
+--- PASS: TestCancellationAndOutputBound (5.51s)
+    --- PASS: TestCancellationAndOutputBound/docker (2.71s)
+    --- PASS: TestCancellationAndOutputBound/gvisor (2.74s)
+=== RUN   TestLifecycle
+=== RUN   TestLifecycle/docker
+    integration_test.go:145: Destroy not idempotent docker inspect: exit status 1: error: no such object: agent-runtime-lab-d74aab05a4e1f84ba409eb4d2ca8c520
+        
+    integration_test.go:131: docker inspect: exit status 1: error: no such object: agent-runtime-lab-d74aab05a4e1f84ba409eb4d2ca8c520
+        
+=== RUN   TestLifecycle/gvisor
+    integration_test.go:145: Destroy not idempotent docker inspect: exit status 1: error: no such object: agent-runtime-lab-85d915ffe9077609262ba4c8017f168a
+        
+    integration_test.go:131: docker inspect: exit status 1: error: no such object: agent-runtime-lab-85d915ffe9077609262ba4c8017f168a
+        
+--- FAIL: TestLifecycle (1.05s)
+    --- FAIL: TestLifecycle/docker (0.47s)
+    --- FAIL: TestLifecycle/gvisor (0.53s)
+FAIL
+coverage: [no statements]
+FAIL	agent-runtime-lab/tests	44.953s
+FAIL

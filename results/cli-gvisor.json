@@ -1,0 +1,25 @@
+{
+  "backend": "gvisor",
+  "container": "agent-runtime-lab-84e0437ec499787de582f3f4b4224730",
+  "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+  "stdout": "{\"ready\":true}\n",
+  "stderr": "",
+  "stdout_dropped_bytes": 0,
+  "stderr_dropped_bytes": 0,
+  "exit_code": 0,
+  "timed_out": false,
+  "cancelled": false,
+  "create_ms": 133.120788,
+  "exec_ms": 244.66104,
+  "workload_ms": 159.160766,
+  "cleanup_ms": 67.795841,
+  "total_ms": 474.025597,
+  "resources": {
+    "oom_killed": false,
+    "samples": 0,
+    "max_observed_memory_bytes": null,
+    "max_observed_pids": null,
+    "max_observed_cpu_percent": null,
+    "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+  }
+}

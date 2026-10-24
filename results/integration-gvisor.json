@@ -1,0 +1,331 @@
+[
+  {
+    "backend": "gvisor",
+    "experiment": "filesystem",
+    "expected": "Host canary and Docker socket absent; UID nonzero; capabilities empty; root write denied; /tmp writable.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-1b90021c756db778695d58a4da11acea",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"capabilities_empty\":true,\"host_canary_hidden\":true,\"root_write_denied\":true,\"tmp_writable\":true,\"uid\":65532}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 123.575062,
+        "exec_ms": 224.571503,
+        "workload_ms": 137.706367,
+        "cleanup_ms": 76.618293,
+        "total_ms": 454.332427,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  },
+  {
+    "backend": "gvisor",
+    "experiment": "network",
+    "expected": "Bridge client reaches a local lab peer; network=none cannot reach the same peer. No external internet dependency.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-9bc7607401a2677fe21f33df5947b866",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"connected\":true,\"expected_allow\":true,\"last_error\":\"\\u003cnil\\u003e\"}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 108.853275,
+        "exec_ms": 320.848428,
+        "workload_ms": 166.975917,
+        "cleanup_ms": 65.643991,
+        "total_ms": 527.697471,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-118c10ea4820a89f56052cf6c669acf5",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"connected\":false,\"expected_allow\":false,\"last_error\":\"dial tcp4 172.17.0.2:8080: connect: network is unreachable\"}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 118.713627,
+        "exec_ms": 248.117533,
+        "workload_ms": 156.985097,
+        "cleanup_ms": 70.534404,
+        "total_ms": 468.227069,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-817ffd360bf367097154f8155570c81f",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"listening\":true}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 137,
+        "timed_out": false,
+        "cancelled": true,
+        "create_ms": 116.67132,
+        "exec_ms": 1247.739484,
+        "workload_ms": 1262.06975,
+        "cleanup_ms": 69.434126,
+        "total_ms": 1638.4178,
+        "resources": {
+          "oom_killed": false,
+          "samples": 2,
+          "max_observed_memory_bytes": 12740198,
+          "max_observed_pids": 29,
+          "max_observed_cpu_percent": 0,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  },
+  {
+    "backend": "gvisor",
+    "experiment": "memory",
+    "expected": "256 MiB allocation succeeds with 512 MiB; 64 MiB configuration is OOM-killed or reports an explicit OOM error.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-76832cab6089e21933d5d2981f820cd1",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"unexpected_allocation_success\":true}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 107.831294,
+        "exec_ms": 4149.420344,
+        "workload_ms": 4055.29386,
+        "cleanup_ms": 69.537641,
+        "total_ms": 4358.175052,
+        "resources": {
+          "oom_killed": false,
+          "samples": 7,
+          "max_observed_memory_bytes": 209924915,
+          "max_observed_pids": 27,
+          "max_observed_cpu_percent": 30.7,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-3e898275187bbdb7c4f7dc5a121942e3",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 137,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 116.486794,
+        "exec_ms": 2664.450538,
+        "workload_ms": 2547.289952,
+        "cleanup_ms": 84.599189,
+        "total_ms": 2904.593326,
+        "resources": {
+          "oom_killed": true,
+          "samples": 4,
+          "max_observed_memory_bytes": 12383682,
+          "max_observed_pids": 27,
+          "max_observed_cpu_percent": 0.06,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  },
+  {
+    "backend": "gvisor",
+    "experiment": "processes",
+    "expected": "At equal 512 MiB RAM, 24 children are allowed with process limit 256; limit 64 refuses creation with EAGAIN or ENOMEM.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-964b9c00191de0d7dac64e4730a59856",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"attempt_bound\":24,\"creation_rejected\":false,\"error\":\"\",\"limit_unit\":\"host tasks, including threads\",\"spawned\":24}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 159.649534,
+        "exec_ms": 1029.863401,
+        "workload_ms": 918.585363,
+        "cleanup_ms": 76.695847,
+        "total_ms": 1304.862664,
+        "resources": {
+          "oom_killed": false,
+          "samples": 1,
+          "max_observed_memory_bytes": 12582912,
+          "max_observed_pids": 27,
+          "max_observed_cpu_percent": 0,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-610665c691269397b8cd78e7d5eaf153",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"attempt_bound\":24,\"creation_rejected\":true,\"error\":\"fork/exec /lab-probe: cannot allocate memory\",\"limit_unit\":\"host tasks, including threads\",\"spawned\":12}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 172.289897,
+        "exec_ms": 639.574808,
+        "workload_ms": 515.295817,
+        "cleanup_ms": 84.009289,
+        "total_ms": 938.464794,
+        "resources": {
+          "oom_killed": false,
+          "samples": 1,
+          "max_observed_memory_bytes": 0,
+          "max_observed_pids": 0,
+          "max_observed_cpu_percent": 0,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  },
+  {
+    "backend": "gvisor",
+    "experiment": "startup",
+    "expected": "Source-built no-op exits 0; record create, attach-to-exit, workload, cleanup, and total wall times without a speed threshold.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-1058257eb7ea9d973d76864247d4f3bf",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"ready\":true}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 147.336156,
+        "exec_ms": 302.446811,
+        "workload_ms": 187.616514,
+        "cleanup_ms": 86.860844,
+        "total_ms": 579.755569,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  },
+  {
+    "backend": "gvisor",
+    "experiment": "cleanup",
+    "expected": "Timed-out parent and child are terminated, owned container disappears, and a fresh sandbox has no old /tmp marker.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-e49e2482afcc8b53749a339030fb2150",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"child_pid\":5,\"marker_written\":true}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 137,
+        "timed_out": true,
+        "cancelled": false,
+        "create_ms": 153.202247,
+        "exec_ms": 2006.270522,
+        "workload_ms": 2012.995556,
+        "cleanup_ms": 95.151364,
+        "total_ms": 2409.257168,
+        "resources": {
+          "oom_killed": false,
+          "samples": 2,
+          "max_observed_memory_bytes": 13348372,
+          "max_observed_pids": 30,
+          "max_observed_cpu_percent": 0,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-4253ca8249ac05f8703b793796ec33b1",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"fresh_tmp\":true}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 144.199383,
+        "exec_ms": 257.498641,
+        "workload_ms": 158.136996,
+        "cleanup_ms": 78.312065,
+        "total_ms": 521.596224,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  }
+]

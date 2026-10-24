@@ -1,0 +1,230 @@
+[
+  {
+    "backend": "docker",
+    "experiment": "filesystem",
+    "expected": "Host canary and Docker socket absent; UID nonzero; capabilities empty; root write denied; /tmp writable.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-49baeb7041e1ab576df3faf6c1cda17e",
+        "image_id": "sha256:e8e17f520d0c5ef4cd9fd37b050fc38436e5580266d460f2b4040cac1815aa80",
+        "stdout": "{\"capabilities_empty\":true,\"host_canary_hidden\":true,\"root_write_denied\":true,\"tmp_writable\":true,\"uid\":65532}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 113.225648,
+        "exec_ms": 197.53366,
+        "workload_ms": 108.637642,
+        "cleanup_ms": 63.838655,
+        "total_ms": 405.489378,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  },
+  {
+    "backend": "docker",
+    "experiment": "network",
+    "expected": "Bridge client reaches a local lab peer; network=none cannot reach the same peer. No external internet dependency.",
+    "status": "error",
+    "details": "no bridge address",
+    "runs": null
+  },
+  {
+    "backend": "docker",
+    "experiment": "memory",
+    "expected": "256 MiB allocation succeeds with 512 MiB; 64 MiB configuration is OOM-killed or reports an explicit OOM error.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-6bcca1d7873bf3bd0c7e9ffcdf142d25",
+        "image_id": "sha256:e8e17f520d0c5ef4cd9fd37b050fc38436e5580266d460f2b4040cac1815aa80",
+        "stdout": "{\"unexpected_allocation_success\":true}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 128.179883,
+        "exec_ms": 3830.956273,
+        "workload_ms": 3730.742833,
+        "cleanup_ms": 67.276148,
+        "total_ms": 4056.654176,
+        "resources": {
+          "oom_killed": false,
+          "samples": 6,
+          "max_observed_memory_bytes": 115343360,
+          "max_observed_pids": 3,
+          "max_observed_cpu_percent": 11.82,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-a0833476462290e4ddb4515c0a4c15d1",
+        "image_id": "sha256:e8e17f520d0c5ef4cd9fd37b050fc38436e5580266d460f2b4040cac1815aa80",
+        "stdout": "",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 137,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 129.696637,
+        "exec_ms": 2643.229369,
+        "workload_ms": 2526.537353,
+        "cleanup_ms": 66.211971,
+        "total_ms": 2872.944524,
+        "resources": {
+          "oom_killed": true,
+          "samples": 3,
+          "max_observed_memory_bytes": 1003520,
+          "max_observed_pids": 3,
+          "max_observed_cpu_percent": 0,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  },
+  {
+    "backend": "docker",
+    "experiment": "processes",
+    "expected": "A bounded attempt to spawn 96 children encounters EAGAIN under configured host-task and per-user process limits.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-350e909820b7ce53ce8ded9ae1c8dc08",
+        "image_id": "sha256:e8e17f520d0c5ef4cd9fd37b050fc38436e5580266d460f2b4040cac1815aa80",
+        "stdout": "{\"creation_rejected\":true,\"error\":\"fork/exec /lab-probe: resource temporarily unavailable\",\"limit_unit\":\"host tasks, including threads\",\"spawned\":20}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 112.903361,
+        "exec_ms": 656.929755,
+        "workload_ms": 555.023573,
+        "cleanup_ms": 66.926448,
+        "total_ms": 873.256741,
+        "resources": {
+          "oom_killed": false,
+          "samples": 1,
+          "max_observed_memory_bytes": 0,
+          "max_observed_pids": 0,
+          "max_observed_cpu_percent": 0,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  },
+  {
+    "backend": "docker",
+    "experiment": "startup",
+    "expected": "Source-built no-op exits 0; record create, attach-to-exit, workload, cleanup, and total wall times without a speed threshold.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-e823e1ad0e1b267ae27136b2ca16c044",
+        "image_id": "sha256:e8e17f520d0c5ef4cd9fd37b050fc38436e5580266d460f2b4040cac1815aa80",
+        "stdout": "{\"ready\":true}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 118.980257,
+        "exec_ms": 207.276226,
+        "workload_ms": 109.570628,
+        "cleanup_ms": 64.272396,
+        "total_ms": 419.456744,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  },
+  {
+    "backend": "docker",
+    "experiment": "cleanup",
+    "expected": "Timed-out parent and child are terminated, owned container disappears, and a fresh sandbox has no old /tmp marker.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-441fc68fc92b04443fb6f3d29291b9b2",
+        "image_id": "sha256:e8e17f520d0c5ef4cd9fd37b050fc38436e5580266d460f2b4040cac1815aa80",
+        "stdout": "{\"child_pid\":10,\"marker_written\":true}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 137,
+        "timed_out": true,
+        "cancelled": false,
+        "create_ms": 102.253727,
+        "exec_ms": 2006.226433,
+        "workload_ms": 2015.089995,
+        "cleanup_ms": 70.814223,
+        "total_ms": 2337.335548,
+        "resources": {
+          "oom_killed": false,
+          "samples": 2,
+          "max_observed_memory_bytes": 1867513,
+          "max_observed_pids": 6,
+          "max_observed_cpu_percent": 0,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-420f9e091c9501c141a4eded144caf7e",
+        "image_id": "sha256:e8e17f520d0c5ef4cd9fd37b050fc38436e5580266d460f2b4040cac1815aa80",
+        "stdout": "{\"fresh_tmp\":true}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 118.059393,
+        "exec_ms": 204.843448,
+        "workload_ms": 112.262583,
+        "cleanup_ms": 66.401032,
+        "total_ms": 420.991122,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  }
+]

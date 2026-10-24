@@ -1,0 +1,25 @@
+{
+  "backend": "docker",
+  "container": "agent-runtime-lab-c1ffb56a0900aa9cd19c0626258850af",
+  "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+  "stdout": "stdout-marker\n",
+  "stderr": "stderr-marker\n",
+  "stdout_dropped_bytes": 0,
+  "stderr_dropped_bytes": 0,
+  "exit_code": 7,
+  "timed_out": false,
+  "cancelled": false,
+  "create_ms": 128.399511,
+  "exec_ms": 242.37131,
+  "workload_ms": 130.145777,
+  "cleanup_ms": 68.753744,
+  "total_ms": 476.173758,
+  "resources": {
+    "oom_killed": false,
+    "samples": 0,
+    "max_observed_memory_bytes": null,
+    "max_observed_pids": null,
+    "max_observed_cpu_percent": null,
+    "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+  }
+}

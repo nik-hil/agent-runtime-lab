@@ -1,0 +1,92 @@
+	agent-runtime-lab/cmd/lab		coverage: 0.0% of statements
+	agent-runtime-lab/cmd/lab-probe		coverage: 0.0% of statements
+	agent-runtime-lab/cmd/lab-summary		coverage: 0.0% of statements
+	agent-runtime-lab/src/experiments		coverage: 0.0% of statements
+=== RUN   TestConfigRejectsUnsafeInputs
+--- PASS: TestConfigRejectsUnsafeInputs (0.00s)
+=== RUN   TestBackendSafetyAndExplicitRuntime
+--- PASS: TestBackendSafetyAndExplicitRuntime (0.00s)
+=== RUN   TestBoundedCaptureDrainsOutput
+--- PASS: TestBoundedCaptureDrainsOutput (0.00s)
+=== RUN   TestResourceSamplesAndUnavailable
+--- PASS: TestResourceSamplesAndUnavailable (0.00s)
+=== RUN   TestNonzeroExitIsCapturedAndSingleUse
+--- PASS: TestNonzeroExitIsCapturedAndSingleUse (0.00s)
+=== RUN   TestDeadlineAndParentCancellationKillWorkload
+=== RUN   TestDeadlineAndParentCancellationKillWorkload/false
+=== RUN   TestDeadlineAndParentCancellationKillWorkload/true
+--- PASS: TestDeadlineAndParentCancellationKillWorkload (0.01s)
+    --- PASS: TestDeadlineAndParentCancellationKillWorkload/false (0.01s)
+    --- PASS: TestDeadlineAndParentCancellationKillWorkload/true (0.00s)
+=== RUN   TestCleanupAfterCreateFailureUsesIndependentContext
+--- PASS: TestCleanupAfterCreateFailureUsesIndependentContext (0.00s)
+=== RUN   TestImageVolumesRejectedBeforeCreate
+--- PASS: TestImageVolumesRejectedBeforeCreate (0.00s)
+=== RUN   TestDestroyRefusesOwnershipMismatch
+--- PASS: TestDestroyRefusesOwnershipMismatch (0.00s)
+=== RUN   TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure
+=== RUN   TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/No_such_object
+=== RUN   TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/error:_no_such_object
+=== RUN   TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/No_such_container
+=== RUN   TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/Cannot_connect_to_the_Docker_daemon
+--- PASS: TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure (0.00s)
+    --- PASS: TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/No_such_object (0.00s)
+    --- PASS: TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/error:_no_such_object (0.00s)
+    --- PASS: TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/No_such_container (0.00s)
+    --- PASS: TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/Cannot_connect_to_the_Docker_daemon (0.00s)
+=== RUN   TestEndpointReadsCurrentAndLegacyDockerMetadata
+--- PASS: TestEndpointReadsCurrentAndLegacyDockerMetadata (0.00s)
+PASS
+coverage: 82.8% of statements
+ok  	agent-runtime-lab/src/sandbox	1.039s	coverage: 82.8% of statements
+=== RUN   TestRuntimeContract
+=== RUN   TestRuntimeContract/docker
+=== RUN   TestRuntimeContract/gvisor
+--- PASS: TestRuntimeContract (0.99s)
+    --- PASS: TestRuntimeContract/docker (0.53s)
+    --- PASS: TestRuntimeContract/gvisor (0.42s)
+=== RUN   TestExperiments
+=== RUN   TestExperiments/docker
+=== RUN   TestExperiments/docker/filesystem
+=== RUN   TestExperiments/docker/network
+=== RUN   TestExperiments/docker/memory
+=== RUN   TestExperiments/docker/processes
+=== RUN   TestExperiments/docker/startup
+=== RUN   TestExperiments/docker/cleanup
+=== RUN   TestExperiments/gvisor
+=== RUN   TestExperiments/gvisor/filesystem
+=== RUN   TestExperiments/gvisor/network
+=== RUN   TestExperiments/gvisor/memory
+=== RUN   TestExperiments/gvisor/processes
+=== RUN   TestExperiments/gvisor/startup
+=== RUN   TestExperiments/gvisor/cleanup
+--- PASS: TestExperiments (29.84s)
+    --- PASS: TestExperiments/docker (14.32s)
+        --- PASS: TestExperiments/docker/filesystem (0.45s)
+        --- PASS: TestExperiments/docker/network (1.66s)
+        --- PASS: TestExperiments/docker/memory (6.98s)
+        --- PASS: TestExperiments/docker/processes (1.89s)
+        --- PASS: TestExperiments/docker/startup (0.47s)
+        --- PASS: TestExperiments/docker/cleanup (2.86s)
+    --- PASS: TestExperiments/gvisor (15.47s)
+        --- PASS: TestExperiments/gvisor/filesystem (0.48s)
+        --- PASS: TestExperiments/gvisor/network (1.72s)
+        --- PASS: TestExperiments/gvisor/memory (7.32s)
+        --- PASS: TestExperiments/gvisor/processes (2.31s)
+        --- PASS: TestExperiments/gvisor/startup (0.61s)
+        --- PASS: TestExperiments/gvisor/cleanup (3.02s)
+=== RUN   TestCancellationAndOutputBound
+=== RUN   TestCancellationAndOutputBound/docker
+=== RUN   TestCancellationAndOutputBound/gvisor
+--- PASS: TestCancellationAndOutputBound (5.76s)
+    --- PASS: TestCancellationAndOutputBound/docker (2.81s)
+    --- PASS: TestCancellationAndOutputBound/gvisor (2.89s)
+=== RUN   TestLifecycle
+=== RUN   TestLifecycle/docker
+=== RUN   TestLifecycle/gvisor
+--- PASS: TestLifecycle (1.21s)
+    --- PASS: TestLifecycle/docker (0.55s)
+    --- PASS: TestLifecycle/gvisor (0.61s)
+PASS
+coverage: [no statements]
+ok  	agent-runtime-lab/tests	38.837s	coverage: [no statements]

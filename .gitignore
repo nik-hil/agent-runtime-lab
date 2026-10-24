@@ -1,0 +1,5 @@
+.tools/
+bin/
+images/probe/lab-probe
+results/*
+!results/.gitkeep

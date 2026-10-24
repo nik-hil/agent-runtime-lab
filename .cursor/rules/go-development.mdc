@@ -1,0 +1,15 @@
+---
+description: Go development rules for this project and its subdirectories
+alwaysApply: true
+---
+
+# Go Development Rules
+
+- Write application code directly in `.go` files using simple, idiomatic Go.
+- Edit source with direct file-editing tools and normal patches. Never use Python, JavaScript, shell scripts, or other languages to generate, modify, or write Go source. Never embed Go source in wrapper scripts.
+- If actual code generation is necessary, explain why before using it.
+- Run `gofmt` on every modified Go file. Run `go test ./...` and `go vet ./...` when appropriate, directly in the terminal.
+- Do not request approval for routine edits, formatting, or tests when current permissions permit them. Briefly explain any additional permissions that are required.
+- Show meaningful changes as readable diffs in fenced `diff` code blocks.
+- Keep work scoped to the requested project. Preserve the existing workspace `AGENTS.md`.
+- Use Go for the runner, probes, experiments, and tests. Shell tooling may invoke existing Go commands; it must not contain or generate Go source.
