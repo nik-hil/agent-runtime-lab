@@ -16,6 +16,8 @@ Workloads use UID/GID 65532, drop all capabilities, prohibit gaining privileges,
 
 RAM defaults to 128 MiB; equal memory and memory-swap caps disable additional swap. CPU quota is one CPU. Host task and per-user process limits default to 64, file descriptors to 256 and core size to zero. RLIMIT_NPROC is included because host PID accounting does not necessarily count gVisor virtual processes identically. With runc it counts tasks for the host UID, potentially across containers sharing UID 65532; run sequentially on a dedicated host. Limits depend on kernel/cgroup/runtime support and do not form a complete denial-of-service defense. See [Docker resource controls](https://docs.docker.com/engine/containers/resource_constraints/).
 
+`Config.PidsLimit` controls only cgroup pids. `Config.NprocLimit` independently controls RLIMIT_NPROC; zero follows PidsLimit to preserve existing callers and the CLI's previous `--pids` behavior. Both limits remain bounded to 512. The process experiment now changes one control at a time at a fixed 512 MiB, and separates successful Start calls, initialized children and workload-visible threads.
+
 ## Isolation guarantees and limitations
 
 | Runtime | Isolation mechanism | Practical limits |
@@ -32,6 +34,8 @@ Network `none` removes external interfaces while retaining loopback ([Docker doc
 Each stream retains at most 1 MiB and drains excess bytes while recording the dropped count. Docker logging is disabled to avoid unbounded daemon log files. Metadata is bounded separately. Results include streams, nullable exit code, timeout/cancellation flags and create/attach/cleanup/total durations.
 
 Daemon StartedAt/FinishedAt timestamps provide optional workload duration. A concurrent Docker stats CLI supplies optional memory, host-PID and CPU-percentage samples. Null indicates unavailable data, especially for short jobs; an observed maximum is not a true peak, CPU percentage is not accumulated CPU time, and runtime memory includes differing overhead. Docker can emit zeros around process exit; those do not establish zero workload consumption. OOMKilled is Docker's reported state, not independently inferred. Unavailable measurements are never replaced with zero.
+
+The process experiment additionally opts into read-only host cgroup v2 sampling. It verifies a local Unix endpoint and ties the inspected native PID's cgroup path to the owned container ID before reading that subtree. Native task entries and cgroup counts are labeled as host accounting; gVisor's workload-visible `/proc` and limits are separate. Read failures and unsupported cgroup v1/remote setups are recorded rather than guessed. Sampling is capped at 256 records (with an explicit dropped count and latest sample retained); fields within a sample are sequential reads, not an atomic snapshot. Child diagnostics retain 2 KiB stdout and 16 KiB stderr per child with explicit dropped-byte counters. Original output, timeout and teardown protections remain in effect.
 
 The startup experiment uses a static no-op probe. Benchmarks alternate runtime order, retain excluded warmups and raw samples, pin each run to its image ID and report nearest-rank percentiles. Attach time includes OCI startup, probe execution and attachment; total also includes metadata, sampler shutdown and cleanup. Sampling adds observer overhead. These support local pipeline comparisons, not claims about pure runtime startup or application throughput.
 

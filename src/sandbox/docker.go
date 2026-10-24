@@ -88,7 +88,7 @@ func (c *container) createArgs(cfg Config) []string {
 		"--memory", strconv.FormatInt(cfg.MemoryBytes, 10),
 		"--memory-swap", strconv.FormatInt(cfg.MemoryBytes, 10),
 		"--pids-limit", strconv.Itoa(cfg.PidsLimit), "--cpus", "1",
-		"--ulimit", "nofile=256:256", "--ulimit", "core=0:0", "--ulimit", fmt.Sprintf("nproc=%d:%d", cfg.PidsLimit, cfg.PidsLimit),
+		"--ulimit", "nofile=256:256", "--ulimit", "core=0:0", "--ulimit", fmt.Sprintf("nproc=%d:%d", cfg.EffectiveNprocLimit(), cfg.EffectiveNprocLimit()),
 		"--shm-size", "1m", "--ipc", "private", "--cgroupns", "private",
 		"--restart=no", "--log-driver=none", "--workdir", "/tmp",
 		"--env", "HOME=/tmp", "--env", "GOMAXPROCS=1",
@@ -133,7 +133,9 @@ func (c *container) Create(ctx context.Context, cfg Config) error {
 }
 
 type inspection struct {
+	ID    string
 	State struct {
+		Pid        int
 		Status     string
 		Running    bool
 		ExitCode   int
@@ -206,6 +208,14 @@ func (c *container) Exec(ctx context.Context) (Result, error) {
 		defer close(statsDone)
 		_ = c.run(statsCtx, &stats, io.Discard, "stats", "--no-trunc", "--format", "{{json .}}", c.name)
 	}()
+	var accounting *HostProcessAccounting
+	accountingDone := make(chan struct{})
+	go func() {
+		defer close(accountingDone)
+		if cfg.CollectProcessAccounting {
+			accounting = c.collectProcessAccounting(statsCtx)
+		}
+	}()
 	start := time.Now()
 	runErr := c.run(runCtx, &stdout, &stderr, "start", "--attach", c.name)
 	result.ExecMS = milliseconds(time.Since(start))
@@ -213,9 +223,11 @@ func (c *container) Exec(ctx context.Context) (Result, error) {
 	result.Cancelled = ctx.Err() != nil
 	stopStats()
 	<-statsDone
+	<-accountingDone
 	result.Stdout, result.Stderr = stdout.String(), stderr.String()
 	result.StdoutDropped, result.StderrDropped = stdout.dropped, stderr.dropped
 	result.Resources = parseStats(stats.Bytes())
+	result.Resources.HostProcessAccounting = accounting
 	// Killing a Docker CLI does not kill its workload. Explicitly kill the container.
 	if runCtx.Err() != nil {
 		killCtx, killCancel := context.WithTimeout(context.Background(), 5*time.Second)

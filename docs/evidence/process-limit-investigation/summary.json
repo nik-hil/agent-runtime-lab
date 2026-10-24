@@ -1,0 +1,201 @@
+[
+  {
+    "backend": "docker",
+    "case": "control",
+    "cgroup_pids_limit": 256,
+    "rlimit_nproc": 256,
+    "memory_bytes": 536870912,
+    "attempt_bound": 24,
+    "attempts": 24,
+    "successful_starts": 24,
+    "ready_children": 24,
+    "failure": "",
+    "parent_failure_errno": null,
+    "child_startup_failures": [],
+    "workload_threads_max_observed": 78,
+    "effective_nproc": {
+      "soft": "256",
+      "hard": "256"
+    },
+    "host_sample_count": 31,
+    "host_pids_current_max_observed": 78,
+    "host_os_threads_max_observed": 78,
+    "host_cgroup_threads_max_observed": 78,
+    "host_events_max_observed": {
+      "min": 0,
+      "max": 0
+    },
+    "host_accounting_errors": [],
+    "dropped_host_samples": 0,
+    "oom_killed": false,
+    "stdout_dropped_bytes": 0,
+    "child_diagnostic_dropped_bytes": 0
+  },
+  {
+    "backend": "docker",
+    "case": "cgroup-restricted",
+    "cgroup_pids_limit": 64,
+    "rlimit_nproc": 256,
+    "memory_bytes": 536870912,
+    "attempt_bound": 24,
+    "attempts": 22,
+    "successful_starts": 21,
+    "ready_children": 20,
+    "failure": "fork/exec /lab-probe: resource temporarily unavailable",
+    "parent_failure_errno": 11,
+    "child_startup_failures": [
+      {
+        "attempt": 21,
+        "exit_code": 2,
+        "diagnostic": "runtime: failed to create new OS thread (have 2 already; errno=11)",
+        "stderr_dropped_bytes": 0
+      }
+    ],
+    "workload_threads_max_observed": 64,
+    "effective_nproc": {
+      "soft": "256",
+      "hard": "256"
+    },
+    "host_sample_count": 30,
+    "host_pids_current_max_observed": 64,
+    "host_os_threads_max_observed": 64,
+    "host_cgroup_threads_max_observed": 64,
+    "host_events_max_observed": {
+      "min": 0,
+      "max": 21
+    },
+    "host_accounting_errors": [],
+    "dropped_host_samples": 0,
+    "oom_killed": false,
+    "stdout_dropped_bytes": 0,
+    "child_diagnostic_dropped_bytes": 0
+  },
+  {
+    "backend": "docker",
+    "case": "rlimit-restricted",
+    "cgroup_pids_limit": 256,
+    "rlimit_nproc": 64,
+    "memory_bytes": 536870912,
+    "attempt_bound": 24,
+    "attempts": 21,
+    "successful_starts": 20,
+    "ready_children": 20,
+    "failure": "fork/exec /lab-probe: resource temporarily unavailable",
+    "parent_failure_errno": 11,
+    "child_startup_failures": [],
+    "workload_threads_max_observed": 64,
+    "effective_nproc": {
+      "soft": "64",
+      "hard": "64"
+    },
+    "host_sample_count": 29,
+    "host_pids_current_max_observed": 64,
+    "host_os_threads_max_observed": 64,
+    "host_cgroup_threads_max_observed": 64,
+    "host_events_max_observed": {
+      "min": 0,
+      "max": 0
+    },
+    "host_accounting_errors": [],
+    "dropped_host_samples": 0,
+    "oom_killed": false,
+    "stdout_dropped_bytes": 0,
+    "child_diagnostic_dropped_bytes": 0
+  },
+  {
+    "backend": "gvisor",
+    "case": "control",
+    "cgroup_pids_limit": 256,
+    "rlimit_nproc": 256,
+    "memory_bytes": 536870912,
+    "attempt_bound": 24,
+    "attempts": 24,
+    "successful_starts": 24,
+    "ready_children": 24,
+    "failure": "",
+    "parent_failure_errno": null,
+    "child_startup_failures": [],
+    "workload_threads_max_observed": 76,
+    "effective_nproc": {
+      "soft": "256",
+      "hard": "256"
+    },
+    "host_sample_count": 34,
+    "host_pids_current_max_observed": 99,
+    "host_os_threads_max_observed": 99,
+    "host_cgroup_threads_max_observed": 99,
+    "host_events_max_observed": {
+      "min": 0,
+      "max": 0
+    },
+    "host_accounting_errors": [],
+    "dropped_host_samples": 0,
+    "oom_killed": false,
+    "stdout_dropped_bytes": 0,
+    "child_diagnostic_dropped_bytes": 0
+  },
+  {
+    "backend": "gvisor",
+    "case": "cgroup-restricted",
+    "cgroup_pids_limit": 64,
+    "rlimit_nproc": 256,
+    "memory_bytes": 536870912,
+    "attempt_bound": 24,
+    "attempts": 13,
+    "successful_starts": 12,
+    "ready_children": 12,
+    "failure": "fork/exec /lab-probe: cannot allocate memory",
+    "parent_failure_errno": 12,
+    "child_startup_failures": [],
+    "workload_threads_max_observed": 40,
+    "effective_nproc": {
+      "soft": "256",
+      "hard": "256"
+    },
+    "host_sample_count": 26,
+    "host_pids_current_max_observed": 64,
+    "host_os_threads_max_observed": 64,
+    "host_cgroup_threads_max_observed": 64,
+    "host_events_max_observed": {
+      "min": 0,
+      "max": 1
+    },
+    "host_accounting_errors": [],
+    "dropped_host_samples": 0,
+    "oom_killed": false,
+    "stdout_dropped_bytes": 0,
+    "child_diagnostic_dropped_bytes": 0
+  },
+  {
+    "backend": "gvisor",
+    "case": "rlimit-restricted",
+    "cgroup_pids_limit": 256,
+    "rlimit_nproc": 64,
+    "memory_bytes": 536870912,
+    "attempt_bound": 24,
+    "attempts": 21,
+    "successful_starts": 20,
+    "ready_children": 20,
+    "failure": "fork/exec /lab-probe: resource temporarily unavailable",
+    "parent_failure_errno": 11,
+    "child_startup_failures": [],
+    "workload_threads_max_observed": 64,
+    "effective_nproc": {
+      "soft": "64",
+      "hard": "64"
+    },
+    "host_sample_count": 33,
+    "host_pids_current_max_observed": 87,
+    "host_os_threads_max_observed": 87,
+    "host_cgroup_threads_max_observed": 87,
+    "host_events_max_observed": {
+      "min": 0,
+      "max": 0
+    },
+    "host_accounting_errors": [],
+    "dropped_host_samples": 0,
+    "oom_killed": false,
+    "stdout_dropped_bytes": 0,
+    "child_diagnostic_dropped_bytes": 0
+  }
+]

@@ -11,8 +11,9 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
+
+	"agent-runtime-lab/src/processinfo"
 )
 
 func emit(value any)  { _ = json.NewEncoder(os.Stdout).Encode(value) }
@@ -126,40 +127,13 @@ func main() {
 		runtime.KeepAlive(blocks)
 		emit(map[string]bool{"unexpected_allocation_success": true})
 	case "processes":
-		if len(os.Args) != 4 || (os.Args[3] != "allow" && os.Args[3] != "reject") {
-			fatal(errors.New("processes requires count and allow|reject"))
+		if err := runProcesses(os.Args[2:]); err != nil {
+			fatal(err)
 		}
-		bound, err := strconv.Atoi(os.Args[2])
-		if err != nil || bound < 1 || bound > 96 {
-			fatal(errors.New("process count must be 1..96"))
-		}
-		children := make([]*exec.Cmd, 0, bound)
-		defer func() {
-			for _, child := range children {
-				_ = child.Process.Kill()
-			}
-			for _, child := range children {
-				_ = child.Wait()
-			}
-		}()
-		rejected := false
-		diagnostic := ""
-		for i := 0; i < bound; i++ {
-			child := exec.Command("/lab-probe", "sleep")
-			child.Env = os.Environ()
-			child.Stdout, child.Stderr = nil, nil
-			if err := child.Start(); err != nil {
-				rejected = errors.Is(err, syscall.EAGAIN) || errors.Is(err, syscall.ENOMEM)
-				diagnostic = err.Error()
-				break
-			}
-			children = append(children, child)
-			time.Sleep(20 * time.Millisecond)
-		}
-		emit(map[string]any{"spawned": len(children), "attempt_bound": bound, "creation_rejected": rejected, "error": diagnostic, "limit_unit": "host tasks, including threads"})
-		if rejected != (os.Args[3] == "reject") {
-			os.Exit(1)
-		}
+	case "process-child":
+		p, err := processinfo.ReadProcess("/proc", os.Getpid())
+		emit(map[string]any{"ready": true, "process": p, "accounting_error": fmt.Sprint(err)})
+		time.Sleep(30 * time.Second)
 	case "sleep":
 		time.Sleep(30 * time.Second)
 	case "tree":

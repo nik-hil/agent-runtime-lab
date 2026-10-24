@@ -45,6 +45,8 @@ docker ps -a --filter label=agent-runtime-lab.managed=true
 
 The image uses FROM scratch, local source and disabled build networking. Its only copied file is the static probe. results/image.json and results/probe.sha256 identify the build. Caches and local artifacts stay under this project apart from automatically removed host canaries and labeled Docker resources. Scripts are Bash commands for the host; they contain no embedded Go source.
 
+Set `LAB_RESULTS=results/process-limit-investigation` when invoking build/test scripts to retain investigation artifacts separately from the original milestone. The process experiment samples host accounting without mounting any host files into containers; unsupported or inaccessible host readings are reported explicitly. The reproduction commands and archived measurements are in [process-limit-investigation.md](process-limit-investigation.md).
+
 ## Cleanup
 
 Stop lab commands first, then inspect and remove only lab resources:

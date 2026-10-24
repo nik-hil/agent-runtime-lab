@@ -27,11 +27,13 @@ Expected: control exits zero; restricted run exits nonzero with Docker's OOMKill
 
 ## 4. Process limits
 
-At a fixed 512 MiB RAM, first create 24 source-built children with both process limits set to 256. Repeat with pids-limit=64 and RLIMIT_NPROC=64. Detect EAGAIN or ENOMEM, record the successful spawn count and exact diagnostic, then kill and reap children. CPU, memory and timeout remain bounded; this is not an unbounded fork bomb.
+At a fixed 512 MiB RAM, run three cases with at most 24 child-launch attempts each: control (cgroup PID limit 256 / RLIMIT_NPROC 256), cgroup-restricted (64/256), and RLIMIT-restricted (256/64). Keep one CPU, no networking and a 12-second deadline. Stop at the first launch error; kill and reap every successfully launched child.
 
-Expected: the control starts all 24 children; the restricted run refuses creation before that bound. ENOMEM alone cannot establish a process limit, so the equal-memory positive control is mandatory. The count need not be 64: Go children create threads, runc accounts host tasks, and gVisor models virtual processes differently. Both process controls apply, so refusal cannot be attributed to one alone. See the shared-UID caveat in [architecture](architecture.md).
+Expected: the control starts all 24 children. Restricted cases are educational observations: validate bounded, complete reports without assuming every runtime must refuse at a particular count. A passed investigation means the control and observation checks passed, not that a particular causal explanation was proved. Legacy probe modes `allow` and `reject` remain available alongside `observe`.
 
-The recorded count is successful process-start calls, not a measurement of concurrently live children. A child may itself fail during Go runtime thread initialization. The experiment checks bounded creation refusal and does not claim an exact concurrent-process ceiling.
+Record exact parent launch errors/errno and bounded child stdout/stderr, readiness markers, exit status, and diagnostic truncation counts. The launch count is successful process-start calls, not initialized or concurrently live children: Go runtime thread initialization can fail after Start succeeds. Child exits are collected after cleanup; a readiness marker establishes initialization, not survival until teardown.
+
+Collect workload-visible process/task snapshots and effective NPROC from `/proc/self/limits`. Separately sample host cgroup v2 `pids.current`, `pids.max`, `pids.events` and native `/proc/<pid>/task` counts about every 50 ms while the container is alive. The trusted host runner reads these files; no host proc/cgroup mount is exposed to workloads. Host collection is optional and requires a local Unix Docker endpoint with a verifiable container-ID cgroup path. Unavailable readings retain nulls and diagnostics. See [the investigation report](process-limit-investigation.md) and the shared-UID caveat in [architecture](architecture.md).
 
 ## 5. Startup latency
 

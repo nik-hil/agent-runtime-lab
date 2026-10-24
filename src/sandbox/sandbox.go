@@ -20,7 +20,10 @@ type Config struct {
 	Timeout     time.Duration
 	MemoryBytes int64
 	PidsLimit   int
-	Network     NetworkPolicy
+	// NprocLimit zero preserves the previous behavior: follow PidsLimit.
+	NprocLimit               int
+	CollectProcessAccounting bool
+	Network                  NetworkPolicy
 }
 
 func DefaultConfig() Config {
@@ -44,10 +47,20 @@ func (c Config) Validate() error {
 	if c.PidsLimit < 1 || c.PidsLimit > 512 {
 		return errors.New("pids limit must be between 1 and 512")
 	}
+	if c.NprocLimit < 0 || c.NprocLimit > 512 {
+		return errors.New("nproc limit must be zero (follow pids) or between 1 and 512")
+	}
 	if c.Network != NetworkNone && c.Network != NetworkBridge {
 		return errors.New("network must be none or bridge")
 	}
 	return nil
+}
+
+func (c Config) EffectiveNprocLimit() int {
+	if c.NprocLimit == 0 {
+		return c.PidsLimit
+	}
+	return c.NprocLimit
 }
 
 // Sandbox is a single-use lifecycle: Create, Exec, Destroy. Destroy is idempotent.
@@ -59,12 +72,13 @@ type Sandbox interface {
 }
 
 type Resources struct {
-	OOMKilled              *bool    `json:"oom_killed"`
-	Samples                int      `json:"samples"`
-	MaxObservedMemoryBytes *uint64  `json:"max_observed_memory_bytes"`
-	MaxObservedPIDs        *uint64  `json:"max_observed_pids"`
-	MaxObservedCPUPercent  *float64 `json:"max_observed_cpu_percent"`
-	Note                   string   `json:"note"`
+	OOMKilled              *bool                  `json:"oom_killed"`
+	Samples                int                    `json:"samples"`
+	MaxObservedMemoryBytes *uint64                `json:"max_observed_memory_bytes"`
+	MaxObservedPIDs        *uint64                `json:"max_observed_pids"`
+	MaxObservedCPUPercent  *float64               `json:"max_observed_cpu_percent"`
+	Note                   string                 `json:"note"`
+	HostProcessAccounting  *HostProcessAccounting `json:"host_process_accounting,omitempty"`
 }
 
 type Result struct {

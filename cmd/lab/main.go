@@ -33,7 +33,9 @@ func run(ctx context.Context, args []string) error {
 	image := flags.String("image", "agent-runtime-lab:local", "trusted local image; resolved to immutable ID")
 	timeout := flags.Duration("timeout", 5*time.Second, "start and execution deadline (at most 10m)")
 	memory := flags.Int64("memory-mib", 128, "memory cap in MiB, swap disabled")
-	pids := flags.Int("pids", 64, "host tasks and per-user process limit")
+	pids := flags.Int("pids", 64, "cgroup host-task limit")
+	nproc := flags.Int("nproc", 0, "RLIMIT_NPROC; zero follows --pids for compatibility")
+	processAccounting := flags.Bool("process-accounting", false, "sample local host cgroup and OS threads (read-only)")
 	network := flags.String("network", "none", "none or bridge (explicit egress opt-in)")
 	output := flags.String("output", "", "JSON output file; defaults to stdout")
 	n := flags.Int("n", 20, "measured benchmark iterations per backend")
@@ -50,6 +52,8 @@ func run(ctx context.Context, args []string) error {
 	cfg.Timeout = *timeout
 	cfg.MemoryBytes = *memory << 20
 	cfg.PidsLimit = *pids
+	cfg.NprocLimit = *nproc
+	cfg.CollectProcessAccounting = *processAccounting
 	cfg.Network = sandbox.NetworkPolicy(*network)
 	emit := func(value any) error {
 		if *output != "" {

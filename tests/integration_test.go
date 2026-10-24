@@ -71,6 +71,9 @@ func TestExperiments(t *testing.T) {
 					if ob.Status != "passed" {
 						t.Errorf("%s: %s; runs=%+v", ob.Status, ob.Details, ob.Runs)
 					}
+					if name == "processes" {
+						checkProcessInvestigation(t, ob)
+					}
 				})
 			}
 			if directory := os.Getenv("LAB_RESULTS"); directory != "" {

@@ -22,11 +22,15 @@ The build compiles a static Go probe into a local `FROM scratch` image with no i
 ```sh
 ./bin/lab run --backend docker --timeout 3s --memory-mib 64 --network none -- /lab-probe echo 7
 ./bin/lab run --backend gvisor --timeout 3s --memory-mib 64 --pids 64 -- /lab-probe noop
+# Set the two process controls independently and collect host accounting:
+./bin/lab run --backend gvisor --timeout 12s --memory-mib 512 --pids 64 --nproc 256 --process-accounting -- /lab-probe processes 24 observe
 ```
 
 The command is an argument vector, with no implicit shell. The scratch image contains only `/lab-probe`; select a trusted local image with `--image` for other executables. Tags resolve to immutable local image IDs before creation; no automatic pulls occur. Images declaring volumes are rejected.
 
 JSON includes separate stdout/stderr, dropped-output counts, nullable workload exit code, deadline/cancellation flags, lifecycle timings, Docker OOM state and optional sampled usage. A workload's nonzero exit is reported in JSON; the CLI returns nonzero for infrastructure errors. Experiments and benchmarks return nonzero when expectations or workloads fail.
+
+`--pids` sets the host cgroup task limit. `--nproc` independently sets soft/hard RLIMIT_NPROC; its default of zero follows `--pids` for compatibility. `--process-accounting` enables read-only local host cgroup v2 and OS-thread sampling. Workload-visible `/proc` data is labeled separately because runsc virtualizes it. See the [process-limit investigation](docs/process-limit-investigation.md) for the three controlled cases and measured results.
 
 ## Layout and safety
 

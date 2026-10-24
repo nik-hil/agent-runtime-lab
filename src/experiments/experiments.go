@@ -11,18 +11,29 @@ import (
 	"strings"
 	"time"
 
+	"agent-runtime-lab/src/processinfo"
 	"agent-runtime-lab/src/sandbox"
 )
 
 var Names = []string{"filesystem", "network", "memory", "processes", "startup", "cleanup"}
 
 type Observation struct {
-	Backend    string           `json:"backend"`
-	Experiment string           `json:"experiment"`
-	Expected   string           `json:"expected"`
-	Status     string           `json:"status"`
-	Details    string           `json:"details"`
-	Runs       []sandbox.Result `json:"runs"`
+	Backend      string           `json:"backend"`
+	Experiment   string           `json:"experiment"`
+	Expected     string           `json:"expected"`
+	Status       string           `json:"status"`
+	Details      string           `json:"details"`
+	Runs         []sandbox.Result `json:"runs"`
+	ProcessCases []ProcessCase    `json:"process_cases,omitempty"`
+}
+
+type ProcessCase struct {
+	Name            string `json:"name"`
+	CgroupPidsLimit int    `json:"cgroup_pids_limit"`
+	RlimitNproc     int    `json:"rlimit_nproc"`
+	MemoryBytes     int64  `json:"memory_bytes"`
+	AttemptBound    int    `json:"attempt_bound"`
+	RunIndex        int    `json:"run_index"`
 }
 
 func Run(ctx context.Context, backend, image, name string) (ob Observation) {
@@ -138,20 +149,33 @@ func Run(ctx context.Context, backend, image, name string) (ob Observation) {
 		explicitOOM := strings.Contains(strings.ToLower(limited.Stderr), "out of memory")
 		pass = success(control) && limited.ExitCode != nil && *limited.ExitCode != 0 && !limited.TimedOut && (oom || explicitOOM)
 	case "processes":
-		ob.Expected = "At equal 512 MiB RAM, 24 children are allowed with process limit 256; limit 64 refuses creation with EAGAIN or ENOMEM."
-		cfg.Command = []string{"/lab-probe", "processes", "24", "allow"}
+		ob.Expected = "At 512 MiB, control 256/256 starts 24 children; independently investigate 64/256 and 256/64 without assuming refusal or its cause."
+		cfg.Command = []string{"/lab-probe", "processes", "24", "observe"}
 		cfg.Timeout = 12 * time.Second
 		cfg.MemoryBytes = 512 << 20
-		cfg.PidsLimit = 256
-		var control, limited sandbox.Result
-		control, err = run(cfg)
-		if err != nil {
-			break
+		cfg.CollectProcessAccounting = true
+		pass = true
+		for _, test := range []struct {
+			name        string
+			pids, nproc int
+		}{{"control", 256, 256}, {"cgroup-restricted", 64, 256}, {"rlimit-restricted", 256, 64}} {
+			cfg.PidsLimit, cfg.NprocLimit = test.pids, test.nproc
+			ob.ProcessCases = append(ob.ProcessCases, ProcessCase{Name: test.name, CgroupPidsLimit: test.pids, RlimitNproc: test.nproc, MemoryBytes: cfg.MemoryBytes, AttemptBound: 24, RunIndex: len(ob.Runs)})
+			result, runErr := run(cfg)
+			err = errors.Join(err, runErr)
+			var probe processinfo.LaunchReport
+			parseErr := json.Unmarshal([]byte(result.Stdout), &probe)
+			if parseErr != nil {
+				err = errors.Join(err, fmt.Errorf("%s probe JSON: %w", test.name, parseErr))
+				pass = false
+				continue
+			}
+			valid := success(result) && probe.AttemptBound == 24 && probe.Attempts <= 24 && probe.Attempts == len(probe.Launches) && probe.Spawned <= probe.Attempts && len(probe.Samples) > 0 && result.StdoutDropped == 0
+			if test.name == "control" {
+				valid = valid && probe.Spawned == 24 && !probe.CreationRejected
+			}
+			pass = pass && valid
 		}
-		cfg.PidsLimit = 64
-		cfg.Command[3] = "reject"
-		limited, err = run(cfg)
-		pass = success(control) && success(limited) && strings.Contains(limited.Stdout, "\"creation_rejected\":true")
 	case "startup":
 		ob.Expected = "Source-built no-op exits 0; record create, attach-to-exit, workload, cleanup, and total wall times without a speed threshold."
 		cfg.Command = []string{"/lab-probe", "noop"}
