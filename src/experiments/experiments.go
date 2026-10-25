@@ -1,4 +1,4 @@
-// Package experiments contains the six reproducible milestone experiments.
+// Package experiments contains the reproducible sandbox learning experiments.
 package experiments
 
 import (
@@ -15,16 +15,17 @@ import (
 	"agent-runtime-lab/src/sandbox"
 )
 
-var Names = []string{"filesystem", "network", "memory", "processes", "startup", "cleanup"}
+var Names = []string{"filesystem", "network", "memory", "processes", "startup", "cleanup", "task-success", "task-partial", "task-retry"}
 
 type Observation struct {
-	Backend      string           `json:"backend"`
-	Experiment   string           `json:"experiment"`
-	Expected     string           `json:"expected"`
-	Status       string           `json:"status"`
-	Details      string           `json:"details"`
-	Runs         []sandbox.Result `json:"runs"`
-	ProcessCases []ProcessCase    `json:"process_cases,omitempty"`
+	Backend      string             `json:"backend"`
+	Experiment   string             `json:"experiment"`
+	Expected     string             `json:"expected"`
+	Status       string             `json:"status"`
+	Details      string             `json:"details"`
+	Runs         []sandbox.Result   `json:"runs"`
+	ProcessCases []ProcessCase      `json:"process_cases,omitempty"`
+	Task         *TaskInvestigation `json:"task,omitempty"`
 }
 
 type ProcessCase struct {
@@ -37,6 +38,9 @@ type ProcessCase struct {
 }
 
 func Run(ctx context.Context, backend, image, name string) (ob Observation) {
+	if name == "task-success" || name == "task-partial" || name == "task-retry" {
+		return runTaskExperiment(ctx, backend, image, name)
+	}
 	ob = Observation{Backend: backend, Experiment: name, Status: "failed"}
 	cfg := sandbox.DefaultConfig()
 	cfg.Image = image

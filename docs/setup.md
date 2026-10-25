@@ -47,6 +47,8 @@ The image uses FROM scratch, local source and disabled build networking. Its onl
 
 Set `LAB_RESULTS=results/process-limit-investigation` when invoking build/test scripts to retain investigation artifacts separately from the original milestone. The process experiment samples host accounting without mounting any host files into containers; unsupported or inaccessible host readings are reported explicitly. The reproduction commands and archived measurements are in [process-limit-investigation.md](process-limit-investigation.md).
 
+For Milestone 1B use `LAB_RESULTS="$PWD/results/task-completion"` with the build/test scripts. Run `task-success`, `task-partial` or `task-retry` through `lab experiments`; [the task investigation](task-completion-investigation.md) contains individual commands and explains what to inspect. The receiver uses only a dedicated internal Docker network and a Docker-managed volume; it publishes no port and calls no third-party API. Normal experiment completion removes both resources after exporting evidence.
+
 ## Cleanup
 
 Stop lab commands first, then inspect and remove only lab resources:
@@ -57,7 +59,7 @@ docker ps -a --filter label=agent-runtime-lab.managed=true
 docker ps -a --filter label=agent-runtime-lab.managed=true
 ```
 
-Omit --image to retain images. With --image, cleanup removes the labeled current image and prunes only dangling images carrying the lab label from earlier builds. It does not prune unrelated containers, images, volumes, networks or shared builder caches, and does not stop Docker. Ordinary build-cache entries may remain.
+Omit --image to retain images. Cleanup removes only lab-labeled containers, then their dedicated networks and volumes. This intentionally deletes the test receiver ledger; save evidence first. With --image, cleanup also removes the labeled current image and prunes only dangling images carrying the lab label from earlier builds. It does not prune unrelated resources or shared builder caches, and does not stop Docker. Ordinary build-cache entries may remain.
 
 After preserving evidence, remove generated files from the project root if desired:
 

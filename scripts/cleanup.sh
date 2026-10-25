@@ -12,6 +12,17 @@ if [[ -n "$owned" ]]; then
   mapfile -t ids <<< "$owned"
   docker rm --force --volumes "${ids[@]}"
 fi
+# The task receiver uses only dedicated, labeled internal networks and volumes.
+owned_networks="$(docker network ls -q --filter label=agent-runtime-lab.managed=true)"
+if [[ -n "$owned_networks" ]]; then
+  mapfile -t ids <<< "$owned_networks"
+  docker network rm "${ids[@]}"
+fi
+owned_volumes="$(docker volume ls -q --filter label=agent-runtime-lab.managed=true)"
+if [[ -n "$owned_volumes" ]]; then
+  mapfile -t ids <<< "$owned_volumes"
+  docker volume rm "${ids[@]}"
+fi
 if [[ "${1:-}" == "--image" ]]; then
   current="$(docker image ls --quiet --filter reference=agent-runtime-lab:local)"
   if [[ -n "$current" ]]; then

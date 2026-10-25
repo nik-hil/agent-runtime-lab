@@ -1,6 +1,6 @@
 # agent-runtime-lab
 
-An educational Go sandbox runner comparing Docker with explicit `runc` and gVisor with explicit `runsc`. Both use the same Docker lifecycle, image, workload and security settings. This milestone contains no server API, orchestration platform, AI agent or additional runtime.
+An educational Go sandbox runner comparing Docker with explicit `runc` and gVisor with explicit `runsc`. Both use the same Docker lifecycle, image, workload and security settings. A small private test receiver demonstrates durable commits and safe retries; no real external business operations, orchestration platforms, AI agents or additional runtimes are included.
 
 ## Setup
 
@@ -35,7 +35,8 @@ JSON includes separate stdout/stderr, dropped-output counts, nullable workload e
 ## Layout and safety
 
 - `src/sandbox/`: common interface, lifecycle and runtime adapters.
-- `src/experiments/`: six bounded experiments and assertions.
+- `src/experiments/`: the six original experiments plus three task-completion experiments.
+- `src/tasklab/`: bounded task protocol, filesystem ledger and test-only receiver.
 - `cmd/`: runner, source-built probe and benchmark summary.
 - `tests/`: real-runtime integration tests.
 - `scripts/`, `images/`, `docs/`, `results/`: tooling, probe image, design and raw evidence.
@@ -44,8 +45,19 @@ Defaults: UID/GID 65532, no capabilities, no new privileges, read-only root, 16 
 
 Read [architecture and limitations](docs/architecture.md), [experiment definitions](docs/experiments.md), and the [first milestone report](docs/milestone-1-report.md). Passing probes establish observed behavior, not proof against container escapes. Contributor and Cursor rules live in `AGENTS.md` and `.cursor/rules/`.
 
+## Task completion and recovery (Milestone 1B)
+
+```sh
+mkdir -p results/task-completion
+./bin/lab experiments --backend all --experiment task-success --output results/task-completion/task-success.json
+./bin/lab experiments --backend all --experiment task-partial --output results/task-completion/task-partial.json
+./bin/lab experiments --backend all --experiment task-retry --output results/task-completion/task-retry.json
+```
+
+These distinguish process readiness/exit, independently verified work, and committed side effects. The retry experiment owns an internal Docker network and a dedicated receiver volume; workloads never mount that volume. It verifies recovery after both sandbox destruction and receiver restart. Read the [investigation and reproduction guide](docs/task-completion-investigation.md) for the timeline, assertions, actual observations and limitations.
+
 The initial commit includes the report's recorded milestone evidence under `results/`. Toolchains, caches, compiled binaries and subsequent generated results are ignored. The project includes its own Go rules so contributor instructions work in a standalone clone.
 
 ## Cleanup
 
-Stop lab commands, then run `./scripts/cleanup.sh --image`. It removes lab-labeled containers and the labeled local probe image. Evidence and the local toolchain are retained; see [setup](docs/setup.md) for file cleanup.
+Stop lab commands, then run `./scripts/cleanup.sh --image`. It removes lab-labeled containers, dedicated networks/volumes and the labeled local probe image. Evidence and the local toolchain are retained; see [setup](docs/setup.md) for file cleanup.

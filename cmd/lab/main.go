@@ -36,7 +36,7 @@ func run(ctx context.Context, args []string) error {
 	pids := flags.Int("pids", 64, "cgroup host-task limit")
 	nproc := flags.Int("nproc", 0, "RLIMIT_NPROC; zero follows --pids for compatibility")
 	processAccounting := flags.Bool("process-accounting", false, "sample local host cgroup and OS threads (read-only)")
-	network := flags.String("network", "none", "none or bridge (explicit egress opt-in)")
+	network := flags.String("network", "none", "none or bridge (explicit egress opt-in); task-retry manages its own internal network")
 	output := flags.String("output", "", "JSON output file; defaults to stdout")
 	n := flags.Int("n", 20, "measured benchmark iterations per backend")
 	warmup := flags.Int("warmup", 3, "unmeasured warmups per backend")

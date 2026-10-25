@@ -79,9 +79,13 @@ func (c *container) capture(ctx context.Context, args ...string) ([]byte, error)
 }
 
 func (c *container) createArgs(cfg Config) []string {
+	network := string(cfg.Network)
+	if cfg.Network == NetworkLabInternal {
+		network = cfg.LabNetwork
+	}
 	return append([]string{"create", "--pull=never", "--name", c.name,
 		"--label", "agent-runtime-lab.managed=true", "--label", labelKey + "=" + c.token,
-		"--runtime", c.runtime, "--network", string(cfg.Network),
+		"--runtime", c.runtime, "--network", network,
 		"--user", "65532:65532", "--cap-drop=ALL",
 		"--security-opt", "no-new-privileges=true", "--read-only",
 		"--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777",
@@ -105,6 +109,11 @@ func (c *container) Create(ctx context.Context, cfg Config) error {
 		return errors.New("sandbox is single-use")
 	}
 	c.config = cfg
+	if cfg.Network == NetworkLabInternal {
+		if err := c.validateLabNetwork(ctx, cfg.LabNetwork); err != nil {
+			return err
+		}
+	}
 	// Resolve the local image to immutable ID; never pull or accept image volumes.
 	out, err := c.capture(ctx, "image", "inspect", "--format", "{{json .}}", cfg.Image)
 	if err != nil {

@@ -3,6 +3,7 @@ set -euo pipefail
 source "$(dirname "$0")/env.sh"
 export LAB_RESULTS="${LAB_RESULTS:-$LAB_ROOT/results}"
 mkdir -p "$LAB_RESULTS"
+export LAB_RESULTS="$(cd "$LAB_RESULTS" && pwd)"
 case "${1:-integration}" in
   integration) export LAB_INTEGRATION=1; log="$LAB_RESULTS/integration-tests.log" ;;
   unit) export LAB_INTEGRATION=0; log="$LAB_RESULTS/unit-tests.log" ;;

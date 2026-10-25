@@ -74,6 +74,9 @@ func TestExperiments(t *testing.T) {
 					if name == "processes" {
 						checkProcessInvestigation(t, ob)
 					}
+					if strings.HasPrefix(name, "task-") {
+						checkTaskCompletion(t, ob)
+					}
 				})
 			}
 			if directory := os.Getenv("LAB_RESULTS"); directory != "" {

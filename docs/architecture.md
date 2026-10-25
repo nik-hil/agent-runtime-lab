@@ -41,4 +41,16 @@ The startup experiment uses a static no-op probe. Benchmarks alternate runtime o
 
 ## Deferred work
 
-No Firecracker, Kubernetes, Temporal, HTTP API or AI agent is included. Remote-daemon host assertions, concurrency, per-tenant quotas, persistent sandboxes, sophisticated networking, crash reconciliation and a production security audit are outside this milestone.
+No Firecracker, Kubernetes, Temporal, public service API or AI agent is included. Remote-daemon host assertions, per-tenant quotas, persistent workload sandboxes, sophisticated networking, production crash reconciliation and a security audit are outside this milestone.
+
+## Milestone 1B: task completion and durable effects
+
+The three `task-*` experiments leave `Sandbox`'s interface intact. The probe emits task-ID/attempt-specific readiness and work events. An optional adapter method runs a second source-built artifact reader in the same owned sandbox. A bounded barrier keeps `/tmp` available during observation. For partial failure a small supervisor waits for its child to exit 42, then holds the sandbox open until the reader has observed the file; the child failure is distinct from sandbox teardown.
+
+`src/tasklab` contains only the fixed protocol, an atomic filesystem ledger and a test-only HTTP handler. The trusted receiver runs with runc regardless of the workload backend, so the comparison changes the task runtime. Only the receiver mounts its dedicated, labeled Docker volume at `/ledger`; the static image provides its non-root-owned initial directory. No host paths or sockets are mounted. Workloads communicate over one newly created `--internal` bridge, with no published ports. `NetworkLabInternal` requires explicit configuration and verifies the network name, ownership labels, driver and internal flag before creation. The ordinary default remains `none`.
+
+The receiver is not a public API and has no authentication. Network membership, the host/Docker control plane and source-built verifier are trusted. Internal networking is not a boundary against the Docker host or an operator that can attach containers. The lab does not change host firewall rules. See [Docker's internal network behavior](https://docs.docker.com/reference/cli/docker/network/create/#network-internal-mode---internal).
+
+Each ledger operation acquires `flock` on a stable lock file, validates existing state, checks both task ID and idempotency key, writes a temporary file in the same directory, syncs it, renames it over the ledger and syncs the directory. The verifier takes the same lock. A directory sync is necessary in addition to a file sync to persist the directory entry ([Linux fsync documentation](https://man7.org/linux/man-pages/man2/fsync.2.html)). A receiver restart uses the same volume and a different container. Deterministic exit 43 occurs after persistence and before any acknowledgement. A new task sandbox then retries the same operation; identical input reuses the stored resource ID, while conflicting identity/input is rejected.
+
+The ledger is the simulated side effect itself. It cannot make an unrelated third-party API atomic; that system would need its own idempotency/reconciliation support. The experiment verifies process/container restart recovery, not physical power-loss survival. Cleanup removes workload/receiver containers before their dedicated network and volume, checks exact ownership before deletion and propagates cleanup failures. The final JSON preserves ledger snapshots before intentionally removing the fixture volume.

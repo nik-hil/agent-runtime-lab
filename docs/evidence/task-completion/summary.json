@@ -1,0 +1,860 @@
+{
+  "observations": [
+    {
+      "backend": "docker",
+      "experiment": "task-success",
+      "status": "passed",
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "completed-artifact-verified; ephemeral-file-absent-after-destruction",
+      "retry_occurred": false,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": true,
+      "attempts": [
+        {
+          "task_id": "task-success-docker",
+          "attempt": 1,
+          "idempotency_key": "key-success-docker",
+          "purpose": "artifact-success",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": {
+            "exists": true,
+            "contents": "sum(1..10)=55\n"
+          },
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-artifact-verified",
+          "event_phases": [
+            "ready",
+            "artifact_written",
+            "work_completed"
+          ],
+          "receipt": null,
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        }
+      ],
+      "ledger_checks": [],
+      "final_ledger": null,
+      "receiver_restart": null
+    },
+    {
+      "backend": "gvisor",
+      "experiment": "task-success",
+      "status": "passed",
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "completed-artifact-verified; ephemeral-file-absent-after-destruction",
+      "retry_occurred": false,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": true,
+      "attempts": [
+        {
+          "task_id": "task-success-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-success-gvisor",
+          "purpose": "artifact-success",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": {
+            "exists": true,
+            "contents": "sum(1..10)=55\n"
+          },
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-artifact-verified",
+          "event_phases": [
+            "ready",
+            "artifact_written",
+            "work_completed"
+          ],
+          "receipt": null,
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        }
+      ],
+      "ledger_checks": [],
+      "final_ledger": null,
+      "receiver_restart": null
+    },
+    {
+      "backend": "docker",
+      "experiment": "task-partial",
+      "status": "passed",
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "failed-partial-work-observed; ephemeral-file-absent-after-destruction",
+      "retry_occurred": false,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": true,
+      "attempts": [
+        {
+          "task_id": "task-partial-docker",
+          "attempt": 1,
+          "idempotency_key": "key-partial-docker",
+          "purpose": "artifact-partial",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 42,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": true,
+          "independent_artifact_read": {
+            "exists": true,
+            "contents": "sum(1..5)=15\n",
+            "child_exit_code_before_read": 42
+          },
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-partial-work-observed",
+          "event_phases": [
+            "child_started",
+            "ready",
+            "artifact_written",
+            "deliberate_crash_after_partial_write",
+            "child_exited"
+          ],
+          "receipt": null,
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        }
+      ],
+      "ledger_checks": [],
+      "final_ledger": null,
+      "receiver_restart": null
+    },
+    {
+      "backend": "gvisor",
+      "experiment": "task-partial",
+      "status": "passed",
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "failed-partial-work-observed; ephemeral-file-absent-after-destruction",
+      "retry_occurred": false,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": true,
+      "attempts": [
+        {
+          "task_id": "task-partial-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-partial-gvisor",
+          "purpose": "artifact-partial",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 42,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": true,
+          "independent_artifact_read": {
+            "exists": true,
+            "contents": "sum(1..5)=15\n",
+            "child_exit_code_before_read": 42
+          },
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-partial-work-observed",
+          "event_phases": [
+            "child_started",
+            "ready",
+            "artifact_written",
+            "deliberate_crash_after_partial_write",
+            "child_exited"
+          ],
+          "receipt": null,
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        }
+      ],
+      "ledger_checks": [],
+      "final_ledger": null,
+      "receiver_restart": null
+    },
+    {
+      "backend": "docker",
+      "experiment": "task-retry",
+      "status": "passed",
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "three-distinct-operations-verified; retries-reused-existing-commit; no-duplicates",
+      "retry_occurred": true,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": null,
+      "attempts": [
+        {
+          "task_id": "task-commit-docker",
+          "attempt": 1,
+          "idempotency_key": "key-commit-docker",
+          "purpose": "acknowledgement-loss",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 45,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "committed-without-acknowledgement",
+          "event_phases": [
+            "ready",
+            "commit_sent"
+          ],
+          "receipt": null,
+          "stderr": "commit acknowledgement unavailable: Post \"http://<lab-internal-ip>:8080/commit\": EOF\n",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-commit-docker",
+          "attempt": 2,
+          "idempotency_key": "key-commit-docker",
+          "purpose": "same-key-fresh-sandbox-retry",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "event_phases": [
+            "ready",
+            "commit_sent",
+            "work_completed"
+          ],
+          "receipt": {
+            "record": {
+              "task_id": "task-commit-docker",
+              "idempotency_key": "key-commit-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            "reused": true
+          },
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-commit-docker",
+          "attempt": 3,
+          "idempotency_key": "key-commit-docker",
+          "purpose": "concurrent-same-key-retry",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "event_phases": [
+            "ready",
+            "commit_sent",
+            "work_completed"
+          ],
+          "receipt": {
+            "record": {
+              "task_id": "task-commit-docker",
+              "idempotency_key": "key-commit-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            "reused": true
+          },
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-commit-docker",
+          "attempt": 4,
+          "idempotency_key": "key-commit-docker",
+          "purpose": "concurrent-same-key-retry",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "event_phases": [
+            "ready",
+            "commit_sent",
+            "work_completed"
+          ],
+          "receipt": {
+            "record": {
+              "task_id": "task-commit-docker",
+              "idempotency_key": "key-commit-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            "reused": true
+          },
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-collision-docker",
+          "attempt": 1,
+          "idempotency_key": "key-commit-docker",
+          "purpose": "different-task-same-key-conflict",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 46,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-no-commit",
+          "event_phases": [
+            "ready",
+            "commit_sent"
+          ],
+          "receipt": null,
+          "stderr": "commit rejected: HTTP 409: task ID or idempotency key reused with different operation\n",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-independent-docker",
+          "attempt": 1,
+          "idempotency_key": "key-independent-docker",
+          "purpose": "different-task-different-key",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "event_phases": [
+            "ready",
+            "commit_sent",
+            "work_completed"
+          ],
+          "receipt": {
+            "record": {
+              "task_id": "task-independent-docker",
+              "idempotency_key": "key-independent-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0002"
+            },
+            "reused": false
+          },
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-before-docker",
+          "attempt": 1,
+          "idempotency_key": "key-before-docker",
+          "purpose": "crash-before-commit",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 44,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-no-commit",
+          "event_phases": [
+            "ready",
+            "deliberate_crash_before_commit"
+          ],
+          "receipt": null,
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-before-docker",
+          "attempt": 2,
+          "idempotency_key": "key-before-docker",
+          "purpose": "retry-after-pre-commit-crash",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "event_phases": [
+            "ready",
+            "commit_sent",
+            "work_completed"
+          ],
+          "receipt": {
+            "record": {
+              "task_id": "task-before-docker",
+              "idempotency_key": "key-before-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0003"
+            },
+            "reused": false
+          },
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        }
+      ],
+      "ledger_checks": [
+        {
+          "stage": "receiver-restarted-before-task-retry",
+          "record_count": 1
+        },
+        {
+          "stage": "same-key-retry",
+          "record_count": 1
+        },
+        {
+          "stage": "concurrent-duplicate-attempts",
+          "record_count": 1
+        },
+        {
+          "stage": "key-collision-rejected",
+          "record_count": 1
+        },
+        {
+          "stage": "independent-task-committed",
+          "record_count": 2
+        },
+        {
+          "stage": "crash-before-commit",
+          "record_count": 2
+        },
+        {
+          "stage": "final",
+          "record_count": 3
+        }
+      ],
+      "final_ledger": [
+        {
+          "task_id": "task-commit-docker",
+          "idempotency_key": "key-commit-docker",
+          "payload": "sum(1..10)=55\n",
+          "resource_id": "resource-0001"
+        },
+        {
+          "task_id": "task-independent-docker",
+          "idempotency_key": "key-independent-docker",
+          "payload": "sum(1..10)=55\n",
+          "resource_id": "resource-0002"
+        },
+        {
+          "task_id": "task-before-docker",
+          "idempotency_key": "key-before-docker",
+          "payload": "sum(1..10)=55\n",
+          "resource_id": "resource-0003"
+        }
+      ],
+      "receiver_restart": {
+        "instances": 2,
+        "first_exit_code": 43,
+        "second_cleanup_exit_code": 143,
+        "same_volume": true,
+        "different_containers": true,
+        "runtime": "runc",
+        "internal_networks": [
+          true,
+          true
+        ],
+        "published_port_counts": [
+          0,
+          0
+        ],
+        "logs": [
+          "{\"phase\":\"receiver_starting\"}\n{\"exit_code\":43,\"phase\":\"durable_commit_before_ack_crash\"}\n",
+          "{\"phase\":\"receiver_starting\"}\n"
+        ]
+      }
+    },
+    {
+      "backend": "gvisor",
+      "experiment": "task-retry",
+      "status": "passed",
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "three-distinct-operations-verified; retries-reused-existing-commit; no-duplicates",
+      "retry_occurred": true,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": null,
+      "attempts": [
+        {
+          "task_id": "task-commit-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-commit-gvisor",
+          "purpose": "acknowledgement-loss",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 45,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "committed-without-acknowledgement",
+          "event_phases": [
+            "ready",
+            "commit_sent"
+          ],
+          "receipt": null,
+          "stderr": "commit acknowledgement unavailable: Post \"http://<lab-internal-ip>:8080/commit\": EOF\n",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-commit-gvisor",
+          "attempt": 2,
+          "idempotency_key": "key-commit-gvisor",
+          "purpose": "same-key-fresh-sandbox-retry",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "event_phases": [
+            "ready",
+            "commit_sent",
+            "work_completed"
+          ],
+          "receipt": {
+            "record": {
+              "task_id": "task-commit-gvisor",
+              "idempotency_key": "key-commit-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            "reused": true
+          },
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-commit-gvisor",
+          "attempt": 3,
+          "idempotency_key": "key-commit-gvisor",
+          "purpose": "concurrent-same-key-retry",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "event_phases": [
+            "ready",
+            "commit_sent",
+            "work_completed"
+          ],
+          "receipt": {
+            "record": {
+              "task_id": "task-commit-gvisor",
+              "idempotency_key": "key-commit-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            "reused": true
+          },
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-commit-gvisor",
+          "attempt": 4,
+          "idempotency_key": "key-commit-gvisor",
+          "purpose": "concurrent-same-key-retry",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "event_phases": [
+            "ready",
+            "commit_sent",
+            "work_completed"
+          ],
+          "receipt": {
+            "record": {
+              "task_id": "task-commit-gvisor",
+              "idempotency_key": "key-commit-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            "reused": true
+          },
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-collision-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-commit-gvisor",
+          "purpose": "different-task-same-key-conflict",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 46,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-no-commit",
+          "event_phases": [
+            "ready",
+            "commit_sent"
+          ],
+          "receipt": null,
+          "stderr": "commit rejected: HTTP 409: task ID or idempotency key reused with different operation\n",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-independent-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-independent-gvisor",
+          "purpose": "different-task-different-key",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "event_phases": [
+            "ready",
+            "commit_sent",
+            "work_completed"
+          ],
+          "receipt": {
+            "record": {
+              "task_id": "task-independent-gvisor",
+              "idempotency_key": "key-independent-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0002"
+            },
+            "reused": false
+          },
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-before-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-before-gvisor",
+          "purpose": "crash-before-commit",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 44,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-no-commit",
+          "event_phases": [
+            "ready",
+            "deliberate_crash_before_commit"
+          ],
+          "receipt": null,
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        },
+        {
+          "task_id": "task-before-gvisor",
+          "attempt": 2,
+          "idempotency_key": "key-before-gvisor",
+          "purpose": "retry-after-pre-commit-crash",
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": null,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "event_phases": [
+            "ready",
+            "commit_sent",
+            "work_completed"
+          ],
+          "receipt": {
+            "record": {
+              "task_id": "task-before-gvisor",
+              "idempotency_key": "key-before-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0003"
+            },
+            "reused": false
+          },
+          "stderr": "",
+          "timed_out": false,
+          "stdout_dropped_bytes": 0,
+          "stderr_dropped_bytes": 0
+        }
+      ],
+      "ledger_checks": [
+        {
+          "stage": "receiver-restarted-before-task-retry",
+          "record_count": 1
+        },
+        {
+          "stage": "same-key-retry",
+          "record_count": 1
+        },
+        {
+          "stage": "concurrent-duplicate-attempts",
+          "record_count": 1
+        },
+        {
+          "stage": "key-collision-rejected",
+          "record_count": 1
+        },
+        {
+          "stage": "independent-task-committed",
+          "record_count": 2
+        },
+        {
+          "stage": "crash-before-commit",
+          "record_count": 2
+        },
+        {
+          "stage": "final",
+          "record_count": 3
+        }
+      ],
+      "final_ledger": [
+        {
+          "task_id": "task-commit-gvisor",
+          "idempotency_key": "key-commit-gvisor",
+          "payload": "sum(1..10)=55\n",
+          "resource_id": "resource-0001"
+        },
+        {
+          "task_id": "task-independent-gvisor",
+          "idempotency_key": "key-independent-gvisor",
+          "payload": "sum(1..10)=55\n",
+          "resource_id": "resource-0002"
+        },
+        {
+          "task_id": "task-before-gvisor",
+          "idempotency_key": "key-before-gvisor",
+          "payload": "sum(1..10)=55\n",
+          "resource_id": "resource-0003"
+        }
+      ],
+      "receiver_restart": {
+        "instances": 2,
+        "first_exit_code": 43,
+        "second_cleanup_exit_code": 143,
+        "same_volume": true,
+        "different_containers": true,
+        "runtime": "runc",
+        "internal_networks": [
+          true,
+          true
+        ],
+        "published_port_counts": [
+          0,
+          0
+        ],
+        "logs": [
+          "{\"phase\":\"receiver_starting\"}\n{\"exit_code\":43,\"phase\":\"durable_commit_before_ack_crash\"}\n",
+          "{\"phase\":\"receiver_starting\"}\n"
+        ]
+      }
+    }
+  ]
+}

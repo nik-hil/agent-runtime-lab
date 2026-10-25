@@ -5,7 +5,7 @@
 ./bin/lab experiments --backend gvisor --experiment filesystem
 ```
 
-Integration tests run the same six definitions and fail on unexpected behavior. Additional tests cover stream separation, exit codes, cancellation, output bounds and lifecycle rules. Experiments run sequentially against a local Linux daemon, without bind mounts or public network dependencies. Infrastructure errors never count as successful isolation.
+Integration tests run the same nine definitions and fail on unexpected behavior. Additional tests cover stream separation, exit codes, cancellation, output bounds and lifecycle rules. Experiment categories run sequentially against a local Linux daemon, without bind mounts or public network dependencies; `task-retry` includes two concurrent bounded attempts. Infrastructure errors never count as successful isolation.
 
 ## 1. Filesystem isolation
 
@@ -46,6 +46,16 @@ Expected: exit zero and real timestamps; there is no speed threshold. `scripts/b
 A parent creates a /tmp marker, starts a child and sleeps. A two-second deadline stops attachment, explicitly kills the workload and removes its owned container. Verify its exact generated name is absent. A fresh sandbox must not contain the old marker.
 
 Expected: timeout after marker/child creation, absent container and fresh temporary storage. This verifies Docker/runtime-managed cleanup, not hypothetical processes escaping the runtime. Host SIGKILL and daemon outages require manual cleanup and are not exercised automatically.
+
+## 7–9. Task completion, partial failure and safe retry
+
+`task-success` computes `sum(1..10)=55`, writes an artifact and waits for an independent reader before exiting 0. Expected: readiness, exact artifact bytes and successful exit all agree. A successful exit without a matching artifact fails verification.
+
+`task-partial` launches one child that writes `sum(1..5)=15` and deliberately exits 42. A supervisor keeps the sandbox alive while a second process observes the file after the child exit. Expected: partial work survives process failure but is absent in a fresh sandbox after destruction; no completed-task marker is emitted.
+
+`task-retry` runs tasks on the selected backend and a trusted runc receiver on a dedicated internal Docker network. The receiver syncs a ledger on its private volume and exits 43 before acknowledgement; the task exits 45. Destroy the task sandbox and receiver container, restart the receiver using the same volume, and independently read the ledger before retrying in a fresh sandbox. Expected: the retry returns the existing resource, with one committed effect. Also verify concurrent same-key retries, a different-task key conflict (exit 46), a distinct task/key (new resource), and a pre-commit crash (exit 44) followed by safe retry. Final ledger contains three distinct operations, with no duplicates.
+
+All task attempts have a 10-second deadline, one CPU, 128 MiB RAM and the existing 64-task limits. The receiver is bounded to 256 MiB and 128 tasks; only it mounts the lab volume. Failures use explicit source-defined exit points, not randomly timed signals. See [task-completion-investigation.md](task-completion-investigation.md) for commands, the event timeline and actual measurements.
 
 ## Evidence
 

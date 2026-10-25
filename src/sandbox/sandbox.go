@@ -10,8 +10,9 @@ import (
 type NetworkPolicy string
 
 const (
-	NetworkNone   NetworkPolicy = "none"
-	NetworkBridge NetworkPolicy = "bridge"
+	NetworkNone        NetworkPolicy = "none"
+	NetworkBridge      NetworkPolicy = "bridge"
+	NetworkLabInternal NetworkPolicy = "lab-internal"
 )
 
 type Config struct {
@@ -24,6 +25,9 @@ type Config struct {
 	NprocLimit               int
 	CollectProcessAccounting bool
 	Network                  NetworkPolicy
+	// LabNetwork is accepted only with NetworkLabInternal. Create verifies its
+	// internal bridge configuration and exact lab ownership labels.
+	LabNetwork string
 }
 
 func DefaultConfig() Config {
@@ -50,8 +54,15 @@ func (c Config) Validate() error {
 	if c.NprocLimit < 0 || c.NprocLimit > 512 {
 		return errors.New("nproc limit must be zero (follow pids) or between 1 and 512")
 	}
-	if c.Network != NetworkNone && c.Network != NetworkBridge {
-		return errors.New("network must be none or bridge")
+	if c.Network != NetworkNone && c.Network != NetworkBridge && c.Network != NetworkLabInternal {
+		return errors.New("network must be none, bridge or lab-internal")
+	}
+	if c.Network == NetworkLabInternal {
+		if !validLabNetworkName(c.LabNetwork) {
+			return errors.New("invalid lab-owned internal network name")
+		}
+	} else if c.LabNetwork != "" {
+		return errors.New("lab network requires explicit lab-internal policy")
 	}
 	return nil
 }

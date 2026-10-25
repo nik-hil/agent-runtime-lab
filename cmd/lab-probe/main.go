@@ -25,6 +25,10 @@ func main() {
 		fatal(errors.New("usage: lab-probe noop|echo|fs|serve|network|memory|processes|sleep|tree|flood"))
 	}
 	switch os.Args[1] {
+	case "task", "task-inspect", "task-clean", "task-receiver", "task-health", "task-ledger":
+		if err := runTaskProbe(os.Args[1:]); err != nil {
+			fatal(err)
+		}
 	case "noop":
 		emit(map[string]bool{"ready": true})
 	case "echo":

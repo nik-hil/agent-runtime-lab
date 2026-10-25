@@ -1,3 +1,5 @@
 *
 !Dockerfile
 !lab-probe
+!ledger/
+!ledger/.keep
