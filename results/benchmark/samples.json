@@ -1,0 +1,1336 @@
+[
+  {
+    "iteration": -3,
+    "warmup": true,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-ac285f99a6d1098e6ff0241542c7415f",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 187.88205,
+      "exec_ms": 248.123366,
+      "workload_ms": 135.255774,
+      "cleanup_ms": 83.379314,
+      "total_ms": 557.866341,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": -3,
+    "warmup": true,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-0082a7745184d19d5ac30393160ed704",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 126.585942,
+      "exec_ms": 270.265327,
+      "workload_ms": 167.48471,
+      "cleanup_ms": 64.816399,
+      "total_ms": 489.347001,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": -2,
+    "warmup": true,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-170399cf2814da21bf9c6e570990f117",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 113.1279,
+      "exec_ms": 246.09308,
+      "workload_ms": 156.255879,
+      "cleanup_ms": 59.531828,
+      "total_ms": 445.986619,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": -2,
+    "warmup": true,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-2f90c801fccec939bb2293211f3c9cd7",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 95.437114,
+      "exec_ms": 193.852874,
+      "workload_ms": 109.020215,
+      "cleanup_ms": 73.002634,
+      "total_ms": 393.912903,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": -1,
+    "warmup": true,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-126f8547207d2cfda62b7eb117d535cb",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 109.945778,
+      "exec_ms": 211.877298,
+      "workload_ms": 114.815262,
+      "cleanup_ms": 72.399759,
+      "total_ms": 426.580028,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": -1,
+    "warmup": true,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-58b867e3f493c57ece5aadab06a26cb0",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 103.252872,
+      "exec_ms": 223.750575,
+      "workload_ms": 138.771607,
+      "cleanup_ms": 60.857057,
+      "total_ms": 418.14206,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 0,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-420c2ac3829689f688ce69b0f8c7a89b",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 101.281486,
+      "exec_ms": 241.970464,
+      "workload_ms": 155.921788,
+      "cleanup_ms": 62.524019,
+      "total_ms": 434.762046,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 0,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-c7a5ffb995d5958e66e167e65226bac7",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 109.757667,
+      "exec_ms": 207.294774,
+      "workload_ms": 119.613751,
+      "cleanup_ms": 66.150785,
+      "total_ms": 414.061416,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 1,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-40e5f1653083cd54f2e3d6efa28f88a9",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 110.721432,
+      "exec_ms": 192.813814,
+      "workload_ms": 114.487815,
+      "cleanup_ms": 61.165357,
+      "total_ms": 392.572455,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 1,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-b04b508a175e3cd6d6dd7ed5d873941f",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 101.95202,
+      "exec_ms": 218.555427,
+      "workload_ms": 135.162626,
+      "cleanup_ms": 62.313436,
+      "total_ms": 409.266033,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 2,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-22eda03a52ad687a54c2044c64abbd22",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 99.302678,
+      "exec_ms": 234.697317,
+      "workload_ms": 148.164113,
+      "cleanup_ms": 73.813908,
+      "total_ms": 440.387208,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 2,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-d9e95caaf1fb649570abc362766b586e",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 119.956167,
+      "exec_ms": 219.797074,
+      "workload_ms": 118.513705,
+      "cleanup_ms": 66.742896,
+      "total_ms": 436.784718,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 3,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-307ec85b1d7baac6b63583bee2b0a177",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 123.432515,
+      "exec_ms": 257.86924,
+      "workload_ms": 126.879445,
+      "cleanup_ms": 79.005198,
+      "total_ms": 498.259869,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 3,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-dc0101b39335e388f26172d87e293fb6",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 126.910594,
+      "exec_ms": 263.980031,
+      "workload_ms": 168.73276,
+      "cleanup_ms": 76.017918,
+      "total_ms": 503.459927,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 4,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-fad4b0a9c7eac991e9e635671d21acd2",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 112.950542,
+      "exec_ms": 237.78513,
+      "workload_ms": 144.584047,
+      "cleanup_ms": 61.906636,
+      "total_ms": 440.55063,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 4,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-f76dc77fa372f70df3f10617efbcadac",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 110.308513,
+      "exec_ms": 206.555276,
+      "workload_ms": 110.897521,
+      "cleanup_ms": 62.655359,
+      "total_ms": 407.263729,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 5,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-42097ea6370c33d42262e543fb70e9c6",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 110.863806,
+      "exec_ms": 203.291857,
+      "workload_ms": 115.831418,
+      "cleanup_ms": 60.047967,
+      "total_ms": 400.800361,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 5,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-e96cc5771356786d224d41822b25a680",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 93.024043,
+      "exec_ms": 254.220082,
+      "workload_ms": 146.545163,
+      "cleanup_ms": 62.941147,
+      "total_ms": 443.716593,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 6,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-4a7896fa23e9f390bdccada520140407",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 107.608401,
+      "exec_ms": 228.478328,
+      "workload_ms": 138.828286,
+      "cleanup_ms": 67.914651,
+      "total_ms": 435.099722,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 6,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-c9533940b36ff8e56e3554afa12f2d86",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 107.510313,
+      "exec_ms": 222.569053,
+      "workload_ms": 120.992581,
+      "cleanup_ms": 69.84594,
+      "total_ms": 432.115438,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 7,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-04a45aa7f3b53b86cbcb3ef72b0a55d6",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 115.476759,
+      "exec_ms": 232.098681,
+      "workload_ms": 120.145739,
+      "cleanup_ms": 70.992486,
+      "total_ms": 451.893662,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 7,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-370237d242eede518a52bcc82a158ef7",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 146.375448,
+      "exec_ms": 264.046529,
+      "workload_ms": 166.293689,
+      "cleanup_ms": 80.085768,
+      "total_ms": 525.473411,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 8,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-2d41beb1931df18e02ee8ba4e59583c2",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 113.55027,
+      "exec_ms": 244.853715,
+      "workload_ms": 148.055534,
+      "cleanup_ms": 81.413531,
+      "total_ms": 474.434144,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 8,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-349c428d43e9d7e783775ef8f3b62a5e",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 118.32883,
+      "exec_ms": 212.474252,
+      "workload_ms": 114.747413,
+      "cleanup_ms": 69.712875,
+      "total_ms": 432.245025,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 9,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-08cb9ff564376b0033487a70f120f67c",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 131.804536,
+      "exec_ms": 226.720963,
+      "workload_ms": 129.604582,
+      "cleanup_ms": 64.583272,
+      "total_ms": 456.585726,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 9,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-21ddf0274b0045596b097364b5056509",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 117.345718,
+      "exec_ms": 238.115944,
+      "workload_ms": 149.223601,
+      "cleanup_ms": 69.168212,
+      "total_ms": 454.288127,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 10,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-05a70dddc817847751ff69f2b9abc652",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 117.266457,
+      "exec_ms": 238.302431,
+      "workload_ms": 147.652573,
+      "cleanup_ms": 67.387963,
+      "total_ms": 454.718912,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 10,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-aa0295a50959245b0761f6951b19ca80",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 104.769125,
+      "exec_ms": 217.833445,
+      "workload_ms": 114.620849,
+      "cleanup_ms": 74.634891,
+      "total_ms": 427.866953,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 11,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-6cdea9b6d1a33a43edb1b7b6e7afb7d9",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 117.349436,
+      "exec_ms": 219.150887,
+      "workload_ms": 121.022971,
+      "cleanup_ms": 74.154721,
+      "total_ms": 443.191919,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 11,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-2e52b7dd5e9a5c0600ca0a90a53158e9",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 112.929041,
+      "exec_ms": 246.000902,
+      "workload_ms": 151.342159,
+      "cleanup_ms": 69.885627,
+      "total_ms": 459.006954,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 12,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-130f51244ab903f9638fb6180c36a08f",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 116.324744,
+      "exec_ms": 247.485004,
+      "workload_ms": 156.743201,
+      "cleanup_ms": 69.263804,
+      "total_ms": 463.314593,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 12,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-207ae92e439a77489161f8ce55f91fa0",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 105.650422,
+      "exec_ms": 232.104182,
+      "workload_ms": 131.193876,
+      "cleanup_ms": 67.16704,
+      "total_ms": 433.373506,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 13,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-81940b987bd0747dd22183ef975f702a",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 106.944219,
+      "exec_ms": 204.033047,
+      "workload_ms": 113.599494,
+      "cleanup_ms": 62.067905,
+      "total_ms": 403.712839,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 13,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-ddd9e66ec6272dc2ff2e33c0c6765145",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 110.990539,
+      "exec_ms": 244.532962,
+      "workload_ms": 158.460871,
+      "cleanup_ms": 63.9084,
+      "total_ms": 449.524515,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 14,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-94bc5cb476b0944981016747f8767874",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 105.160785,
+      "exec_ms": 235.107142,
+      "workload_ms": 145.208123,
+      "cleanup_ms": 73.178541,
+      "total_ms": 442.460668,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 14,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-07560c79666c8d428dcc697067ff6364",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 103.342913,
+      "exec_ms": 223.776144,
+      "workload_ms": 128.614547,
+      "cleanup_ms": 71.072819,
+      "total_ms": 427.485262,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 15,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-850de5eec37d83fe459e156d1833f925",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 125.102241,
+      "exec_ms": 219.678016,
+      "workload_ms": 125.592491,
+      "cleanup_ms": 69.343908,
+      "total_ms": 445.24557,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 15,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-0220338604f64d12741b6bf8e439f910",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 109.784599,
+      "exec_ms": 209.437658,
+      "workload_ms": 125.416362,
+      "cleanup_ms": 64.815346,
+      "total_ms": 415.475513,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 16,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-3538fbd10261b90af4ce31504e491205",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 99.371429,
+      "exec_ms": 234.935824,
+      "workload_ms": 147.013329,
+      "cleanup_ms": 63.689611,
+      "total_ms": 428.940778,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 16,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-36f723918e8009d911365a58b0628a2c",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 114.81401,
+      "exec_ms": 239.575648,
+      "workload_ms": 130.205924,
+      "cleanup_ms": 75.50762,
+      "total_ms": 463.388393,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 17,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-5f9304398f4b48369bd16aafe1775573",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 121.316282,
+      "exec_ms": 230.997793,
+      "workload_ms": 123.247009,
+      "cleanup_ms": 73.834457,
+      "total_ms": 458.524279,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 17,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-ba75067a138551e5d303d34381e790a7",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 127.62924,
+      "exec_ms": 251.635012,
+      "workload_ms": 161.927219,
+      "cleanup_ms": 68.298095,
+      "total_ms": 480.073814,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 18,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-0fc42964da095395901309ac23063071",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 122.493005,
+      "exec_ms": 242.518404,
+      "workload_ms": 149.664286,
+      "cleanup_ms": 75.032362,
+      "total_ms": 470.366406,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 18,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-8ffaaca0a7a96d2d10bf11183a0b2a64",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 129.065702,
+      "exec_ms": 238.765527,
+      "workload_ms": 127.971114,
+      "cleanup_ms": 73.717023,
+      "total_ms": 471.645946,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 19,
+    "warmup": false,
+    "result": {
+      "backend": "docker",
+      "container": "agent-runtime-lab-22a7204ec9ea602eca304ce4c1baf2ed",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 109.065331,
+      "exec_ms": 231.060924,
+      "workload_ms": 122.901527,
+      "cleanup_ms": 80.82802,
+      "total_ms": 454.321922,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  },
+  {
+    "iteration": 19,
+    "warmup": false,
+    "result": {
+      "backend": "gvisor",
+      "container": "agent-runtime-lab-4e96cb5b7bc5f927d7e798458ec0989c",
+      "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+      "stdout": "{\"ready\":true}\n",
+      "stderr": "",
+      "stdout_dropped_bytes": 0,
+      "stderr_dropped_bytes": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "cancelled": false,
+      "create_ms": 117.916352,
+      "exec_ms": 237.696301,
+      "workload_ms": 146.794882,
+      "cleanup_ms": 60.391865,
+      "total_ms": 444.4249,
+      "resources": {
+        "oom_killed": false,
+        "samples": 0,
+        "max_observed_memory_bytes": null,
+        "max_observed_pids": null,
+        "max_observed_cpu_percent": null,
+        "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+      }
+    }
+  }
+]

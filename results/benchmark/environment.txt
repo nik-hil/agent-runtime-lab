@@ -1,0 +1,39 @@
+UTC: 2026-10-24T11:07:33Z
+Linux ubuntu-s-4vcpu-8gb-amd-blr1 6.8.0-142-generic #142-Ubuntu SMP PREEMPT_DYNAMIC Wed Sep  2 14:24:27 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+go version go1.27.3 linux/amd64
+Probe SHA256: 412add18dc57410497f2e03e1be16d8a64a10ec5425bea2d060a01340ef4d6d4  images/probe/lab-probe
+Client:
+ Version:           29.1.3
+ API version:       1.52
+ Go version:        go1.24.4
+ Git commit:        29.1.3-0ubuntu3~24.04.2
+ Built:             Wed Apr 29 16:41:06 2026
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server:
+ Engine:
+  Version:          29.1.3
+  API version:      1.52 (minimum version 1.44)
+  Go version:       go1.24.4
+  Git commit:       29.1.3-0ubuntu3~24.04.2
+  Built:            Wed Apr 29 16:41:06 2026
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          2.2.1
+  GitCommit:        
+ runc:
+  Version:          1.3.4-0ubuntu1~24.04.1
+  GitCommit:        
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        
+OS=Ubuntu 24.04.5 LTS kernel=6.8.0-142-generic arch=x86_64 cpus=4 memory_bytes=8326950912 cgroup=2 driver=systemd default_runtime=runc security=["name=apparmor","name=seccomp,profile=builtin","name=cgroupns"]
+image_id=sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45
+runsc version release-20261019.0
+spec: 1.2.1
+runc version 1.3.4-0ubuntu1~24.04.1
+spec: 1.2.1
+go: go1.24.4
+libseccomp: 2.5.5

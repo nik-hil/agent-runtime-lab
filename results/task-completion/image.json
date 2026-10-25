@@ -1,0 +1,46 @@
+[
+    {
+        "Architecture": "amd64",
+        "Config": {
+            "Cmd": [
+                "noop"
+            ],
+            "Entrypoint": [
+                "/lab-probe"
+            ],
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Labels": {
+                "agent-runtime-lab.managed": "true"
+            },
+            "User": "65532:65532"
+        },
+        "Created": "2026-10-24T19:55:23.341792804Z",
+        "Descriptor": {
+            "digest": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "size": 757
+        },
+        "Id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "Metadata": {
+            "LastTagTime": "2026-10-24T19:55:23.402777798Z"
+        },
+        "Os": "linux",
+        "Parent": "sha256:6b5399e75cfcebb7942567543aac981ba3ab58aa9be4c568551fb77caa19cf7d",
+        "RepoDigests": [
+            "agent-runtime-lab@sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9"
+        ],
+        "RepoTags": [
+            "agent-runtime-lab:local"
+        ],
+        "RootFS": {
+            "Layers": [
+                "sha256:3e918b31c9d3a0c4d6f7544ad80cb848726a4f9b8fd353ccd011bd7d10c61d0c",
+                "sha256:19f07e001547e02bb5e8493fe8d2085ceec6ed6d8e1bb43ec12954031ef4ac69"
+            ],
+            "Type": "layers"
+        },
+        "Size": 3239866
+    }
+]

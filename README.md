@@ -56,7 +56,7 @@ mkdir -p results/task-completion
 
 These distinguish process readiness/exit, independently verified work, and committed side effects. The retry experiment owns an internal Docker network and a dedicated receiver volume; workloads never mount that volume. It verifies recovery after both sandbox destruction and receiver restart. Read the [investigation and reproduction guide](docs/task-completion-investigation.md) for the timeline, assertions, actual observations and limitations.
 
-The initial commit includes the report's recorded milestone evidence under `results/`. Toolchains, caches, compiled binaries and subsequent generated results are ignored. The project includes its own Go rules so contributor instructions work in a standalone clone.
+Experiment evidence under `results/` is tracked in Git, including the original milestone, process-limit investigation and task-completion runs. See [the results index](results/README.md) for final evidence versus development runs. Toolchains, caches and compiled binaries remain ignored. The project includes its own Go rules so contributor instructions work in a standalone clone.
 
 ## Cleanup
 

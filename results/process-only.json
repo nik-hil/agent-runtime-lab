@@ -1,0 +1,120 @@
+[
+  {
+    "backend": "docker",
+    "experiment": "processes",
+    "expected": "At equal 512 MiB RAM, 24 children are allowed with process limit 256; limit 64 refuses creation with EAGAIN or ENOMEM.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-4fb3d3aa22f37db1e00b5d96a61809f7",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"attempt_bound\":24,\"creation_rejected\":false,\"error\":\"\",\"limit_unit\":\"host tasks, including threads\",\"spawned\":24}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 125.304407,
+        "exec_ms": 715.080093,
+        "workload_ms": 618.768567,
+        "cleanup_ms": 62.814845,
+        "total_ms": 932.290836,
+        "resources": {
+          "oom_killed": false,
+          "samples": 1,
+          "max_observed_memory_bytes": 0,
+          "max_observed_pids": 0,
+          "max_observed_cpu_percent": 0,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-cd17a5f979a45d5bffb1f9356ca10d4f",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"attempt_bound\":24,\"creation_rejected\":true,\"error\":\"fork/exec /lab-probe: resource temporarily unavailable\",\"limit_unit\":\"host tasks, including threads\",\"spawned\":20}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 108.930721,
+        "exec_ms": 629.030221,
+        "workload_ms": 536.827138,
+        "cleanup_ms": 58.506039,
+        "total_ms": 822.319461,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  },
+  {
+    "backend": "gvisor",
+    "experiment": "processes",
+    "expected": "At equal 512 MiB RAM, 24 children are allowed with process limit 256; limit 64 refuses creation with EAGAIN or ENOMEM.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-00407e1822b218027034902485752bd3",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"attempt_bound\":24,\"creation_rejected\":false,\"error\":\"\",\"limit_unit\":\"host tasks, including threads\",\"spawned\":24}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 106.942624,
+        "exec_ms": 844.327096,
+        "workload_ms": 747.590435,
+        "cleanup_ms": 65.262691,
+        "total_ms": 1045.164423,
+        "resources": {
+          "oom_killed": false,
+          "samples": 1,
+          "max_observed_memory_bytes": 19105054,
+          "max_observed_pids": 42,
+          "max_observed_cpu_percent": 0,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-e07502bb0fba7bb558b2660b11ea1698",
+        "image_id": "sha256:387306d43f0e8610819ddbc51a13c42be3fdeee06804bc279a3b0e1bcc81ce45",
+        "stdout": "{\"attempt_bound\":24,\"creation_rejected\":true,\"error\":\"fork/exec /lab-probe: cannot allocate memory\",\"limit_unit\":\"host tasks, including threads\",\"spawned\":12}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 107.026917,
+        "exec_ms": 556.179924,
+        "workload_ms": 469.385822,
+        "cleanup_ms": 63.154426,
+        "total_ms": 758.529595,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  }
+]

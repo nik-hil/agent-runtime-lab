@@ -1,0 +1,56 @@
+	agent-runtime-lab/cmd/lab		coverage: 0.0% of statements
+	agent-runtime-lab/cmd/lab-probe		coverage: 0.0% of statements
+	agent-runtime-lab/cmd/lab-summary		coverage: 0.0% of statements
+	agent-runtime-lab/src/experiments		coverage: 0.0% of statements
+=== RUN   TestParseNproc
+--- PASS: TestParseNproc (0.00s)
+=== RUN   TestProcTaskEntriesAndIncompleteAccounting
+--- PASS: TestProcTaskEntriesAndIncompleteAccounting (0.00s)
+PASS
+coverage: 69.1% of statements
+ok  	agent-runtime-lab/src/processinfo	1.026s	coverage: 69.1% of statements
+=== RUN   TestIndependentProcessControlsAndLegacyDefault
+--- PASS: TestIndependentProcessControlsAndLegacyDefault (0.00s)
+=== RUN   TestUnifiedCgroupRequiresOwnedContainerIdentity
+--- PASS: TestUnifiedCgroupRequiresOwnedContainerIdentity (0.00s)
+=== RUN   TestHostCountersAndNativeThreadCounts
+--- PASS: TestHostCountersAndNativeThreadCounts (0.00s)
+=== RUN   TestRemoteDaemonNeverUsesLocalHostPID
+--- PASS: TestRemoteDaemonNeverUsesLocalHostPID (0.00s)
+=== RUN   TestConfigRejectsUnsafeInputs
+--- PASS: TestConfigRejectsUnsafeInputs (0.00s)
+=== RUN   TestBackendSafetyAndExplicitRuntime
+--- PASS: TestBackendSafetyAndExplicitRuntime (0.00s)
+=== RUN   TestBoundedCaptureDrainsOutput
+--- PASS: TestBoundedCaptureDrainsOutput (0.00s)
+=== RUN   TestResourceSamplesAndUnavailable
+--- PASS: TestResourceSamplesAndUnavailable (0.00s)
+=== RUN   TestNonzeroExitIsCapturedAndSingleUse
+--- PASS: TestNonzeroExitIsCapturedAndSingleUse (0.00s)
+=== RUN   TestDeadlineAndParentCancellationKillWorkload
+=== RUN   TestDeadlineAndParentCancellationKillWorkload/false
+=== RUN   TestDeadlineAndParentCancellationKillWorkload/true
+--- PASS: TestDeadlineAndParentCancellationKillWorkload (0.01s)
+    --- PASS: TestDeadlineAndParentCancellationKillWorkload/false (0.01s)
+    --- PASS: TestDeadlineAndParentCancellationKillWorkload/true (0.00s)
+=== RUN   TestCleanupAfterCreateFailureUsesIndependentContext
+--- PASS: TestCleanupAfterCreateFailureUsesIndependentContext (0.00s)
+=== RUN   TestImageVolumesRejectedBeforeCreate
+--- PASS: TestImageVolumesRejectedBeforeCreate (0.00s)
+=== RUN   TestDestroyRefusesOwnershipMismatch
+--- PASS: TestDestroyRefusesOwnershipMismatch (0.00s)
+=== RUN   TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure
+=== RUN   TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/No_such_object
+=== RUN   TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/error:_no_such_object
+=== RUN   TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/No_such_container
+=== RUN   TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/Cannot_connect_to_the_Docker_daemon
+--- PASS: TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure (0.00s)
+    --- PASS: TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/No_such_object (0.00s)
+    --- PASS: TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/error:_no_such_object (0.00s)
+    --- PASS: TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/No_such_container (0.00s)
+    --- PASS: TestDestroyAcceptsMissingContainerAndPropagatesDaemonFailure/Cannot_connect_to_the_Docker_daemon (0.00s)
+=== RUN   TestEndpointReadsCurrentAndLegacyDockerMetadata
+--- PASS: TestEndpointReadsCurrentAndLegacyDockerMetadata (0.00s)
+PASS
+coverage: 75.5% of statements
+ok  	agent-runtime-lab/src/sandbox	1.046s	coverage: 75.5% of statements

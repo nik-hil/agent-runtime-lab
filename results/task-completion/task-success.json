@@ -1,0 +1,214 @@
+[
+  {
+    "backend": "docker",
+    "experiment": "task-success",
+    "expected": "A ready child exits 0 AND a separate reader verifies the exact deterministic artifact.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-7a2fc372ffd30a02df78e9353504bea4",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-success-docker\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-success-docker\",\"attempt\":1,\"phase\":\"artifact_written\"}\n{\"task_id\":\"task-success-docker\",\"attempt\":1,\"phase\":\"work_completed\"}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 0,
+        "exec_ms": 337.319878,
+        "workload_ms": 230.320582,
+        "cleanup_ms": 0,
+        "total_ms": 0,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-6613b8cc5a300cf8079f430ecf5d87e4",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"exists\":false,\"contents\":\"\"}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 112.278503,
+        "exec_ms": 216.157418,
+        "workload_ms": 118.51181,
+        "cleanup_ms": 75.389907,
+        "total_ms": 432.081499,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ],
+    "task": {
+      "attempts": [
+        {
+          "task_id": "task-success-docker",
+          "attempt": 1,
+          "idempotency_key": "key-success-docker",
+          "purpose": "artifact-success",
+          "run_index": 0,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": {
+            "exists": true,
+            "contents": "sum(1..10)=55\n"
+          },
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-artifact-verified",
+          "events": [
+            {
+              "task_id": "task-success-docker",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-success-docker",
+              "attempt": 1,
+              "phase": "artifact_written"
+            },
+            {
+              "task_id": "task-success-docker",
+              "attempt": 1,
+              "phase": "work_completed"
+            }
+          ]
+        }
+      ],
+      "retry_occurred": false,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": true,
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "completed-artifact-verified; ephemeral-file-absent-after-destruction"
+    }
+  },
+  {
+    "backend": "gvisor",
+    "experiment": "task-success",
+    "expected": "A ready child exits 0 AND a separate reader verifies the exact deterministic artifact.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-63d94f33c62b822f64fd00526d47c9fd",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-success-gvisor\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-success-gvisor\",\"attempt\":1,\"phase\":\"artifact_written\"}\n{\"task_id\":\"task-success-gvisor\",\"attempt\":1,\"phase\":\"work_completed\"}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 0,
+        "exec_ms": 347.973254,
+        "workload_ms": 247.148222,
+        "cleanup_ms": 0,
+        "total_ms": 0,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-2546012aaf6b33146fad43c842e2f24d",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"exists\":false,\"contents\":\"\"}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 148.334269,
+        "exec_ms": 293.301315,
+        "workload_ms": 177.273554,
+        "cleanup_ms": 83.97462,
+        "total_ms": 562.101249,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ],
+    "task": {
+      "attempts": [
+        {
+          "task_id": "task-success-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-success-gvisor",
+          "purpose": "artifact-success",
+          "run_index": 0,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "independent_artifact_read": {
+            "exists": true,
+            "contents": "sum(1..10)=55\n"
+          },
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-artifact-verified",
+          "events": [
+            {
+              "task_id": "task-success-gvisor",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-success-gvisor",
+              "attempt": 1,
+              "phase": "artifact_written"
+            },
+            {
+              "task_id": "task-success-gvisor",
+              "attempt": 1,
+              "phase": "work_completed"
+            }
+          ]
+        }
+      ],
+      "retry_occurred": false,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": true,
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "completed-artifact-verified; ephemeral-file-absent-after-destruction"
+    }
+  }
+]

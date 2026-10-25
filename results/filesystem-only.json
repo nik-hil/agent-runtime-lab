@@ -1,0 +1,70 @@
+[
+  {
+    "backend": "docker",
+    "experiment": "filesystem",
+    "expected": "Host canary and Docker socket absent; UID nonzero; capabilities empty; root write denied; /tmp writable.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-1988c3dd50625afde188b1c2590beb35",
+        "image_id": "sha256:2f4cd938514f6d6725254db1065f75b8b65b0553b52239d896f29c6b7cbaf4ee",
+        "stdout": "{\"capabilities_empty\":true,\"host_canary_hidden\":true,\"root_write_denied\":true,\"tmp_writable\":true,\"uid\":65532}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 140.318906,
+        "exec_ms": 210.802719,
+        "workload_ms": 116.092591,
+        "cleanup_ms": 64.366808,
+        "total_ms": 445.147965,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  },
+  {
+    "backend": "gvisor",
+    "experiment": "filesystem",
+    "expected": "Host canary and Docker socket absent; UID nonzero; capabilities empty; root write denied; /tmp writable.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-3ca5f1890afe9facc515978577188d34",
+        "image_id": "sha256:2f4cd938514f6d6725254db1065f75b8b65b0553b52239d896f29c6b7cbaf4ee",
+        "stdout": "{\"capabilities_empty\":true,\"host_canary_hidden\":true,\"root_write_denied\":true,\"tmp_writable\":true,\"uid\":65532}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 108.949968,
+        "exec_ms": 243.171284,
+        "workload_ms": 143.156618,
+        "cleanup_ms": 70.706191,
+        "total_ms": 455.331811,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ]
+  }
+]

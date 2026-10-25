@@ -1,0 +1,1286 @@
+[
+  {
+    "backend": "docker",
+    "experiment": "task-retry",
+    "expected": "After durable commit and lost acknowledgement, a fresh sandbox retries against a restarted receiver without duplicates; collision, concurrency and pre-commit recovery checks pass.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-ff5a2f8ab4fd6e619eebad3257409e75",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-commit-docker\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-commit-docker\",\"attempt\":1,\"phase\":\"commit_sent\"}\n",
+        "stderr": "commit acknowledgement unavailable: Post \"http://172.18.0.2:8080/commit\": EOF\n",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 45,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 143.942711,
+        "exec_ms": 331.279619,
+        "workload_ms": 172.389468,
+        "cleanup_ms": 68.011432,
+        "total_ms": 571.279911,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-d228a2855bfa0c01b496ece9acefe4cd",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-commit-docker\",\"attempt\":2,\"phase\":\"ready\"}\n{\"task_id\":\"task-commit-docker\",\"attempt\":2,\"phase\":\"commit_sent\"}\n{\"task_id\":\"task-commit-docker\",\"attempt\":2,\"phase\":\"work_completed\",\"receipt\":{\"record\":{\"task_id\":\"task-commit-docker\",\"idempotency_key\":\"key-commit-docker\",\"payload\":\"sum(1..10)=55\\n\",\"resource_id\":\"resource-0001\"},\"reused\":true}}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 155.224102,
+        "exec_ms": 349.019962,
+        "workload_ms": 192.673726,
+        "cleanup_ms": 90.25472,
+        "total_ms": 630.931936,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-a32681af88511b6151b613fd12bb27e5",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-commit-docker\",\"attempt\":3,\"phase\":\"ready\"}\n{\"task_id\":\"task-commit-docker\",\"attempt\":3,\"phase\":\"commit_sent\"}\n{\"task_id\":\"task-commit-docker\",\"attempt\":3,\"phase\":\"work_completed\",\"receipt\":{\"record\":{\"task_id\":\"task-commit-docker\",\"idempotency_key\":\"key-commit-docker\",\"payload\":\"sum(1..10)=55\\n\",\"resource_id\":\"resource-0001\"},\"reused\":true}}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 193.578353,
+        "exec_ms": 414.987181,
+        "workload_ms": 238.063907,
+        "cleanup_ms": 77.971846,
+        "total_ms": 722.917052,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-63e9ae65fab3e07d6d432edf59a2cce0",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-commit-docker\",\"attempt\":4,\"phase\":\"ready\"}\n{\"task_id\":\"task-commit-docker\",\"attempt\":4,\"phase\":\"commit_sent\"}\n{\"task_id\":\"task-commit-docker\",\"attempt\":4,\"phase\":\"work_completed\",\"receipt\":{\"record\":{\"task_id\":\"task-commit-docker\",\"idempotency_key\":\"key-commit-docker\",\"payload\":\"sum(1..10)=55\\n\",\"resource_id\":\"resource-0001\"},\"reused\":true}}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 192.616476,
+        "exec_ms": 392.987662,
+        "workload_ms": 230.565358,
+        "cleanup_ms": 79.21286,
+        "total_ms": 704.528426,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-646b26c30eebc0a496d6f23d948d0928",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-collision-docker\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-collision-docker\",\"attempt\":1,\"phase\":\"commit_sent\"}\n",
+        "stderr": "commit rejected: HTTP 409: task ID or idempotency key reused with different operation\n",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 46,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 159.490074,
+        "exec_ms": 311.941032,
+        "workload_ms": 181.395002,
+        "cleanup_ms": 70.933445,
+        "total_ms": 574.938554,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-d69d39db1a6ac9ef7fb8c095869aea23",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-independent-docker\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-independent-docker\",\"attempt\":1,\"phase\":\"commit_sent\"}\n{\"task_id\":\"task-independent-docker\",\"attempt\":1,\"phase\":\"work_completed\",\"receipt\":{\"record\":{\"task_id\":\"task-independent-docker\",\"idempotency_key\":\"key-independent-docker\",\"payload\":\"sum(1..10)=55\\n\",\"resource_id\":\"resource-0002\"},\"reused\":false}}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 162.4359,
+        "exec_ms": 340.548961,
+        "workload_ms": 199.508609,
+        "cleanup_ms": 79.195407,
+        "total_ms": 616.856098,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-1126d86600fe88dd22d9f353a24f9c96",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-before-docker\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-before-docker\",\"attempt\":1,\"phase\":\"deliberate_crash_before_commit\"}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 44,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 185.994534,
+        "exec_ms": 337.585302,
+        "workload_ms": 193.078465,
+        "cleanup_ms": 66.232098,
+        "total_ms": 624.281135,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-a80dbc39e9722c13924dcf257857d24a",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-before-docker\",\"attempt\":2,\"phase\":\"ready\"}\n{\"task_id\":\"task-before-docker\",\"attempt\":2,\"phase\":\"commit_sent\"}\n{\"task_id\":\"task-before-docker\",\"attempt\":2,\"phase\":\"work_completed\",\"receipt\":{\"record\":{\"task_id\":\"task-before-docker\",\"idempotency_key\":\"key-before-docker\",\"payload\":\"sum(1..10)=55\\n\",\"resource_id\":\"resource-0003\"},\"reused\":false}}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 162.386176,
+        "exec_ms": 323.58349,
+        "workload_ms": 183.944088,
+        "cleanup_ms": 66.46759,
+        "total_ms": 586.560003,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ],
+    "task": {
+      "attempts": [
+        {
+          "task_id": "task-commit-docker",
+          "attempt": 1,
+          "idempotency_key": "key-commit-docker",
+          "purpose": "acknowledgement-loss",
+          "run_index": 0,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 45,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "committed-without-acknowledgement",
+          "events": [
+            {
+              "task_id": "task-commit-docker",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-commit-docker",
+              "attempt": 1,
+              "phase": "commit_sent"
+            }
+          ]
+        },
+        {
+          "task_id": "task-commit-docker",
+          "attempt": 2,
+          "idempotency_key": "key-commit-docker",
+          "purpose": "same-key-fresh-sandbox-retry",
+          "run_index": 1,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "events": [
+            {
+              "task_id": "task-commit-docker",
+              "attempt": 2,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-commit-docker",
+              "attempt": 2,
+              "phase": "commit_sent"
+            },
+            {
+              "task_id": "task-commit-docker",
+              "attempt": 2,
+              "phase": "work_completed",
+              "receipt": {
+                "record": {
+                  "task_id": "task-commit-docker",
+                  "idempotency_key": "key-commit-docker",
+                  "payload": "sum(1..10)=55\n",
+                  "resource_id": "resource-0001"
+                },
+                "reused": true
+              }
+            }
+          ]
+        },
+        {
+          "task_id": "task-commit-docker",
+          "attempt": 3,
+          "idempotency_key": "key-commit-docker",
+          "purpose": "concurrent-same-key-retry",
+          "run_index": 2,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "events": [
+            {
+              "task_id": "task-commit-docker",
+              "attempt": 3,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-commit-docker",
+              "attempt": 3,
+              "phase": "commit_sent"
+            },
+            {
+              "task_id": "task-commit-docker",
+              "attempt": 3,
+              "phase": "work_completed",
+              "receipt": {
+                "record": {
+                  "task_id": "task-commit-docker",
+                  "idempotency_key": "key-commit-docker",
+                  "payload": "sum(1..10)=55\n",
+                  "resource_id": "resource-0001"
+                },
+                "reused": true
+              }
+            }
+          ]
+        },
+        {
+          "task_id": "task-commit-docker",
+          "attempt": 4,
+          "idempotency_key": "key-commit-docker",
+          "purpose": "concurrent-same-key-retry",
+          "run_index": 3,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "events": [
+            {
+              "task_id": "task-commit-docker",
+              "attempt": 4,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-commit-docker",
+              "attempt": 4,
+              "phase": "commit_sent"
+            },
+            {
+              "task_id": "task-commit-docker",
+              "attempt": 4,
+              "phase": "work_completed",
+              "receipt": {
+                "record": {
+                  "task_id": "task-commit-docker",
+                  "idempotency_key": "key-commit-docker",
+                  "payload": "sum(1..10)=55\n",
+                  "resource_id": "resource-0001"
+                },
+                "reused": true
+              }
+            }
+          ]
+        },
+        {
+          "task_id": "task-collision-docker",
+          "attempt": 1,
+          "idempotency_key": "key-commit-docker",
+          "purpose": "different-task-same-key-conflict",
+          "run_index": 4,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 46,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-no-commit",
+          "events": [
+            {
+              "task_id": "task-collision-docker",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-collision-docker",
+              "attempt": 1,
+              "phase": "commit_sent"
+            }
+          ]
+        },
+        {
+          "task_id": "task-independent-docker",
+          "attempt": 1,
+          "idempotency_key": "key-independent-docker",
+          "purpose": "different-task-different-key",
+          "run_index": 5,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "events": [
+            {
+              "task_id": "task-independent-docker",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-independent-docker",
+              "attempt": 1,
+              "phase": "commit_sent"
+            },
+            {
+              "task_id": "task-independent-docker",
+              "attempt": 1,
+              "phase": "work_completed",
+              "receipt": {
+                "record": {
+                  "task_id": "task-independent-docker",
+                  "idempotency_key": "key-independent-docker",
+                  "payload": "sum(1..10)=55\n",
+                  "resource_id": "resource-0002"
+                },
+                "reused": false
+              }
+            }
+          ]
+        },
+        {
+          "task_id": "task-before-docker",
+          "attempt": 1,
+          "idempotency_key": "key-before-docker",
+          "purpose": "crash-before-commit",
+          "run_index": 6,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 44,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-no-commit",
+          "events": [
+            {
+              "task_id": "task-before-docker",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-before-docker",
+              "attempt": 1,
+              "phase": "deliberate_crash_before_commit"
+            }
+          ]
+        },
+        {
+          "task_id": "task-before-docker",
+          "attempt": 2,
+          "idempotency_key": "key-before-docker",
+          "purpose": "retry-after-pre-commit-crash",
+          "run_index": 7,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "events": [
+            {
+              "task_id": "task-before-docker",
+              "attempt": 2,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-before-docker",
+              "attempt": 2,
+              "phase": "commit_sent"
+            },
+            {
+              "task_id": "task-before-docker",
+              "attempt": 2,
+              "phase": "work_completed",
+              "receipt": {
+                "record": {
+                  "task_id": "task-before-docker",
+                  "idempotency_key": "key-before-docker",
+                  "payload": "sum(1..10)=55\n",
+                  "resource_id": "resource-0003"
+                },
+                "reused": false
+              }
+            }
+          ]
+        }
+      ],
+      "independent_ledger_checks": [
+        {
+          "stage": "receiver-restarted-before-task-retry",
+          "records": [
+            {
+              "task_id": "task-commit-docker",
+              "idempotency_key": "key-commit-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            }
+          ]
+        },
+        {
+          "stage": "same-key-retry",
+          "records": [
+            {
+              "task_id": "task-commit-docker",
+              "idempotency_key": "key-commit-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            }
+          ]
+        },
+        {
+          "stage": "concurrent-duplicate-attempts",
+          "records": [
+            {
+              "task_id": "task-commit-docker",
+              "idempotency_key": "key-commit-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            }
+          ]
+        },
+        {
+          "stage": "key-collision-rejected",
+          "records": [
+            {
+              "task_id": "task-commit-docker",
+              "idempotency_key": "key-commit-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            }
+          ]
+        },
+        {
+          "stage": "independent-task-committed",
+          "records": [
+            {
+              "task_id": "task-commit-docker",
+              "idempotency_key": "key-commit-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            {
+              "task_id": "task-independent-docker",
+              "idempotency_key": "key-independent-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0002"
+            }
+          ]
+        },
+        {
+          "stage": "crash-before-commit",
+          "records": [
+            {
+              "task_id": "task-commit-docker",
+              "idempotency_key": "key-commit-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            {
+              "task_id": "task-independent-docker",
+              "idempotency_key": "key-independent-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0002"
+            }
+          ]
+        },
+        {
+          "stage": "final",
+          "records": [
+            {
+              "task_id": "task-commit-docker",
+              "idempotency_key": "key-commit-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            {
+              "task_id": "task-independent-docker",
+              "idempotency_key": "key-independent-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0002"
+            },
+            {
+              "task_id": "task-before-docker",
+              "idempotency_key": "key-before-docker",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0003"
+            }
+          ]
+        }
+      ],
+      "receivers": [
+        {
+          "container": "agent-runtime-lab-task-9943196f15657ca6c3cd913d4f4f4052-receiver-1",
+          "exit_code": 43,
+          "logs": "{\"phase\":\"receiver_starting\"}\n{\"exit_code\":43,\"phase\":\"durable_commit_before_ack_crash\"}\n",
+          "runtime": "runc",
+          "internal_network": true,
+          "published_ports": 0,
+          "volume": "agent-runtime-lab-task-9943196f15657ca6c3cd913d4f4f4052"
+        },
+        {
+          "container": "agent-runtime-lab-task-9943196f15657ca6c3cd913d4f4f4052-receiver-2",
+          "exit_code": 143,
+          "logs": "{\"phase\":\"receiver_starting\"}\n",
+          "runtime": "runc",
+          "internal_network": true,
+          "published_ports": 0,
+          "volume": "agent-runtime-lab-task-9943196f15657ca6c3cd913d4f4f4052"
+        }
+      ],
+      "retry_occurred": true,
+      "duplicate_side_effects": false,
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "three-distinct-operations-verified; retries-reused-existing-commit; no-duplicates"
+    }
+  },
+  {
+    "backend": "gvisor",
+    "experiment": "task-retry",
+    "expected": "After durable commit and lost acknowledgement, a fresh sandbox retries against a restarted receiver without duplicates; collision, concurrency and pre-commit recovery checks pass.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-d59192728f1ff89e71b154267ef7085d",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-commit-gvisor\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-commit-gvisor\",\"attempt\":1,\"phase\":\"commit_sent\"}\n",
+        "stderr": "commit acknowledgement unavailable: Post \"http://172.18.0.2:8080/commit\": EOF\n",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 45,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 157.168019,
+        "exec_ms": 384.800351,
+        "workload_ms": 233.659305,
+        "cleanup_ms": 75.631586,
+        "total_ms": 649.469166,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-2edb76ffa1616f35b33bf5ba5caaa20f",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-commit-gvisor\",\"attempt\":2,\"phase\":\"ready\"}\n{\"task_id\":\"task-commit-gvisor\",\"attempt\":2,\"phase\":\"commit_sent\"}\n{\"task_id\":\"task-commit-gvisor\",\"attempt\":2,\"phase\":\"work_completed\",\"receipt\":{\"record\":{\"task_id\":\"task-commit-gvisor\",\"idempotency_key\":\"key-commit-gvisor\",\"payload\":\"sum(1..10)=55\\n\",\"resource_id\":\"resource-0001\"},\"reused\":true}}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 170.900798,
+        "exec_ms": 388.243324,
+        "workload_ms": 242.238799,
+        "cleanup_ms": 69.567052,
+        "total_ms": 658.584361,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-e125a7a4ec4020cd2cfc38338a9f8eb3",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-commit-gvisor\",\"attempt\":3,\"phase\":\"ready\"}\n{\"task_id\":\"task-commit-gvisor\",\"attempt\":3,\"phase\":\"commit_sent\"}\n{\"task_id\":\"task-commit-gvisor\",\"attempt\":3,\"phase\":\"work_completed\",\"receipt\":{\"record\":{\"task_id\":\"task-commit-gvisor\",\"idempotency_key\":\"key-commit-gvisor\",\"payload\":\"sum(1..10)=55\\n\",\"resource_id\":\"resource-0001\"},\"reused\":true}}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 191.282843,
+        "exec_ms": 429.803874,
+        "workload_ms": 276.456771,
+        "cleanup_ms": 70.738642,
+        "total_ms": 724.770103,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-42358145a4eb6fc4452055fbb02b9d77",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-commit-gvisor\",\"attempt\":4,\"phase\":\"ready\"}\n{\"task_id\":\"task-commit-gvisor\",\"attempt\":4,\"phase\":\"commit_sent\"}\n{\"task_id\":\"task-commit-gvisor\",\"attempt\":4,\"phase\":\"work_completed\",\"receipt\":{\"record\":{\"task_id\":\"task-commit-gvisor\",\"idempotency_key\":\"key-commit-gvisor\",\"payload\":\"sum(1..10)=55\\n\",\"resource_id\":\"resource-0001\"},\"reused\":true}}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 187.958358,
+        "exec_ms": 475.193274,
+        "workload_ms": 307.901947,
+        "cleanup_ms": 74.991898,
+        "total_ms": 769.599459,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-efcdc7f500525ea4f628aa238f0a82d4",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-collision-gvisor\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-collision-gvisor\",\"attempt\":1,\"phase\":\"commit_sent\"}\n",
+        "stderr": "commit rejected: HTTP 409: task ID or idempotency key reused with different operation\n",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 46,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 146.777631,
+        "exec_ms": 330.101131,
+        "workload_ms": 211.018277,
+        "cleanup_ms": 71.65944,
+        "total_ms": 580.538294,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-f038df91f86e6c712fb37e98fddf15db",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-independent-gvisor\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-independent-gvisor\",\"attempt\":1,\"phase\":\"commit_sent\"}\n{\"task_id\":\"task-independent-gvisor\",\"attempt\":1,\"phase\":\"work_completed\",\"receipt\":{\"record\":{\"task_id\":\"task-independent-gvisor\",\"idempotency_key\":\"key-independent-gvisor\",\"payload\":\"sum(1..10)=55\\n\",\"resource_id\":\"resource-0002\"},\"reused\":false}}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 145.75673,
+        "exec_ms": 367.935426,
+        "workload_ms": 232.657765,
+        "cleanup_ms": 66.32592,
+        "total_ms": 613.182614,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-04e9465a14d0e49eadd7f8d0e0d69a9a",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-before-gvisor\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-before-gvisor\",\"attempt\":1,\"phase\":\"deliberate_crash_before_commit\"}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 44,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 158.983207,
+        "exec_ms": 380.809997,
+        "workload_ms": 229.59781,
+        "cleanup_ms": 79.114484,
+        "total_ms": 651.595522,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-35fab6dcfc8ccf89c9d70e70cb4b8e83",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-before-gvisor\",\"attempt\":2,\"phase\":\"ready\"}\n{\"task_id\":\"task-before-gvisor\",\"attempt\":2,\"phase\":\"commit_sent\"}\n{\"task_id\":\"task-before-gvisor\",\"attempt\":2,\"phase\":\"work_completed\",\"receipt\":{\"record\":{\"task_id\":\"task-before-gvisor\",\"idempotency_key\":\"key-before-gvisor\",\"payload\":\"sum(1..10)=55\\n\",\"resource_id\":\"resource-0003\"},\"reused\":false}}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 194.263006,
+        "exec_ms": 413.228835,
+        "workload_ms": 258.924311,
+        "cleanup_ms": 86.882941,
+        "total_ms": 727.668058,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ],
+    "task": {
+      "attempts": [
+        {
+          "task_id": "task-commit-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-commit-gvisor",
+          "purpose": "acknowledgement-loss",
+          "run_index": 0,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 45,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "committed-without-acknowledgement",
+          "events": [
+            {
+              "task_id": "task-commit-gvisor",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-commit-gvisor",
+              "attempt": 1,
+              "phase": "commit_sent"
+            }
+          ]
+        },
+        {
+          "task_id": "task-commit-gvisor",
+          "attempt": 2,
+          "idempotency_key": "key-commit-gvisor",
+          "purpose": "same-key-fresh-sandbox-retry",
+          "run_index": 1,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "events": [
+            {
+              "task_id": "task-commit-gvisor",
+              "attempt": 2,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-commit-gvisor",
+              "attempt": 2,
+              "phase": "commit_sent"
+            },
+            {
+              "task_id": "task-commit-gvisor",
+              "attempt": 2,
+              "phase": "work_completed",
+              "receipt": {
+                "record": {
+                  "task_id": "task-commit-gvisor",
+                  "idempotency_key": "key-commit-gvisor",
+                  "payload": "sum(1..10)=55\n",
+                  "resource_id": "resource-0001"
+                },
+                "reused": true
+              }
+            }
+          ]
+        },
+        {
+          "task_id": "task-commit-gvisor",
+          "attempt": 3,
+          "idempotency_key": "key-commit-gvisor",
+          "purpose": "concurrent-same-key-retry",
+          "run_index": 2,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "events": [
+            {
+              "task_id": "task-commit-gvisor",
+              "attempt": 3,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-commit-gvisor",
+              "attempt": 3,
+              "phase": "commit_sent"
+            },
+            {
+              "task_id": "task-commit-gvisor",
+              "attempt": 3,
+              "phase": "work_completed",
+              "receipt": {
+                "record": {
+                  "task_id": "task-commit-gvisor",
+                  "idempotency_key": "key-commit-gvisor",
+                  "payload": "sum(1..10)=55\n",
+                  "resource_id": "resource-0001"
+                },
+                "reused": true
+              }
+            }
+          ]
+        },
+        {
+          "task_id": "task-commit-gvisor",
+          "attempt": 4,
+          "idempotency_key": "key-commit-gvisor",
+          "purpose": "concurrent-same-key-retry",
+          "run_index": 3,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "events": [
+            {
+              "task_id": "task-commit-gvisor",
+              "attempt": 4,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-commit-gvisor",
+              "attempt": 4,
+              "phase": "commit_sent"
+            },
+            {
+              "task_id": "task-commit-gvisor",
+              "attempt": 4,
+              "phase": "work_completed",
+              "receipt": {
+                "record": {
+                  "task_id": "task-commit-gvisor",
+                  "idempotency_key": "key-commit-gvisor",
+                  "payload": "sum(1..10)=55\n",
+                  "resource_id": "resource-0001"
+                },
+                "reused": true
+              }
+            }
+          ]
+        },
+        {
+          "task_id": "task-collision-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-commit-gvisor",
+          "purpose": "different-task-same-key-conflict",
+          "run_index": 4,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 46,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-no-commit",
+          "events": [
+            {
+              "task_id": "task-collision-gvisor",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-collision-gvisor",
+              "attempt": 1,
+              "phase": "commit_sent"
+            }
+          ]
+        },
+        {
+          "task_id": "task-independent-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-independent-gvisor",
+          "purpose": "different-task-different-key",
+          "run_index": 5,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "events": [
+            {
+              "task_id": "task-independent-gvisor",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-independent-gvisor",
+              "attempt": 1,
+              "phase": "commit_sent"
+            },
+            {
+              "task_id": "task-independent-gvisor",
+              "attempt": 1,
+              "phase": "work_completed",
+              "receipt": {
+                "record": {
+                  "task_id": "task-independent-gvisor",
+                  "idempotency_key": "key-independent-gvisor",
+                  "payload": "sum(1..10)=55\n",
+                  "resource_id": "resource-0002"
+                },
+                "reused": false
+              }
+            }
+          ]
+        },
+        {
+          "task_id": "task-before-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-before-gvisor",
+          "purpose": "crash-before-commit",
+          "run_index": 6,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 44,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": false,
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-no-commit",
+          "events": [
+            {
+              "task_id": "task-before-gvisor",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-before-gvisor",
+              "attempt": 1,
+              "phase": "deliberate_crash_before_commit"
+            }
+          ]
+        },
+        {
+          "task_id": "task-before-gvisor",
+          "attempt": 2,
+          "idempotency_key": "key-before-gvisor",
+          "purpose": "retry-after-pre-commit-crash",
+          "run_index": 7,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 0,
+          "child_reported_completion": true,
+          "work_completed": true,
+          "partial_artifact_created": false,
+          "external_commit_exists": true,
+          "retry_occurred": true,
+          "duplicate_side_effects": false,
+          "verified_task_state": "completed-commit-verified",
+          "events": [
+            {
+              "task_id": "task-before-gvisor",
+              "attempt": 2,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-before-gvisor",
+              "attempt": 2,
+              "phase": "commit_sent"
+            },
+            {
+              "task_id": "task-before-gvisor",
+              "attempt": 2,
+              "phase": "work_completed",
+              "receipt": {
+                "record": {
+                  "task_id": "task-before-gvisor",
+                  "idempotency_key": "key-before-gvisor",
+                  "payload": "sum(1..10)=55\n",
+                  "resource_id": "resource-0003"
+                },
+                "reused": false
+              }
+            }
+          ]
+        }
+      ],
+      "independent_ledger_checks": [
+        {
+          "stage": "receiver-restarted-before-task-retry",
+          "records": [
+            {
+              "task_id": "task-commit-gvisor",
+              "idempotency_key": "key-commit-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            }
+          ]
+        },
+        {
+          "stage": "same-key-retry",
+          "records": [
+            {
+              "task_id": "task-commit-gvisor",
+              "idempotency_key": "key-commit-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            }
+          ]
+        },
+        {
+          "stage": "concurrent-duplicate-attempts",
+          "records": [
+            {
+              "task_id": "task-commit-gvisor",
+              "idempotency_key": "key-commit-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            }
+          ]
+        },
+        {
+          "stage": "key-collision-rejected",
+          "records": [
+            {
+              "task_id": "task-commit-gvisor",
+              "idempotency_key": "key-commit-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            }
+          ]
+        },
+        {
+          "stage": "independent-task-committed",
+          "records": [
+            {
+              "task_id": "task-commit-gvisor",
+              "idempotency_key": "key-commit-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            {
+              "task_id": "task-independent-gvisor",
+              "idempotency_key": "key-independent-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0002"
+            }
+          ]
+        },
+        {
+          "stage": "crash-before-commit",
+          "records": [
+            {
+              "task_id": "task-commit-gvisor",
+              "idempotency_key": "key-commit-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            {
+              "task_id": "task-independent-gvisor",
+              "idempotency_key": "key-independent-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0002"
+            }
+          ]
+        },
+        {
+          "stage": "final",
+          "records": [
+            {
+              "task_id": "task-commit-gvisor",
+              "idempotency_key": "key-commit-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0001"
+            },
+            {
+              "task_id": "task-independent-gvisor",
+              "idempotency_key": "key-independent-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0002"
+            },
+            {
+              "task_id": "task-before-gvisor",
+              "idempotency_key": "key-before-gvisor",
+              "payload": "sum(1..10)=55\n",
+              "resource_id": "resource-0003"
+            }
+          ]
+        }
+      ],
+      "receivers": [
+        {
+          "container": "agent-runtime-lab-task-23950091f189be88c69f725e3f38cccc-receiver-1",
+          "exit_code": 43,
+          "logs": "{\"phase\":\"receiver_starting\"}\n{\"exit_code\":43,\"phase\":\"durable_commit_before_ack_crash\"}\n",
+          "runtime": "runc",
+          "internal_network": true,
+          "published_ports": 0,
+          "volume": "agent-runtime-lab-task-23950091f189be88c69f725e3f38cccc"
+        },
+        {
+          "container": "agent-runtime-lab-task-23950091f189be88c69f725e3f38cccc-receiver-2",
+          "exit_code": 143,
+          "logs": "{\"phase\":\"receiver_starting\"}\n",
+          "runtime": "runc",
+          "internal_network": true,
+          "published_ports": 0,
+          "volume": "agent-runtime-lab-task-23950091f189be88c69f725e3f38cccc"
+        }
+      ],
+      "retry_occurred": true,
+      "duplicate_side_effects": false,
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "three-distinct-operations-verified; retries-reused-existing-commit; no-duplicates"
+    }
+  }
+]

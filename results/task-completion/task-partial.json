@@ -1,0 +1,240 @@
+[
+  {
+    "backend": "docker",
+    "experiment": "task-partial",
+    "expected": "A ready child writes independently observed partial work, exits 42, and its file is absent in a fresh sandbox after destruction.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-57cd2b9f45b246681772b1b7d01c232f",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-partial-docker\",\"attempt\":1,\"phase\":\"child_started\",\"child_pid\":10}\n{\"task_id\":\"task-partial-docker\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-partial-docker\",\"attempt\":1,\"phase\":\"artifact_written\"}\n{\"task_id\":\"task-partial-docker\",\"attempt\":1,\"phase\":\"deliberate_crash_after_partial_write\"}\n{\"task_id\":\"task-partial-docker\",\"attempt\":1,\"phase\":\"child_exited\",\"child_exit_code\":42}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 42,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 0,
+        "exec_ms": 357.07457,
+        "workload_ms": 237.855481,
+        "cleanup_ms": 0,
+        "total_ms": 0,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "docker",
+        "container": "agent-runtime-lab-7542758444e374effa11ab0879311eb0",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"exists\":false,\"contents\":\"\"}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 131.241473,
+        "exec_ms": 233.324432,
+        "workload_ms": 129.759298,
+        "cleanup_ms": 71.778855,
+        "total_ms": 468.12136,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ],
+    "task": {
+      "attempts": [
+        {
+          "task_id": "task-partial-docker",
+          "attempt": 1,
+          "idempotency_key": "key-partial-docker",
+          "purpose": "artifact-partial",
+          "run_index": 0,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 42,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": true,
+          "independent_artifact_read": {
+            "exists": true,
+            "contents": "sum(1..5)=15\n",
+            "child_exit_code_before_read": 42
+          },
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-partial-work-observed",
+          "events": [
+            {
+              "task_id": "task-partial-docker",
+              "attempt": 1,
+              "phase": "child_started",
+              "child_pid": 10
+            },
+            {
+              "task_id": "task-partial-docker",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-partial-docker",
+              "attempt": 1,
+              "phase": "artifact_written"
+            },
+            {
+              "task_id": "task-partial-docker",
+              "attempt": 1,
+              "phase": "deliberate_crash_after_partial_write"
+            },
+            {
+              "task_id": "task-partial-docker",
+              "attempt": 1,
+              "phase": "child_exited",
+              "child_exit_code": 42
+            }
+          ]
+        }
+      ],
+      "retry_occurred": false,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": true,
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "failed-partial-work-observed; ephemeral-file-absent-after-destruction"
+    }
+  },
+  {
+    "backend": "gvisor",
+    "experiment": "task-partial",
+    "expected": "A ready child writes independently observed partial work, exits 42, and its file is absent in a fresh sandbox after destruction.",
+    "status": "passed",
+    "details": "",
+    "runs": [
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-95217e859eec4e553fdc9c58b08be5a1",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"task_id\":\"task-partial-gvisor\",\"attempt\":1,\"phase\":\"child_started\",\"child_pid\":5}\n{\"task_id\":\"task-partial-gvisor\",\"attempt\":1,\"phase\":\"ready\"}\n{\"task_id\":\"task-partial-gvisor\",\"attempt\":1,\"phase\":\"artifact_written\"}\n{\"task_id\":\"task-partial-gvisor\",\"attempt\":1,\"phase\":\"deliberate_crash_after_partial_write\"}\n{\"task_id\":\"task-partial-gvisor\",\"attempt\":1,\"phase\":\"child_exited\",\"child_exit_code\":42}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 42,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 0,
+        "exec_ms": 350.876631,
+        "workload_ms": 244.530388,
+        "cleanup_ms": 0,
+        "total_ms": 0,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      },
+      {
+        "backend": "gvisor",
+        "container": "agent-runtime-lab-7286538dc80e9380415802019456b693",
+        "image_id": "sha256:98a408c71b48614324ad548331b49ca481094afaff268e7329aefeb4dd4c3ef9",
+        "stdout": "{\"exists\":false,\"contents\":\"\"}\n",
+        "stderr": "",
+        "stdout_dropped_bytes": 0,
+        "stderr_dropped_bytes": 0,
+        "exit_code": 0,
+        "timed_out": false,
+        "cancelled": false,
+        "create_ms": 143.268415,
+        "exec_ms": 271.034997,
+        "workload_ms": 162.863408,
+        "cleanup_ms": 75.542092,
+        "total_ms": 521.685787,
+        "resources": {
+          "oom_killed": false,
+          "samples": 0,
+          "max_observed_memory_bytes": null,
+          "max_observed_pids": null,
+          "max_observed_cpu_percent": null,
+          "note": "Docker CLI samples; observed maxima are not peaks. CPU is a sampled percentage, not CPU time. Short jobs may have no samples; null means unavailable."
+        }
+      }
+    ],
+    "task": {
+      "attempts": [
+        {
+          "task_id": "task-partial-gvisor",
+          "attempt": 1,
+          "idempotency_key": "key-partial-gvisor",
+          "purpose": "artifact-partial",
+          "run_index": 0,
+          "process_started": true,
+          "ready": true,
+          "exit_code": 42,
+          "child_reported_completion": false,
+          "work_completed": false,
+          "partial_artifact_created": true,
+          "independent_artifact_read": {
+            "exists": true,
+            "contents": "sum(1..5)=15\n",
+            "child_exit_code_before_read": 42
+          },
+          "external_commit_exists": false,
+          "retry_occurred": false,
+          "duplicate_side_effects": false,
+          "verified_task_state": "failed-partial-work-observed",
+          "events": [
+            {
+              "task_id": "task-partial-gvisor",
+              "attempt": 1,
+              "phase": "child_started",
+              "child_pid": 5
+            },
+            {
+              "task_id": "task-partial-gvisor",
+              "attempt": 1,
+              "phase": "ready"
+            },
+            {
+              "task_id": "task-partial-gvisor",
+              "attempt": 1,
+              "phase": "artifact_written"
+            },
+            {
+              "task_id": "task-partial-gvisor",
+              "attempt": 1,
+              "phase": "deliberate_crash_after_partial_write"
+            },
+            {
+              "task_id": "task-partial-gvisor",
+              "attempt": 1,
+              "phase": "child_exited",
+              "child_exit_code": 42
+            }
+          ]
+        }
+      ],
+      "retry_occurred": false,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": true,
+      "cleanup_confirmed": true,
+      "final_verified_task_state": "failed-partial-work-observed; ephemeral-file-absent-after-destruction"
+    }
+  }
+]

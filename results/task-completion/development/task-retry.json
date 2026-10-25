@@ -1,0 +1,34 @@
+[
+  {
+    "backend": "docker",
+    "experiment": "task-retry",
+    "expected": "After durable commit and lost acknowledgement, a fresh sandbox retries against a restarted receiver without duplicates; collision, concurrency and pre-commit recovery checks pass.",
+    "status": "failed",
+    "details": "docker start: exit status 1: Error response from daemon: failed to create task for container: failed to initialize logging driver: compression cannot be enabled when max file count is 1\nfailed to start containers: agent-runtime-lab-task-a8aca59ce12357fdcc2b573c539f18e0-receiver-1\n\ndocker logs: exit status 1: Error response from daemon: compression cannot be enabled when max file count is 1\n\nnetwork removal not confirmed: docker network: exit status 1: Error response from daemon: network agent-runtime-lab-task-a8aca59ce12357fdcc2b573c539f18e0 not found\n\ndocker volume: exit status 1: Error response from daemon: remove agent-runtime-lab-task-a8aca59ce12357fdcc2b573c539f18e0: volume is in use - [4bc5c54a4ad42c02631beb242bdb031a106b91e20d12b9d1ba467dcd89896390]\n",
+    "runs": null,
+    "task": {
+      "attempts": [],
+      "retry_occurred": false,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": false,
+      "cleanup_confirmed": false,
+      "final_verified_task_state": ""
+    }
+  },
+  {
+    "backend": "gvisor",
+    "experiment": "task-retry",
+    "expected": "After durable commit and lost acknowledgement, a fresh sandbox retries against a restarted receiver without duplicates; collision, concurrency and pre-commit recovery checks pass.",
+    "status": "failed",
+    "details": "docker start: exit status 1: Error response from daemon: failed to create task for container: failed to initialize logging driver: compression cannot be enabled when max file count is 1\nfailed to start containers: agent-runtime-lab-task-dae002e9bdaf0eed825bead584219a3d-receiver-1\n\ndocker logs: exit status 1: Error response from daemon: compression cannot be enabled when max file count is 1\n\nnetwork removal not confirmed: docker network: exit status 1: Error response from daemon: network agent-runtime-lab-task-dae002e9bdaf0eed825bead584219a3d not found\n\ndocker volume: exit status 1: Error response from daemon: remove agent-runtime-lab-task-dae002e9bdaf0eed825bead584219a3d: volume is in use - [27c25f832a7555180b418a101c4f397179b0ebc80b744f714ac14160e4efc3d7]\n",
+    "runs": null,
+    "task": {
+      "attempts": [],
+      "retry_occurred": false,
+      "duplicate_side_effects": false,
+      "fresh_sandbox_artifact_absent": false,
+      "cleanup_confirmed": false,
+      "final_verified_task_state": ""
+    }
+  }
+]
