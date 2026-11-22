@@ -90,3 +90,24 @@ go run ./cmd/admission-demo
 ```
 
 See [M2.8 experiments and known limitations](docs/admission-scheduling-m2-8.md).
+
+## M2.9 — Durable E2B fleet admission and scheduling
+
+`src/fleet` integrates the M2.8 admission scheduler with E2B lifecycle
+operations and persists the complete reservation checkpoint together with
+sandbox identity/intent before contacting E2B. CPU/RAM reservations are
+conservative upper bounds for one E2B template and are checked against the
+actual E2B-reported `cpuCount` and `memoryMB` after creation.
+
+The experimental CLI can queue, tick, pause, resume, recover and delete
+multiple sandboxes for two tenants across independent invocations. It is
+**single-host only** and requires explicit `--execute` for changes.
+
+```sh
+CGO_ENABLED=1 go test -race ./src/admission ./src/fleet ./src/e2bapi
+go vet ./...
+# Read the live E2B runbook before creating any VM:
+# docs/fleet-admission-m2-9.md
+```
+
+See [M2.9 design, live commands and limits](docs/fleet-admission-m2-9.md).
