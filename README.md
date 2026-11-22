@@ -61,3 +61,17 @@ Experiment evidence under `results/` is tracked in Git, including the original m
 ## Cleanup
 
 Stop lab commands, then run `./scripts/cleanup.sh --image`. It removes lab-labeled containers, dedicated networks/volumes and the labeled local probe image. Evidence and the local toolchain are retained; see [setup](docs/setup.md) for file cleanup.
+
+## Durable E2B control loop (M2.7)
+
+The `src/durable` package records sandbox ownership and desired state before issuing remote operations. On restart, an ambiguous create stays fenced until an existing E2B sandbox is identified by its exact metadata. The state file uses atomic rename, fsync and an exclusive local lock; no new Go dependencies or E2B upgrades are required. See [M2.7 reproduction and limitations](docs/durable-controller-m2-7.md).
+
+```sh
+cd ~/e2b
+eval "$(sudo docker compose exec -T ready cat /run/e2b/sdk.env)"
+cd ~/src/agent-runtime-lab
+go run ./cmd/e2b-durable --execute start
+go run ./cmd/e2b-durable --execute pause
+go run ./cmd/e2b-durable --execute resume
+go run ./cmd/e2b-durable --execute delete
+```
