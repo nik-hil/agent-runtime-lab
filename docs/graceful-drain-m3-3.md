@@ -6,8 +6,8 @@ deletes a VM just because its process is shutting down.
 
 The new `POST /v1/drain` endpoint is reachable only over the daemon's private
 Unix socket. It serializes with new submissions, refuses submissions and
-non-deletion intent changes for the remainder of the process, and persists
-`desired=deleted` for each active, paused, queued, or uncertain job. The
+non-deletion intent changes, and **atomically persists** a durable drain
+admission fence plus `desired=deleted` for each active, paused, queued, or uncertain job. The
 existing reconciler then observes remote ABSENT before returning reservations.
 
 `fleetctl --execute drain` waits until every workload is *confirmed* deleted
@@ -96,10 +96,11 @@ go run ./cmd/e2b-fleetctl --socket .state/m3-3-drain.sock metrics \
   Create; in that case `fleetctl drain` times out and lists the outstanding ID.
   Run `fleetctl --execute --id <id> recover` and retry drain. Do **not** reset
   or remove the journal to unblock an ambiguous Create.
-- Drain rejects new submissions for the **life of the daemon process**. The
-  admission freeze is NOT yet persisted across daemon restarts. Existing
-  per-job delete intents are persisted. Reissue drain immediately after a
-  restart, before allowing any new submission.
+- Drain's admission fence and per-job delete intents survive daemon restarts.
+  A drained journal cannot accept new workloads through the daemon. Use a
+  **different, fresh journal** for subsequent experiments. The legacy standalone
+  `e2b-fleet` CLI is not a participant in the new daemon admission guard: do
+  not use that CLI for mutations against a draining journal.
 - Drain waits for **journal-confirmed** deletion; it does not independently
   audit the E2B infrastructure for sandboxes owned by other clients.
 - No new cloud instances, network listeners, Go dependencies or system

@@ -169,3 +169,70 @@ func TestDrainKeepsReservationAcrossProviderDeleteFailure(t *testing.T) {
 		t.Fatal("reservation not reclaimed after observed absence")
 	}
 }
+
+func TestDrainFenceAndDeleteIntentsSurviveDaemonRestart(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "fleet.json")
+	b := newRuntime()
+	store, err := fleet.Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := fleet.New(store, b, testConfig(), time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := c.Submit("alpha", "job"); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 3; i++ {
+		if _, err := c.Tick(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if c.Status().Jobs["job"].Entry.State != admission.Running {
+		t.Fatal("test sandbox was not started")
+	}
+	d, err := New(c, 100*time.Millisecond, 12)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := httptest.NewRecorder()
+	DrainHandler(d).ServeHTTP(recorder, httptest.NewRequest(http.MethodPost, "/v1/drain", nil))
+	if recorder.Code != http.StatusAccepted || !c.Draining() {
+		t.Fatalf("drain was not recorded: HTTP %d", recorder.Code)
+	}
+	if err := store.Close(); err != nil {
+		t.Fatal(err)
+	}
+	store, err = fleet.Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	c, err = fleet.New(store, b, testConfig(), time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !c.Draining() || c.Status().Jobs["job"].Workload.Desired != "deleted" {
+		t.Fatal("restart lost drain fence or deletion intent")
+	}
+	d, err = New(c, 100*time.Millisecond, 12)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder = httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodPost, "/v1/submit", bytes.NewBufferString(`{"id":"other","tenant":"alpha"}`))
+	request.Header.Set("Content-Type", "application/json")
+	DrainHandler(d).ServeHTTP(recorder, request)
+	if recorder.Code != http.StatusConflict {
+		t.Fatalf("admission reopened after restart: HTTP %d", recorder.Code)
+	}
+	for i := 0; i < 4 && c.Status().Jobs["job"].Entry.State != admission.Deleted; i++ {
+		if _, err := c.Tick(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if c.Status().Jobs["job"].Entry.State != admission.Deleted || c.Status().Admission.Used.CPU != 0 {
+		t.Fatal("pending deletion did not recover after restart")
+	}
+}

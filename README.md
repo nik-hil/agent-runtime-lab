@@ -148,5 +148,5 @@ refuses new submissions during drain, and polls the read-only status until
 all workloads are confirmed deleted with zero active reservations. A timeout
 reports unresolved work and **does not** assume sandbox cleanup succeeded.
 `Ctrl+C` is still non-destructive and now prints an accurate summary of
-remaining journal workloads. The admission fence is process-local: repeat
-drain after a daemon restart. See [M3.3a runbook](docs/graceful-drain-m3-3.md).
+remaining journal workloads. The admission fence and deletion intents are persisted together in
+the journal; use a fresh journal after draining to admit new work. See [M3.3a runbook](docs/graceful-drain-m3-3.md).
