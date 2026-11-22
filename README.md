@@ -111,3 +111,17 @@ go vet ./...
 ```
 
 See [M2.9 design, live commands and limits](docs/fleet-admission-m2-9.md).
+
+## M3.1 — Continuous local E2B fleet reconciliation
+
+The M2.9 controller can now run as a manually started daemon. The daemon
+holds the exclusive journal lock, periodically reconciles desired state and
+accepts commands over a private Unix-domain socket (mode 0600). Clients no
+longer compete for the journal lock or need the E2B API key.
+
+- Server: `go run ./cmd/e2b-fleetd --execute`
+- Client: `go run ./cmd/e2b-fleetctl status`
+- Full two-terminal live experiment: [M3.1 runbook](docs/continuous-reconciler-m3-1.md).
+
+This is a single-host experiment; it does not install/start a system service,
+extend E2B TTL automatically, or deploy a multi-host control plane.
