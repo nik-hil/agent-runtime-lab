@@ -1,0 +1,31 @@
+name: Go validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CGO_ENABLED: "1"
+      LAB_INTEGRATION: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Unit tests with race detector
+        run: go test -race -count=1 ./...
+      - name: Static analysis
+        run: go vet ./...
+      - name: Formatting
+        run: |
+          test -z "$(gofmt -l src/durable src/e2bapi src/lifecycle cmd/e2b-crashlab cmd/e2b-durable cmd/e2b-lifecycle cmd/lifecycle-demo)"
