@@ -150,3 +150,18 @@ reports unresolved work and **does not** assume sandbox cleanup succeeded.
 `Ctrl+C` is still non-destructive and now prints an accurate summary of
 remaining journal workloads. The admission fence and deletion intents are persisted together in
 the journal; use a fresh journal after draining to admit new work. See [M3.3a runbook](docs/graceful-drain-m3-3.md).
+
+## M3.4 — Continuous E2B inventory reconciliation
+
+The E2B fleet daemon runs a bounded, read-only provider audit periodically.
+Critical drift (e.g. confirmed unexpected VM disappearance or duplicate
+ownership) is only allowed to **durably fence new admissions** after two
+matching complete audits and a strict current-journal snapshot check. It never
+blindly recreates, deletes unknown VMs, or releases uncertain reservations.
+New `e2b-fleetctl audit` and expanded `metrics` expose the monitor.
+
+Optional `--renew-ttl` (off by default) extends known, healthy RUNNING
+sandboxes via E2B's timeout API; `--audit-global` reports lab-tagged sandboxes
+missing from this journal without deleting them. For a consolidated
+end-to-end run, flags, limitations and cleanup, see
+[the M3.4 runbook](docs/control-plane-reliability-m3-4.md).

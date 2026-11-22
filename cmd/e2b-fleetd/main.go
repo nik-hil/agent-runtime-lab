@@ -34,6 +34,12 @@ func run() error {
 	steps := flag.Int("steps", 12, "maximum state transitions per reconciliation cycle")
 	maxBackoff := flag.Duration("max-backoff", 30*time.Second, "maximum delay for repeated transient reconciliation errors")
 	stuckAfter := flag.Duration("stuck-after", 2*time.Minute, "time before a non-converged workload is reported stalled")
+	auditInterval := flag.Duration("audit-interval", 60*time.Second, "periodic provider inventory reconciliation interval")
+	auditTimeout := flag.Duration("audit-timeout", 30*time.Second, "provider inventory request budget")
+	auditMaxJobs := flag.Int("audit-max-jobs", 100, "maximum workload records in one complete inventory audit")
+	auditGlobal := flag.Bool("audit-global", false, "also scan provider-wide lab-tagged active sandboxes")
+	renewTTL := flag.Bool("renew-ttl", false, "opt in to extending RUNNING sandbox TTL")
+	renewInterval := flag.Duration("renew-interval", 2*time.Minute, "TTL renewal interval when --renew-ttl is set")
 	execute := flag.Bool("execute", false, "required to enable live E2B operations")
 	template := flag.String("template", "base", "E2B sandbox template")
 	ttl := flag.Int("ttl", 900, "E2B sandbox TTL (seconds)")
@@ -82,6 +88,15 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	monitor, err := fleetdaemon.NewMonitor(controller, backend, fleetdaemon.MonitorOptions{
+		AuditInterval: *auditInterval, AuditTimeout: *auditTimeout,
+		MaxWorkloads: *auditMaxJobs, GlobalScan: *auditGlobal,
+		RenewTTL: *renewTTL, TTLSeconds: *ttl, RenewInterval: *renewInterval,
+		Logger: logger,
+	})
+	if err != nil {
+		return err
+	}
 	listener, cleanup, err := fleetdaemon.ListenUnix(*socket)
 	if err != nil {
 		return err
@@ -94,13 +109,18 @@ func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	server := &http.Server{
-		Handler: fleetdaemon.DrainHandler(d), ReadHeaderTimeout: 5 * time.Second,
+		Handler: monitor.Handler(fleetdaemon.DrainHandler(d)), ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout: 10 * time.Second, WriteTimeout: 90 * time.Second,
 	}
 	workerDone := make(chan struct{})
 	go func() {
 		defer close(workerDone)
 		d.Run(ctx)
+	}()
+	monitorDone := make(chan struct{})
+	go func() {
+		defer close(monitorDone)
+		monitor.Run(ctx)
 	}()
 	serveErr := make(chan error, 1)
 	go func() { serveErr <- server.Serve(listener) }()
@@ -111,6 +131,7 @@ func run() error {
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			stop()
 			<-workerDone
+			<-monitorDone
 			return fmt.Errorf("Unix API server: %w", err)
 		}
 	}
@@ -120,9 +141,11 @@ func run() error {
 	if err := server.Shutdown(shutdownCtx); err != nil {
 		_ = server.Close()
 		<-workerDone
+		<-monitorDone
 		return fmt.Errorf("HTTP shutdown: %w", err)
 	}
 	<-workerDone
+	<-monitorDone
 	state := controller.Status()
 	remaining := 0
 	for _, job := range state.Jobs {

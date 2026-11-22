@@ -1,0 +1,30 @@
+name: Inventory audit validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CGO_ENABLED: "1"
+      LAB_INTEGRATION: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Audit tests with race detector
+        run: go test -race -count=1 ./src/fleetaudit ./cmd/e2b-audit
+      - name: Static analysis
+        run: go vet ./src/fleetaudit ./cmd/e2b-audit
+      - name: Formatting
+        run: test -z "$(gofmt -l src/fleetaudit cmd/e2b-audit)"

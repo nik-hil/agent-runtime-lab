@@ -32,7 +32,7 @@ func run() error {
 	drainPoll := flag.Duration("drain-poll", 500*time.Millisecond, "status polling interval during drain")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		return errors.New("usage: e2b-fleetctl [flags] status|metrics|submit|pause|resume|delete|recover|drain")
+		return errors.New("usage: e2b-fleetctl [flags] status|audit|metrics|submit|pause|resume|delete|recover|drain")
 	}
 	action := flag.Arg(0)
 	method, endpoint := http.MethodPost, ""
@@ -40,6 +40,8 @@ func run() error {
 	switch action {
 	case "status":
 		method, endpoint = http.MethodGet, "/v1/status"
+	case "audit":
+		method, endpoint = http.MethodGet, "/v1/audit"
 	case "metrics":
 		method, endpoint = http.MethodGet, "/v1/metrics"
 	case "submit":
