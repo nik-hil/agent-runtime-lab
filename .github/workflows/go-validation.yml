@@ -28,4 +28,4 @@ jobs:
         run: go vet ./...
       - name: Formatting
         run: |
-          test -z "$(gofmt -l src/durable src/e2bapi src/lifecycle cmd/e2b-crashlab cmd/e2b-durable cmd/e2b-lifecycle cmd/lifecycle-demo)"
+          test -z "$(gofmt -l src/durable src/e2bapi src/lifecycle cmd/e2b-crashlab cmd/e2b-durable cmd/e2b-lifecycle cmd/lifecycle-demo src/admission cmd/admission-demo)"
