@@ -20,6 +20,7 @@ func main() { os.Exit(run()) }
 func run() int {
 	stateFile := flag.String("state-file", "", "existing journal path; stop fleetd first")
 	timeout := flag.Duration("timeout", 90*time.Second, "whole-audit timeout")
+	global := flag.Bool("global", false, "also scan provider-wide lab-tagged active sandboxes (read-only)")
 	flag.Parse()
 	if *stateFile == "" || flag.NArg() != 0 || *timeout <= 0 || *timeout > 5*time.Minute {
 		fmt.Fprintln(os.Stderr, "usage: e2b-audit --state-file PATH [--timeout 90s]; read-only, daemon must be stopped")
@@ -53,7 +54,12 @@ func run() int {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
-	report, err := fleetaudit.Run(ctx, j, api)
+	var report fleetaudit.Report
+	if *global {
+		report, err = fleetaudit.RunGlobal(ctx, j, api)
+	} else {
+		report, err = fleetaudit.Run(ctx, j, api)
+	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "audit incomplete; do not infer provider absence:", err)
 		return 1
