@@ -32,6 +32,7 @@ type Journal struct {
 	Workloads    map[string]Workload  `json:"workloads"`
 	Unsafe       bool                 `json:"unsafe"`
 	UnsafeNote   string               `json:"unsafe_note,omitempty"`
+	Draining     bool                 `json:"draining,omitempty"` // admission fence survives controller restart
 }
 
 // Store owns an exclusive advisory local lock and writes a temporary file,

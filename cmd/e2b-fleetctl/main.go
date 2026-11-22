@@ -28,9 +28,11 @@ func run() error {
 	id := flag.String("id", "", "stable workload ID")
 	tenant := flag.String("tenant", "alpha", "tenant for submit")
 	execute := flag.Bool("execute", false, "required for mutating commands")
+	drainTimeout := flag.Duration("drain-timeout", 120*time.Second, "time to wait for confirmed drain completion")
+	drainPoll := flag.Duration("drain-poll", 500*time.Millisecond, "status polling interval during drain")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		return errors.New("usage: e2b-fleetctl [flags] status|metrics|submit|pause|resume|delete|recover")
+		return errors.New("usage: e2b-fleetctl [flags] status|metrics|submit|pause|resume|delete|recover|drain")
 	}
 	action := flag.Arg(0)
 	method, endpoint := http.MethodPost, ""
@@ -57,11 +59,16 @@ func run() error {
 	case "recover":
 		endpoint = "/v1/recover"
 		payload = struct{ ID string }{*id}
+	case "drain":
+		endpoint = "/v1/drain"
 	default:
 		return fmt.Errorf("unknown action %q", action)
 	}
-	if method != http.MethodGet && (!*execute || *id == "") {
-		return errors.New("mutating commands require --execute and --id")
+	if method != http.MethodGet && (!*execute || (*id == "" && action != "drain")) {
+		return errors.New("mutating commands require --execute, and --id except for drain")
+	}
+	if action == "drain" && (*drainTimeout < time.Second || *drainTimeout > 10*time.Minute || *drainPoll < 100*time.Millisecond || *drainPoll > 5*time.Second) {
+		return errors.New("drain-timeout must be 1s..10m and drain-poll 100ms..5s")
 	}
 	var body io.Reader
 	if payload != nil {
@@ -100,6 +107,10 @@ func run() error {
 	if action == "metrics" {
 		_, err := os.Stdout.Write(data)
 		return err
+	}
+	if action == "drain" {
+		fmt.Fprintln(os.Stdout, "Drain requested; awaiting observed sandbox deletion (Ctrl+C on the daemon remains non-destructive)")
+		return waitForDrain(client, *drainTimeout, *drainPoll)
 	}
 	var formatted bytes.Buffer
 	if err := json.Indent(&formatted, data, "", "  "); err != nil {
