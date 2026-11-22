@@ -75,3 +75,18 @@ go run ./cmd/e2b-durable --execute pause
 go run ./cmd/e2b-durable --execute resume
 go run ./cmd/e2b-durable --execute delete
 ```
+
+## M2.8 — CPU/RAM admission control and tenant quotas
+
+The standalone `src/admission` lab implements bounded queueing, fair
+round-robin dispatch between tenants, host/tenant CPU and memory reservations,
+and cautious handling of ambiguous VM operations. Pausing releases **active**
+resources only after E2B has confirmed PAUSED; resuming requires a new
+reservation. It does **not** make live E2B calls.
+
+```sh
+go test -race -count=1 ./src/admission
+go run ./cmd/admission-demo
+```
+
+See [M2.8 experiments and known limitations](docs/admission-scheduling-m2-8.md).
