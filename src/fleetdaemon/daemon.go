@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"strings"
 	"sync"
@@ -30,9 +31,26 @@ type Controller interface {
 }
 
 type ReconcilerStatus struct {
-	Cycles      uint64    `json:"cycles"`
-	LastAttempt time.Time `json:"last_attempt,omitempty"`
-	LastError   string    `json:"last_error,omitempty"`
+	Cycles              uint64     `json:"cycles"`
+	Failures            uint64     `json:"failures"`
+	Transitions         uint64     `json:"transitions"`
+	ConsecutiveFailures uint64     `json:"consecutive_failures"`
+	LastAttempt         time.Time  `json:"last_attempt,omitempty"`
+	LastSuccess         time.Time  `json:"last_success,omitempty"`
+	LastError           string     `json:"last_error,omitempty"`
+	LastErrorAt         time.Time  `json:"last_error_at,omitempty"`
+	BackoffUntil        time.Time  `json:"backoff_until,omitempty"`
+	StuckJobs           []StuckJob `json:"stuck_jobs,omitempty"`
+}
+
+// StuckJob is a locally observed lack of convergence, not proof of a dead VM.
+// Queued jobs can be waiting legitimately for resources. Times reset on daemon
+// restart because this monitoring state is deliberately not persisted.
+type StuckJob struct {
+	ID         string `json:"id"`
+	State      string `json:"state"`
+	Desired    string `json:"desired"`
+	AgeSeconds int64  `json:"age_seconds"`
 }
 
 type Status struct {
@@ -47,16 +65,55 @@ type Daemon struct {
 	controller Controller
 	interval   time.Duration
 	maxSteps   int
+	maxBackoff time.Duration
+	stuckAfter time.Duration
+	logger     *slog.Logger
 	wake       chan struct{}
 	mu         sync.Mutex
 	status     ReconcilerStatus
+	tracked    map[string]trackedJob
 }
 
 func New(controller Controller, interval time.Duration, maxSteps int) (*Daemon, error) {
-	if controller == nil || interval < 100*time.Millisecond || interval > time.Hour || maxSteps < 1 || maxSteps > 100 {
+	return NewWithOptions(controller, Options{Interval: interval, MaxSteps: maxSteps})
+}
+
+// Options leaves existing callers on safe defaults; the daemon CLI exposes
+// explicit bounds for retries and detection. Logger may be nil to disable logs
+// (useful in unit tests). No workload content or provider credentials are logged.
+type Options struct {
+	Interval   time.Duration
+	MaxSteps   int
+	MaxBackoff time.Duration
+	StuckAfter time.Duration
+	Logger     *slog.Logger
+}
+
+func NewWithOptions(controller Controller, opts Options) (*Daemon, error) {
+	if controller == nil || opts.Interval < 100*time.Millisecond || opts.Interval > time.Hour || opts.MaxSteps < 1 || opts.MaxSteps > 100 {
 		return nil, errors.New("controller, interval [100ms..1h] and maxSteps [1..100] required")
 	}
-	return &Daemon{controller: controller, interval: interval, maxSteps: maxSteps, wake: make(chan struct{}, 1)}, nil
+	if opts.MaxBackoff == 0 {
+		opts.MaxBackoff = 30 * time.Second
+		if opts.Interval > opts.MaxBackoff {
+			opts.MaxBackoff = opts.Interval
+		}
+	}
+	if opts.StuckAfter == 0 {
+		opts.StuckAfter = 2 * time.Minute
+		if opts.Interval > opts.StuckAfter {
+			opts.StuckAfter = opts.Interval
+		}
+	}
+	if opts.MaxBackoff < opts.Interval || opts.MaxBackoff > time.Hour || opts.StuckAfter < opts.Interval || opts.StuckAfter > 24*time.Hour {
+		return nil, errors.New("max backoff must be [interval..1h], stuck-after [interval..24h]")
+	}
+	if opts.Logger == nil {
+		opts.Logger = slog.New(slog.NewTextHandler(io.Discard, nil))
+	}
+	return &Daemon{controller: controller, interval: opts.Interval, maxSteps: opts.MaxSteps,
+		maxBackoff: opts.MaxBackoff, stuckAfter: opts.StuckAfter, logger: opts.Logger,
+		wake: make(chan struct{}, 1), tracked: make(map[string]trackedJob)}, nil
 }
 
 func (d *Daemon) signal() {
@@ -73,11 +130,20 @@ func (d *Daemon) Run(ctx context.Context) {
 	defer timer.Stop()
 	d.reconcile(ctx) // resume interrupted work immediately on daemon startup
 	for {
+		var forced bool
 		select {
 		case <-ctx.Done():
 			return
 		case <-timer.C:
 		case <-d.wake:
+			forced = true // an explicit operator action may bypass a retry delay
+		}
+		d.mu.Lock()
+		waiting := !forced && time.Now().Before(d.status.BackoffUntil)
+		d.mu.Unlock()
+		if waiting {
+			d.observeJobs(time.Now().UTC()) // still detect stalls during backoff
+			continue
 		}
 		d.reconcile(ctx)
 	}
@@ -87,23 +153,46 @@ func (d *Daemon) reconcile(ctx context.Context) {
 	if ctx.Err() != nil {
 		return
 	}
+	begin := time.Now()
 	var err error
+	var transitions uint64
 	for i := 0; i < d.maxSteps; i++ {
 		var changed bool
 		changed, err = d.controller.Tick(ctx)
+		if changed {
+			transitions++
+		}
 		if err != nil || !changed {
 			break
 		}
 	}
+	now := time.Now().UTC()
 	d.mu.Lock()
 	d.status.Cycles++
-	d.status.LastAttempt = time.Now().UTC()
+	d.status.Transitions += transitions
+	d.status.LastAttempt = now
 	if err != nil {
 		d.status.LastError = err.Error()
+		d.status.LastErrorAt = now
+		d.status.Failures++
+		d.status.ConsecutiveFailures++
+		d.status.BackoffUntil = now.Add(d.retryDelay(d.status.ConsecutiveFailures))
 	} else {
-		d.status.LastError = ""
+		d.status.ConsecutiveFailures = 0
+		d.status.BackoffUntil = time.Time{}
+		d.status.LastSuccess = now
 	}
+	cycle := d.status.Cycles
+	backoff := d.status.BackoffUntil
 	d.mu.Unlock()
+	d.observeJobs(now)
+	if err != nil {
+		d.logger.Error("fleet_reconcile_failed", "cycle", cycle, "error", err.Error(),
+			"backoff_until", backoff, "transitions", transitions, "elapsed_ms", time.Since(begin).Milliseconds())
+	} else if transitions > 0 {
+		d.logger.Info("fleet_reconcile_progress", "cycle", cycle, "transitions", transitions,
+			"elapsed_ms", time.Since(begin).Milliseconds())
+	}
 }
 
 // Handler is deliberately HTTP over a filesystem-permission-restricted Unix
@@ -115,6 +204,12 @@ func (d *Daemon) Handler() http.Handler {
 		s := d.status
 		d.mu.Unlock()
 		respond(w, http.StatusOK, Status{Fleet: d.controller.Status(), Reconciler: s})
+	})
+	mux.HandleFunc("GET /v1/metrics", func(w http.ResponseWriter, r *http.Request) {
+		d.mu.Lock()
+		s := d.status
+		d.mu.Unlock()
+		writeMetrics(w, s, d.controller.Status())
 	})
 	mux.HandleFunc("POST /v1/submit", func(w http.ResponseWriter, r *http.Request) {
 		var req struct{ ID, Tenant string }

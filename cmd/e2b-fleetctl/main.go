@@ -30,7 +30,7 @@ func run() error {
 	execute := flag.Bool("execute", false, "required for mutating commands")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		return errors.New("usage: e2b-fleetctl [flags] status|submit|pause|resume|delete|recover")
+		return errors.New("usage: e2b-fleetctl [flags] status|metrics|submit|pause|resume|delete|recover")
 	}
 	action := flag.Arg(0)
 	method, endpoint := http.MethodPost, ""
@@ -38,6 +38,8 @@ func run() error {
 	switch action {
 	case "status":
 		method, endpoint = http.MethodGet, "/v1/status"
+	case "metrics":
+		method, endpoint = http.MethodGet, "/v1/metrics"
 	case "submit":
 		endpoint = "/v1/submit"
 		payload = struct{ ID, Tenant string }{*id, *tenant}
@@ -94,6 +96,10 @@ func run() error {
 	}
 	if resp.StatusCode >= 300 {
 		return fmt.Errorf("fleet daemon HTTP %d: %s", resp.StatusCode, bytes.TrimSpace(data))
+	}
+	if action == "metrics" {
+		_, err := os.Stdout.Write(data)
+		return err
 	}
 	var formatted bytes.Buffer
 	if err := json.Indent(&formatted, data, "", "  "); err != nil {

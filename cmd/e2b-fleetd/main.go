@@ -7,6 +7,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -31,6 +32,8 @@ func run() error {
 	socket := flag.String("socket", ".state/m3-1.sock", "private Unix control socket path")
 	interval := flag.Duration("interval", 2*time.Second, "reconciliation interval")
 	steps := flag.Int("steps", 12, "maximum state transitions per reconciliation cycle")
+	maxBackoff := flag.Duration("max-backoff", 30*time.Second, "maximum delay for repeated transient reconciliation errors")
+	stuckAfter := flag.Duration("stuck-after", 2*time.Minute, "time before a non-converged workload is reported stalled")
 	execute := flag.Bool("execute", false, "required to enable live E2B operations")
 	template := flag.String("template", "base", "E2B sandbox template")
 	ttl := flag.Int("ttl", 900, "E2B sandbox TTL (seconds)")
@@ -71,7 +74,11 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	d, err := fleetdaemon.New(controller, *interval, *steps)
+	logger := slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	d, err := fleetdaemon.NewWithOptions(controller, fleetdaemon.Options{
+		Interval: *interval, MaxSteps: *steps, MaxBackoff: *maxBackoff,
+		StuckAfter: *stuckAfter, Logger: logger,
+	})
 	if err != nil {
 		return err
 	}

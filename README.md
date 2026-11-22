@@ -125,3 +125,17 @@ longer compete for the journal lock or need the E2B API key.
 
 This is a single-host experiment; it does not install/start a system service,
 extend E2B TTL automatically, or deploy a multi-host control plane.
+
+## M3.2 — Operational reliability
+
+The local `e2b-fleetd` now emits structured JSON reconciliation progress/error
+events, bounds timer-driven retry traffic with exponential backoff, detects
+non-converged workloads that have made no progress, and exposes Prometheus
+metrics **only over its existing private Unix socket**.
+
+Use `go run ./cmd/e2b-fleetctl metrics` while the daemon is running.
+Monitoring counters and stall ages reset when the daemon restarts; the
+M2.9 fleet journal still preserves VM IDs, desired states and resource budgets.
+This stage does **not** install an observability stack or change E2B itself.
+
+See [M3.2 behavior and live experiment](docs/operational-reliability-m3-2.md).
