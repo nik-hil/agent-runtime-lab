@@ -70,9 +70,10 @@ go vet ./...
 cd ~/e2b
 eval "$(sudo docker compose exec -T ready cat /run/e2b/sdk.env)"
 cd ~/src/agent-runtime-lab
+go build -o /tmp/agentlab-e2b-audit ./cmd/e2b-audit
 
 # Run only AFTER the old M3.3b daemon has stopped.
-go run ./cmd/e2b-audit --state-file .state/m3-3b-live.json \
+/tmp/agentlab-e2b-audit --state-file .state/m3-3b-live.json \
   > /tmp/m3-4a-clean-audit.json
 cat /tmp/m3-4a-clean-audit.json
 ```
@@ -111,7 +112,7 @@ Terminal 1 with `Ctrl+C`; it must preserve the running VM. After the provider's
 perform the read-only comparison:
 
 ```sh
-go run ./cmd/e2b-audit --state-file .state/m3-4a-ttl.json \
+/tmp/agentlab-e2b-audit --state-file .state/m3-4a-ttl.json \
   > /tmp/m3-4a-expired-audit.json
 echo "audit exit code: $?"
 cat /tmp/m3-4a-expired-audit.json
