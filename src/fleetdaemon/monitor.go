@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"net/http/httptest"
 	"sort"
 	"strings"
 	"sync"
@@ -81,7 +80,8 @@ func NewMonitor(c *fleet.Controller, p monitorProvider, opts MonitorOptions) (*M
 	if opts.Logger == nil {
 		opts.Logger = slog.Default()
 	}
-	return &Monitor{controller: c, provider: p, opts: opts}, nil
+	return &Monitor{controller: c, provider: p, opts: opts,
+		status: MonitorStatus{Fenced: c.Status().Unsafe}}, nil
 }
 
 func (m *Monitor) Status() MonitorStatus {
@@ -93,13 +93,31 @@ func (m *Monitor) Status() MonitorStatus {
 func (m *Monitor) Run(ctx context.Context) {
 	auditTicker := time.NewTicker(m.opts.AuditInterval)
 	defer auditTicker.Stop()
-	var renewTicker *time.Ticker
-	var renewC <-chan time.Time
+	var renewDone chan struct{}
 	if m.opts.RenewTTL {
-		renewTicker = time.NewTicker(m.opts.RenewInterval)
-		defer renewTicker.Stop()
-		renewC = renewTicker.C
+		// Renewals must run independently: a slow metadata audit must NOT
+		// postpone TTL extensions long enough for an otherwise healthy VM
+		// to expire. Both loops obey the same shutdown context.
+		renewDone = make(chan struct{})
+		go func() {
+			defer close(renewDone)
+			ticker := time.NewTicker(m.opts.RenewInterval)
+			defer ticker.Stop()
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case <-ticker.C:
+					m.renew(ctx)
+				}
+			}
+		}()
 	}
+	defer func() {
+		if renewDone != nil {
+			<-renewDone
+		}
+	}()
 	// Do not issue a full inventory scan during the controller's initial
 	// recovery cycle. The periodic audit begins after one complete interval.
 	for {
@@ -108,8 +126,6 @@ func (m *Monitor) Run(ctx context.Context) {
 			return
 		case <-auditTicker.C:
 			m.Audit(ctx)
-		case <-renewC:
-			m.renew(ctx)
 		}
 	}
 }
@@ -248,17 +264,13 @@ func (m *Monitor) Handler(base http.Handler) http.Handler {
 			w.Header().Set("Cache-Control", "no-store")
 			_ = json.NewEncoder(w).Encode(m.Status())
 		case r.Method == http.MethodGet && r.URL.Path == "/v1/metrics":
-			// Keep all base metrics intact; the base handler is guaranteed to
-			// be a bounded local-only response (no user-controlled labels).
-			recorder := httptest.NewRecorder()
-			base.ServeHTTP(recorder, r)
-			if recorder.Code != http.StatusOK {
-				base.ServeHTTP(w, r)
+			// Stream existing metrics to the client rather than buffering an
+			// httptest recorder in production. Append only on HTTP 200.
+			stream := &metricsWriter{ResponseWriter: w, status: http.StatusOK}
+			base.ServeHTTP(stream, r)
+			if stream.status != http.StatusOK {
 				return
 			}
-			w.Header().Set("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
-			w.Header().Set("Cache-Control", "no-store")
-			_, _ = w.Write(recorder.Body.Bytes())
 			s := m.Status()
 			fmt.Fprintf(w, "# HELP fleetd_inventory_audits_total Complete inventory audit attempts.\n# TYPE fleetd_inventory_audits_total counter\nfleetd_inventory_audits_total %d\n", s.Runs)
 			fmt.Fprintf(w, "# HELP fleetd_inventory_failures_total Incomplete inventory audits.\n# TYPE fleetd_inventory_failures_total counter\nfleetd_inventory_failures_total %d\n", s.Failures)
@@ -269,4 +281,14 @@ func (m *Monitor) Handler(base http.Handler) http.Handler {
 			base.ServeHTTP(w, r)
 		}
 	})
+}
+
+type metricsWriter struct {
+	http.ResponseWriter
+	status int
+}
+
+func (w *metricsWriter) WriteHeader(status int) {
+	w.status = status
+	w.ResponseWriter.WriteHeader(status)
 }
