@@ -139,3 +139,14 @@ M2.9 fleet journal still preserves VM IDs, desired states and resource budgets.
 This stage does **not** install an observability stack or change E2B itself.
 
 See [M3.2 behavior and live experiment](docs/operational-reliability-m3-2.md).
+
+## M3.3a — Explicit fleet draining
+
+The daemon now supports a separate `fleetctl --execute drain` operation.
+It requests deletion for all workloads in the active single-host journal,
+refuses new submissions during drain, and polls the read-only status until
+all workloads are confirmed deleted with zero active reservations. A timeout
+reports unresolved work and **does not** assume sandbox cleanup succeeded.
+`Ctrl+C` is still non-destructive and now prints an accurate summary of
+remaining journal workloads. The admission fence is process-local: repeat
+drain after a daemon restart. See [M3.3a runbook](docs/graceful-drain-m3-3.md).

@@ -94,7 +94,7 @@ func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	server := &http.Server{
-		Handler: d.Handler(), ReadHeaderTimeout: 5 * time.Second,
+		Handler: fleetdaemon.DrainHandler(d), ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout: 10 * time.Second, WriteTimeout: 90 * time.Second,
 	}
 	workerDone := make(chan struct{})
@@ -104,7 +104,7 @@ func run() error {
 	}()
 	serveErr := make(chan error, 1)
 	go func() { serveErr <- server.Serve(listener) }()
-	fmt.Printf("Fleet reconciler running; socket=%s journal=%s (SIGINT/SIGTERM stops it; VMs remain managed by E2B)\n", *socket, *stateFile)
+	fmt.Printf("Fleet reconciler running; socket=%s journal=%s (Ctrl+C stops controller only; use fleetctl drain for cleanup)\n", *socket, *stateFile)
 	select {
 	case <-ctx.Done():
 	case err := <-serveErr:
@@ -123,6 +123,18 @@ func run() error {
 		return fmt.Errorf("HTTP shutdown: %w", err)
 	}
 	<-workerDone
-	fmt.Println("Fleet worker stopped; remote sandboxes were NOT deleted")
+	state := controller.Status()
+	remaining := 0
+	for _, job := range state.Jobs {
+		if job.Entry.State != admission.Deleted {
+			remaining++
+		}
+	}
+	if remaining == 0 && state.Admission.Pending == 0 && state.Admission.Used.CPU == 0 && state.Admission.Used.MemoryMiB == 0 {
+		fmt.Println("Fleet controller stopped; all journal workloads confirmed deleted; shutdown performed no VM mutations")
+	} else {
+		fmt.Printf("Fleet controller stopped; %d unresolved workload(s), CPU=%d and RAM=%d MiB still reserved; shutdown performed no VM mutations. Restart with same journal to continue.\n",
+			remaining, state.Admission.Used.CPU, state.Admission.Used.MemoryMiB)
+	}
 	return nil
 }
