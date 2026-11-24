@@ -20,7 +20,7 @@ import (
 	"agent-runtime-lab/src/taskevidence"
 )
 
-func startM5Process(t *testing.T, binary, logPath string, args ...string) *liveProcess {
+func startM5Process(t, lifetime *testing.T, binary, logPath string, args ...string) *liveProcess {
 	t.Helper()
 	log, err := os.OpenFile(logPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 	if err != nil {
@@ -34,7 +34,7 @@ func startM5Process(t *testing.T, binary, logPath string, args ...string) *liveP
 	}
 	p := &liveProcess{cmd: cmd, done: make(chan struct{})}
 	go func() { p.err = cmd.Wait(); log.Close(); close(p.done) }()
-	t.Cleanup(func() { stopM5Process(t, p, false) })
+	lifetime.Cleanup(func() { stopM5Process(lifetime, p, false) })
 	return p
 }
 func stopM5Process(t *testing.T, p *liveProcess, crash bool) {
@@ -65,6 +65,7 @@ func stopM5Process(t *testing.T, p *liveProcess, crash bool) {
 // three real etcd members. This single-host gate proves process failover;
 // physical-server HA requires deploying those roles across failure domains.
 func TestM5Cluster(t *testing.T) {
+	lifetime := t
 	if os.Getenv("LAB_M5_E2B_INTEGRATION") != "1" {
 		t.Skip("set LAB_M5_E2B_INTEGRATION=1 for live M5 cluster release gate")
 	}
@@ -86,8 +87,9 @@ func TestM5Cluster(t *testing.T) {
 	for i := range agents {
 		address := availablePort(t)
 		id := fmt.Sprintf("node-%c", 'a'+i)
-		agentArgs[i] = append(append([]string{}, common...), "--id", id, "--listen", address, "--advertise", "https://"+address, "--state-file", filepath.Join(q.dir, id, "node.json"), "--fleet-socket", fleets[i].socket, "--labels", "pin="+id, "--test-hold-claim-job", "pending-move")
-		agents[i] = startM5Process(t, filepath.Join(build.dir, "node-agent"), filepath.Join(q.dir, id+".log"), agentArgs[i]...)
+		agentArgs[i] = append(append([]string{}, common...), "--id", id, "--listen", address, "--advertise", "https://"+address, "--state-file", filepath.Join(q.dir, id, "node.json"), "--fleet-socket", fleets[i].socket, "--labels", "pin="+id)
+		agentArgs[i] = append(agentArgs[i], m5PendingFaultArgs(id)...)
+		agents[i] = startM5Process(t, lifetime, filepath.Join(build.dir, "node-agent"), filepath.Join(q.dir, id+".log"), agentArgs[i]...)
 	}
 	coordinators := map[string]*liveProcess{}
 	var servers []string
@@ -96,7 +98,7 @@ func TestM5Cluster(t *testing.T) {
 		id := fmt.Sprintf("coord-%c", 'a'+i)
 		args := append(append([]string{}, common...), "--id", id, "--listen", address, "--advertise", "https://"+address)
 		servers = append(servers, "https://"+address)
-		coordinators[id] = startM5Process(t, filepath.Join(build.dir, "clusterd"), filepath.Join(q.dir, id+".log"), args...)
+		coordinators[id] = startM5Process(t, lifetime, filepath.Join(build.dir, "clusterd"), filepath.Join(q.dir, id+".log"), args...)
 	}
 	ctx := context.Background()
 	tlsConfig, err := clustertls.Config(filepath.Join(q.pki, "cluster-ca.pem"), filepath.Join(q.pki, "operator.pem"), filepath.Join(q.pki, "operator.key"))
@@ -114,26 +116,32 @@ func TestM5Cluster(t *testing.T) {
 		}
 		return r
 	}
-	submit := func(req cluster.Request) {
+	submit := func(t *testing.T, req cluster.Request) {
 		t.Helper()
 		if _, _, err := client.Request(ctx, http.MethodPost, "/v1/jobs", req); err != nil {
 			t.Fatal(err)
 		}
 	}
-	job := func(id, state string) cluster.Job {
+	job := func(t *testing.T, id, state string) cluster.Job {
 		t.Helper()
 		var result cluster.Job
+		last := ""
 		eventuallyM5(t, id+" "+state, func() bool {
 			s, err := q.repo.Read(ctx)
 			if err != nil {
 				return false
 			}
 			result = s.Jobs[id]
+			progress := fmt.Sprintf("state=%s node=%s epoch=%d replicas=%d note=%s", result.State, result.Node, result.Epoch, len(result.Replicas), result.Note)
+			if progress != last {
+				t.Logf("job %s: %s", id, progress)
+				last = progress
+			}
 			return result.State == state
 		})
 		return result
 	}
-	artifact := func(id string) {
+	artifact := func(t *testing.T, id string) {
 		t.Helper()
 		data, headers, err := client.Request(ctx, http.MethodGet, "/v1/jobs/"+id+"/artifacts/0", nil)
 		if err != nil || string(data) != "marker\n" || headers.Get("X-Artifact-SHA256") != taskevidence.Hash(data) {
@@ -141,21 +149,21 @@ func TestM5Cluster(t *testing.T) {
 		}
 	}
 	if !t.Run("pending_assignment_moves_after_worker_crash", func(t *testing.T) {
-		submit(request("pending-move", false))
-		assigned := job("pending-move", "assigned")
+		submit(t, request("pending-move", false))
+		assigned := job(t, "pending-move", "assigned")
 		if assigned.Node != "node-a" {
 			t.Fatal("deterministic initial assignment changed", assigned)
 		}
 		stopM5Process(t, agents[0], true)
-		done := job("pending-move", "succeeded")
+		done := job(t, "pending-move", "succeeded")
 		if done.Node == "node-a" || done.Epoch <= assigned.Epoch {
 			t.Fatal("never-dispatched assignment did not move", done)
 		}
-		artifact("pending-move")
+		artifact(t, "pending-move")
 		if _, err := cluster.NewFleetClient(fleets[0].socket).Job(ctx, assigned.LocalID); !errors.Is(err, cluster.ErrNotFound) {
 			t.Fatal("old owner dispatched moved job", err)
 		}
-		agents[0] = startM5Process(t, filepath.Join(build.dir, "node-agent"), filepath.Join(q.dir, "node-a-rejoin.log"), agentArgs[0]...)
+		agents[0] = startM5Process(t, lifetime, filepath.Join(build.dir, "node-agent"), filepath.Join(q.dir, "node-a-rejoin.log"), agentArgs[0]...)
 		eventuallyM5(t, "node-a rejoined with same incarnation", ready)
 	}) {
 		return
@@ -163,8 +171,8 @@ func TestM5Cluster(t *testing.T) {
 	if !t.Run("coordinator_crash_elects_successor", func(t *testing.T) {
 		r := request("leader-failover", false)
 		r.Command = "sleep 2; " + r.Command
-		submit(r)
-		job(r.ID, "dispatched")
+		submit(t, r)
+		job(t, r.ID, "dispatched")
 		s, err := q.repo.Read(ctx)
 		if err != nil {
 			t.Fatal(err)
@@ -172,8 +180,8 @@ func TestM5Cluster(t *testing.T) {
 		old := s.Leader
 		stopM5Process(t, coordinators[old.ID], true)
 		eventuallyM5(t, "new coordinator leader", func() bool { s, err := q.repo.Read(ctx); return err == nil && s.Leader.ID != "" && s.Leader != old })
-		job(r.ID, "succeeded")
-		artifact(r.ID)
+		job(t, r.ID, "succeeded")
+		artifact(t, r.ID)
 		// Future mutations deliberately target the surviving coordinator once.
 		s, _ = q.repo.Read(ctx)
 		client.Servers = []string{s.Leader.URL}
@@ -206,10 +214,10 @@ func TestM5Cluster(t *testing.T) {
 				agentArgs[0][i+1] = fleets[0].socket
 			}
 		}
-		agents[0] = startM5Process(t, filepath.Join(build.dir, "node-agent"), filepath.Join(q.dir, "node-a-proof.log"), agentArgs[0]...)
+		agents[0] = startM5Process(t, lifetime, filepath.Join(build.dir, "node-agent"), filepath.Join(q.dir, "node-a-proof.log"), agentArgs[0]...)
 		eventuallyM5(t, "proof node ready", ready)
 		r := request("pinned-proof", true)
-		submit(r)
+		submit(t, r)
 		select {
 		case <-fleets[0].process.done:
 		case <-time.After(90 * time.Second):
@@ -220,7 +228,7 @@ func TestM5Cluster(t *testing.T) {
 			t.Fatal("wrong crash outcome", fleets[0].process.err)
 		}
 		stopM5Process(t, agents[0], true)
-		unknown := job(r.ID, "uncertain")
+		unknown := job(t, r.ID, "uncertain")
 		eventuallyM5(t, "original node heartbeat expired", func() bool { s, err := q.repo.Read(ctx); _, live := s.Live["node-a"]; return err == nil && !live })
 		if unknown.Node != "node-a" || unknown.Epoch != 1 || unknown.Released {
 			t.Fatal("unknown execution moved or reservation was released", unknown)
@@ -236,12 +244,12 @@ func TestM5Cluster(t *testing.T) {
 				agentArgs[0][i+1] = fleets[0].socket
 			}
 		}
-		agents[0] = startM5Process(t, filepath.Join(build.dir, "node-agent"), filepath.Join(q.dir, "node-a-recover.log"), agentArgs[0]...)
+		agents[0] = startM5Process(t, lifetime, filepath.Join(build.dir, "node-agent"), filepath.Join(q.dir, "node-a-recover.log"), agentArgs[0]...)
 		eventuallyM5(t, "original journal node restored", ready)
 		if _, _, err := client.Request(ctx, http.MethodPost, "/v1/jobs/"+r.ID+"/recover", struct{}{}); err != nil {
 			t.Fatal(err)
 		}
-		done := job(r.ID, "succeeded")
+		done := job(t, r.ID, "succeeded")
 		if done.Epoch != unknown.Epoch || done.LocalID != localID || len(done.Replicas) < 2 {
 			t.Fatal("recovery changed execution or lacks independent receipts", done)
 		}
@@ -254,7 +262,7 @@ func TestM5Cluster(t *testing.T) {
 		if err := fleets[0].stop(); err != nil {
 			t.Fatal(err)
 		}
-		artifact(r.ID)
+		artifact(t, r.ID)
 		data, _, err := client.Request(ctx, http.MethodGet, "/v1/jobs/"+r.ID+"/result", nil)
 		if err != nil || !strings.Contains(string(data), "1 /tmp/pinned-proof") {
 			t.Fatal("verified one-marker result unavailable", err)

@@ -56,7 +56,7 @@ if [[ "$mode" == e2b || "$mode" == all || "$mode" == cluster ]]; then
 fi
 if [[ "$mode" == quorum || "$mode" == cluster || "$mode" == all ]]; then
   LAB_INTEGRATION=0 LAB_E2B_INTEGRATION=0 LAB_CLUSTER_INTEGRATION=1 LAB_M5_E2B_INTEGRATION=0 CGO_ENABLED=1 \
-    go test -race -count=1 -timeout 10m -v ./tests -run '^TestM5(Quorum|Protocol)$' 2>&1 | tee "$report_dir/quorum.log"
+    go test -race -count=1 -timeout 10m -v ./tests -run '^TestM5(Quorum|Protocol|PendingFailover)$' 2>&1 | tee "$report_dir/quorum.log"
 fi
 if [[ "$mode" == cluster || "$mode" == all ]]; then
   LAB_INTEGRATION=0 LAB_E2B_INTEGRATION=0 LAB_CLUSTER_INTEGRATION=0 LAB_M5_E2B_INTEGRATION=1 CGO_ENABLED=1 \

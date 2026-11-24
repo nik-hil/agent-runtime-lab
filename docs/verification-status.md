@@ -62,3 +62,24 @@ This editing workspace cannot create Unix sockets (`operation not permitted`).
 Targeted in-process and filesystem tests run here; GitHub CI must run the full
 unit/race suite including existing Unix-socket tests. No socket tests are
 silently skipped to claim success.
+
+## M5 live fixture failure: pending assignment
+
+The operator's cluster run at `results/verify-tnLJQbKi` passed all unit/race,
+M4 lifecycle/async, and etcd quorum/TLS protocol gates. Its first live M5
+subtest timed out waiting for `pending-move` to succeed. Every selected fleet
+cleanup completed with CPU=0, MiB=0 and pending=0. This remains a failed M5
+live run, not a cluster verification pass.
+
+The fixture accidentally supplied `--test-hold-claim-job pending-move` to all
+three workers, preventing surviving workers from claiming the reassigned job.
+The fault is now scoped to node-a and shared with a CI pending-reassignment
+regression that verifies one admission on a survivor and no VM creation on the
+held original owner. Polling/assertion helpers now use the active subtest's
+testing.T, preventing the secondary parent-FailNow panic. Restarted worker
+processes are retained for the entire parent scenario instead of being stopped
+by a subtest's cleanup. Job progress logs include state, owner, epoch, replicas
+and the saved note without command contents.
+
+The TLS `client certificate role is not authorized` line inside the passing
+protocol test is its intentional operator-certificate rejection check.
