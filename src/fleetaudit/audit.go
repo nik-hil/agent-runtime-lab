@@ -58,7 +58,7 @@ func Run(ctx context.Context, j fleet.Journal, p Provider) (Report, error) {
 		}
 	}
 	if j.Unsafe {
-		add("", "journal_unsafe", "critical", "journal already blocks admission; investigate the saved unsafe reason", "")
+		add("", "journal_unsafe", "warning", "journal already blocks admission; investigate the saved unsafe reason", "")
 	}
 	ids := make([]string, 0, len(j.Workloads))
 	for id := range j.Workloads {

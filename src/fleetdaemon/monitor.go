@@ -192,7 +192,7 @@ func (m *Monitor) Audit(ctx context.Context) {
 		m.opts.Logger.Warn("fleet_inventory_drift", "findings", len(report.Findings),
 			"critical", len(critical), "scope", report.Scope)
 	}
-	if confirm {
+	if confirm && !m.controller.Status().Unsafe {
 		// The controller verifies that NONE of the live journal state changed
 		// since the audited snapshot, before durably fencing admission.
 		fenced, fenceErr := m.controller.FenceIfSnapshotCurrent(snapshot,
