@@ -33,6 +33,10 @@ func recoverTask(w http.ResponseWriter, r *http.Request, c *fleet.Controller, ex
 		fail(w, http.StatusServiceUnavailable, "task journal unavailable")
 		return
 	}
+	if entry.Async {
+		fail(w, http.StatusConflict, "async jobs require /v1/jobs/ID/recover so durable artifacts are verified")
+		return
+	}
 	if entry.State == taskjournal.Succeeded || entry.State == taskjournal.Failed {
 		respond(w, http.StatusOK, entry)
 		return

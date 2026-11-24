@@ -102,7 +102,7 @@ func (v *liveFleet) build(t *testing.T, name, source string, static bool) {
 	}
 }
 
-func (v *liveFleet) start(t *testing.T, name string, crash bool) {
+func (v *liveFleet) start(t *testing.T, name string, crash bool, extra ...string) {
 	t.Helper()
 	v.socket = filepath.Join(v.dir, name+".sock")
 	if len(v.socket) > 100 {
@@ -125,6 +125,7 @@ func (v *liveFleet) start(t *testing.T, name string, crash bool) {
 	if crash {
 		args = append(args, "--test-crash-after-evidence-task", "verify-crash")
 	}
+	args = append(args, extra...)
 	logFile, err := os.OpenFile(filepath.Join(v.dir, name+".log"), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 	if err != nil {
 		t.Fatal(err)
@@ -142,9 +143,10 @@ func (v *liveFleet) start(t *testing.T, name string, crash bool) {
 		_ = logFile.Close()
 		close(p.done)
 	}()
+	socket := v.socket
 	transport := &http.Transport{
 		DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
-			return (&net.Dialer{}).DialContext(ctx, "unix", v.socket)
+			return (&net.Dialer{}).DialContext(ctx, "unix", socket)
 		},
 	}
 	v.client = &http.Client{

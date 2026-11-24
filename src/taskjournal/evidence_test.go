@@ -110,7 +110,7 @@ func TestEvidenceRequestBindingAndKnownFailure(t *testing.T) {
 	}
 }
 
-func TestVersionOneMigrationPreservesRecordsAndWritesVersionTwo(t *testing.T) {
+func TestVersionOneMigrationPreservesRecordsAndWritesCurrentVersion(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "private", "tasks.json")
 	s := openTest(t, path)
 	_, _, _ = s.Begin("legacy", "work", "vm-1", "echo original", 30)
@@ -135,7 +135,7 @@ func TestVersionOneMigrationPreservesRecordsAndWritesVersionTwo(t *testing.T) {
 	}
 	data, _ = os.ReadFile(path)
 	var migrated checkpoint
-	if err := json.Unmarshal(data, &migrated); err != nil || migrated.Version != 2 {
+	if err := json.Unmarshal(data, &migrated); err != nil || migrated.Version != version {
 		t.Fatalf("migration not persisted: %s %v", data, err)
 	}
 }

@@ -52,6 +52,6 @@ if [[ "$mode" == all ]]; then
 fi
 if [[ "$mode" != unit ]]; then
   LAB_INTEGRATION=0 LAB_E2B_INTEGRATION=1 CGO_ENABLED=1 \
-    go test -race -count=1 -timeout 20m -v ./tests -run '^TestE2BFullLifecycle$' 2>&1 | tee "$report_dir/e2b.log"
+    go test -race -count=1 -timeout 20m -v ./tests -run '^TestE2B(FullLifecycle|AsyncJobs)$' 2>&1 | tee "$report_dir/e2b.log"
 fi
 echo "PASS: requested verification mode $mode; logs preserved in $report_dir"

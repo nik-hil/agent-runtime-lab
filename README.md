@@ -214,3 +214,18 @@ E2B lifecycle/task/crash-recovery gate. The test owns its daemon and disposable
 journal and checks standalone cleanup. Use `./scripts/verify.sh e2b` for an
 Embed-only host, or `./scripts/verify.sh unit` without live infrastructure.
 See [complete commands, coverage and remaining implementation](docs/full-verification.md).
+
+## M4.4 — Asynchronous jobs and durable artifacts
+
+`e2b-jobctl submit` returns a durable queued acceptance while bounded workers
+execute evidence-backed commands independently of the client connection. Jobs
+share the synchronous task journal's VM fence, survive queued restarts, and
+support explicit cancellation and recovery. Interrupted dispatch is never
+automatically rerun. Verified completion bundles and artifact bytes are synced
+to private host storage before completion, survive VM deletion, and can be
+downloaded with integrity checks. No new services or runtimes are installed.
+
+See [M4.4 behavior and complete commands](docs/m4-async-jobs.md), and
+[the recorded verification status](docs/verification-status.md). The e2b
+verification mode now runs both M4.3 and M4.4 live gates; the all mode still
+requires Docker's gVisor runtime registration.
