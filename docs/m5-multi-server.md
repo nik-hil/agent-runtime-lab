@@ -111,8 +111,11 @@ cd ~/src/agent-runtime-lab
 ./scripts/verify.sh quorum
 ```
 
-CI runs that quorum gate against real etcd; it does not pretend to run live
-VMs. The full live gate is opt-in and must pass on the E2B host before calling
+CI runs that quorum gate against real etcd, plus a TLS node/coordinator protocol
+test with a synthetic fleet backend. That test exercises async admission,
+artifact replication, reservation release, coordinator replacement and download
+after owner loss; it makes no live VM execution claim. The full live gate is
+opt-in and must pass on the E2B host before calling
 M5 live-verified. A single-host process test does not prove physical host HA.
 
 ## Build and operator commands
@@ -235,6 +238,17 @@ needs its reservation-release acknowledgement. Do not clear global records
 based only on an offline node or expired lease. There is no automatic garbage
 collection of historical jobs or archives in this milestone; quota exhaustion
 fails closed and requires planned namespace retirement after full cleanup.
+
+## Maintainer verification record
+
+The full Go race/format/vet gate, inventory audit gate, and real three-member
+etcd/TLS protocol gate passed in PR #15 on commit
+`086eb84b1a3c68034fbfcbc1ce1702590197ecad`. The quorum gate includes
+server-side lease expiration, stale coordinator rejection, operation with one
+member down, fail-closed behavior with two members down, and verified replica
+access after owner loss. It does not include real E2B commands. The live M5
+gate remains pending on the operator's server; the earlier M4.4 live pass is
+recorded separately in verification-status.md.
 
 References: [etcd JSON gateway](https://etcd.io/docs/v3.6/dev-guide/api_grpc_gateway/),
 [client design and failure semantics](https://etcd.io/docs/v3.6/learning/design-client/),

@@ -6,6 +6,10 @@ Its live gate is `./scripts/verify.sh cluster`; M4.4's earlier operator pass is
 not evidence of an M5 live pass. The gVisor/runsc registration issue remains a
 separate prerequisite for `verify.sh all`.
 
+M5 CI on `086eb84b1a3c68034fbfcbc1ce1702590197ecad`: all Go race tests,
+formatting/vet, inventory audit, and the real etcd quorum/TLS protocol gate
+passed. The protocol backend synthesizes results; it is not a live E2B pass.
+
 ## 2026-11-24: ubuntu-c-8-sfo2
 
 The operator ran `./scripts/verify.sh all` on branch

@@ -249,6 +249,7 @@ func TestM5Cluster(t *testing.T) {
 		if _, _, err := client.Request(ctx, http.MethodPost, "/v1/jobs", r); err != nil {
 			t.Fatal(err)
 		}
+		eventuallyM5(t, "recovered VM confirmed deleted and reservation released", func() bool { s, err := q.repo.Read(ctx); return err == nil && s.Jobs[r.ID].Released })
 		stopM5Process(t, agents[0], true)
 		if err := fleets[0].stop(); err != nil {
 			t.Fatal(err)
@@ -260,6 +261,12 @@ func TestM5Cluster(t *testing.T) {
 		}
 	}) {
 		return
+	}
+	if _, _, err := client.Request(ctx, http.MethodPost, "/v1/drain", struct{}{}); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := client.Request(ctx, http.MethodPost, "/v1/jobs", request("after-drain", false)); err == nil {
+		t.Fatal("cluster drain accepted new work")
 	}
 	t.Log("PASS: real E2B process failover, pinned uncertain execution, evidence-only recovery, replicated artifacts; selected-journal cleanup follows")
 }
