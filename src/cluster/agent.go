@@ -109,7 +109,7 @@ func (a *Agent) heartbeat(ctx context.Context) {
 			n := a.Node
 			n.Capacity = caps.Capacity
 			n.Template = caps.Template
-			n.ForeignWork = status.Fleet.Unsafe || caps.Workers == 0 || caps.Helper == ""
+			n.ForeignWork = status.Fleet.Unsafe || status.Fleet.Draining || caps.Workers == 0 || caps.Helper == ""
 			known := map[string]bool{}
 			for _, job := range view.Jobs {
 				if job.Node == n.ID && job.Incarnation == n.Incarnation {
@@ -294,6 +294,9 @@ func (a *Agent) observe(ctx context.Context, job Job, live Live, local taskjourn
 	job.Accepted = true
 	job.Request.Command = ""
 	identity := local.EvidenceIdentity()
+	if job.Identity != nil && !reflect.DeepEqual(*job.Identity, identity) {
+		return a.unknown(ctx, job, live, "local completion identity changed; saved ownership requires review")
+	}
 	job.Identity = &identity
 	if job.Cancel && local.State != taskjournal.Succeeded && local.State != taskjournal.Failed && local.State != taskjournal.Cancelled {
 		if err := a.Fleet.Cancel(ctx, job.LocalID); err != nil {

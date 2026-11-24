@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -462,5 +463,132 @@ func TestReplicatedArtifactsSurviveOriginalNodeLoss(t *testing.T) {
 	}
 	if err := SaveDownload(filepath.Join(t.TempDir(), "bad"), []byte("bad"), taskevidence.Hash([]byte("good"))); err == nil {
 		t.Fatal("corrupt download published")
+	}
+}
+
+func TestTenantActiveBudgetAcrossServersAndDurableDrain(t *testing.T) {
+	kv := newMemory()
+	r, _ := NewRepository(kv, "test")
+	cfg := DefaultConfig("test")
+	cfg.Tenants["alpha"] = Policy{MaxLogical: MaxJobs, MaxActive: admission.Resources{CPU: 4, MemoryMiB: 4096}}
+	if err := r.Bootstrap(context.Background(), cfg); err != nil {
+		t.Fatal(err)
+	}
+	l, _, _, err := r.Campaign(context.Background(), "leader", "https://leader:7443", 6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, live, _ := register(t, r, "a", nil)
+	register(t, r, "b", nil)
+	register(t, r, "c", nil)
+	for _, id := range []string{"one", "two", "three"} {
+		submit(t, r, id)
+	}
+	for range 3 {
+		schedule(t, r, l)
+	}
+	s := snapshot(t, r)
+	if s.Jobs["three"].State != "queued" || usage(s, "", "alpha").CPU != 4 {
+		t.Fatal("global tenant active quota ignored", s.Jobs)
+	}
+	first := s.Jobs["one"]
+	if ok, err := r.Claim(context.Background(), first.Request.ID, first.Epoch, live); err != nil || !ok {
+		t.Fatal(err)
+	}
+	if err := r.Drain(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	for _, j := range snapshot(t, r).Jobs {
+		if j.Request.ID == "one" {
+			if j.State != "dispatched" || j.Released {
+				t.Fatal("drain claimed running cancellation")
+			}
+		} else if j.State != "cancelled" || !j.Released {
+			t.Fatal("drain failed to cancel undispatched work", j)
+		}
+	}
+	if _, _, err := r.Submit(context.Background(), Request{ID: "new", Tenant: "alpha", Command: "true", Timeout: 30, Resources: shape}); !errors.Is(err, ErrFenced) {
+		t.Fatal("drain failed to fence admission", err)
+	}
+	if err := r.Bootstrap(context.Background(), cfg); err != nil {
+		t.Fatal("restart rejected identical config", err)
+	}
+	if !snapshot(t, r).Draining {
+		t.Fatal("restart cleared drain")
+	}
+}
+
+func TestCommandIntentAndMissingLocalJournalCannotAuthorizeReplay(t *testing.T) {
+	r, _, l := testRepo(t)
+	state, err := OpenLocal(filepath.Join(t.TempDir(), "private", "state"), "test", "a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer state.Close()
+	n := Node{ID: "a", Incarnation: state.Incarnation(), URL: "https://a:7443", Capacity: shape, Template: shape}
+	live := Live{Node: n.ID, Incarnation: n.Incarnation, Token: Token()}
+	lease, _ := r.KV.Grant(context.Background(), 6)
+	if err := r.Register(context.Background(), n, live, lease); err != nil {
+		t.Fatal(err)
+	}
+	submit(t, r, "command-sent")
+	schedule(t, r, l)
+	j := snapshot(t, r).Jobs["command-sent"]
+	if err := state.Prepare(j); err != nil {
+		t.Fatal(err)
+	}
+	if ok, err := r.Claim(context.Background(), j.Request.ID, j.Epoch, live); err != nil || !ok {
+		t.Fatal(err)
+	}
+	if send, err := state.Mark(j.Request.ID, j.Epoch, false); err != nil || !send {
+		t.Fatal(err)
+	}
+	if send, err := state.Mark(j.Request.ID, j.Epoch, true); err != nil || !send {
+		t.Fatal(err)
+	}
+	f := &deadFleet{}
+	a := Agent{Repo: r, State: state, Fleet: f, Node: n}
+	a.setSession(live, true)
+	for range 3 {
+		if err := a.Step(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if f.vmCalls != 0 || f.jobCalls != 0 || snapshot(t, r).Jobs[j.Request.ID].State != "uncertain" {
+		t.Fatal("missing local task authorized replay")
+	}
+}
+
+func TestConcurrentBootstrapAndBoundedDrain(t *testing.T) {
+	kv := newMemory()
+	r, _ := NewRepository(kv, "test")
+	cfg := DefaultConfig("test")
+	cfg.Tenants["alpha"] = Policy{MaxLogical: MaxJobs, MaxActive: shape}
+	var wg sync.WaitGroup
+	errs := make(chan error, 8)
+	for range 8 {
+		wg.Add(1)
+		go func() { defer wg.Done(); errs <- r.Bootstrap(context.Background(), cfg) }()
+	}
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		if err != nil {
+			t.Fatal("standby startup failed", err)
+		}
+	}
+	for i := 0; i < MaxJobs; i++ {
+		q := Request{ID: fmt.Sprintf("job-%d", i), Tenant: "alpha", Command: "true", Timeout: 30, Resources: shape}
+		if _, _, err := r.Submit(context.Background(), q); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := r.Drain(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	for _, j := range snapshot(t, r).Jobs {
+		if j.State != "cancelled" {
+			t.Fatal("bounded drain left runnable intent")
+		}
 	}
 }

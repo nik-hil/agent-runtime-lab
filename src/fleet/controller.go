@@ -49,6 +49,7 @@ type Config struct {
 // Status is a nonsecret durable snapshot suitable for CLI output.
 type Status struct {
 	Unsafe     bool                 `json:"unsafe"`
+	Draining   bool                 `json:"draining,omitempty"`
 	UnsafeNote string               `json:"unsafe_note,omitempty"`
 	Admission  admission.Snapshot   `json:"admission"`
 	Jobs       map[string]JobStatus `json:"jobs"`
@@ -159,7 +160,7 @@ func (c *Controller) Status() Status {
 		e, _ := c.sched.Get(id)
 		jobs[id] = JobStatus{Entry: e, Workload: w}
 	}
-	return Status{Unsafe: c.j.Unsafe, UnsafeNote: c.j.UnsafeNote, Admission: c.sched.Snapshot(), Jobs: jobs}
+	return Status{Unsafe: c.j.Unsafe, Draining: c.j.Draining, UnsafeNote: c.j.UnsafeNote, Admission: c.sched.Snapshot(), Jobs: jobs}
 }
 
 func (c *Controller) Submit(tenant, id string) error {

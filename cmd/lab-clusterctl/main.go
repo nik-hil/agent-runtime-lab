@@ -55,7 +55,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	c := cluster.Client{HTTP: clustertls.Client(tlsConfig), Servers: strings.Split(*servers, ",")}
+	c := cluster.Client{HTTP: clustertls.ClientRole(tlsConfig, "coordinator"), Servers: strings.Split(*servers, ",")}
 	op := f.Arg(0)
 	method, path := http.MethodGet, "/v1/jobs/"+*id
 	var input any

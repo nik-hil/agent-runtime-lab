@@ -28,6 +28,8 @@ func TestVerificationDockerAccess(t *testing.T) {
 		{"passwordless_sudo", "all", "0", "1", false, true, true},
 		{"no_access", "all", "0", "0", true, true, false},
 		{"unit_without_docker", "unit", "0", "0", false, false, false},
+		{"quorum_passwordless_sudo", "quorum", "0", "1", false, true, true},
+		{"cluster_passwordless_sudo", "cluster", "0", "1", false, true, true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			root := t.TempDir()
@@ -51,7 +53,7 @@ func TestVerificationDockerAccess(t *testing.T) {
 			write(filepath.Join(bin, "go"), `#!/bin/sh
 set -eu
 echo "go:$*" >> "$VERIFY_FIXTURE_LOG"
-if [ "${LAB_INTEGRATION:-0}" = 1 ]; then
+if [ "${LAB_INTEGRATION:-0}" = 1 ] || [ "${LAB_CLUSTER_INTEGRATION:-0}" = 1 ] || [ "${LAB_M5_E2B_INTEGRATION:-0}" = 1 ]; then
   env docker info
 fi
 `)

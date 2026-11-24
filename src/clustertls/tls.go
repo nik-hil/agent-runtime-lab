@@ -41,6 +41,20 @@ func Client(config *tls.Config) *http.Client {
 		CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
 }
 
+// ClientRole keeps hostname/CA verification and additionally constrains the
+// authenticated server's role, so an operator certificate cannot impersonate
+// a coordinator even if development certificates share SANs.
+func ClientRole(config *tls.Config, role string) *http.Client {
+	c := config.Clone()
+	c.VerifyConnection = func(state tls.ConnectionState) error {
+		if len(state.PeerCertificates) != 0 && state.PeerCertificates[0].Subject.CommonName == role {
+			return nil
+		}
+		return errors.New("server certificate role is not authorized")
+	}
+	return Client(c)
+}
+
 func Server(config *tls.Config, roles ...string) *tls.Config {
 	c := config.Clone()
 	c.ClientAuth = tls.RequireAndVerifyClientCert

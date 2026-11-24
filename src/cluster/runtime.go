@@ -54,7 +54,7 @@ func (c RuntimeFlags) Open(role string) (*Repository, *tls.Config, *http.Client,
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	return repo, api, clustertls.Client(api), nil
+	return repo, api, clustertls.ClientRole(api, "node"), nil
 }
 
 // Serve joins the worker before returning so its journals remain open until

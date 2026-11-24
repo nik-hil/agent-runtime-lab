@@ -103,7 +103,7 @@ func TestM5Cluster(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	client := cluster.Client{HTTP: clustertls.Client(tlsConfig), Servers: servers}
+	client := cluster.Client{HTTP: clustertls.ClientRole(tlsConfig, "coordinator"), Servers: servers}
 	defer client.HTTP.CloseIdleConnections()
 	ready := func() bool { s, err := q.repo.Read(ctx); return err == nil && len(s.Live) == 3 && s.Leader.ID != "" }
 	eventuallyM5(t, "three nodes and elected coordinator", ready)
