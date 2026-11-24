@@ -165,3 +165,13 @@ sandboxes via E2B's timeout API; `--audit-global` reports lab-tagged sandboxes
 missing from this journal without deleting them. For a consolidated
 end-to-end run, flags, limitations and cleanup, see
 [the M3.4 runbook](docs/control-plane-reliability-m3-4.md).
+
+## M4.1 — Execute commands inside a managed microVM
+
+`e2b-fleetctl --execute --id JOB --command 'echo hello' exec` now runs a bounded
+synchronous shell command inside an existing, confirmed RUNNING E2B sandbox
+through the daemon's private Unix socket. It uses the local envd client proxy,
+never the host shell. The result carries stdout, stderr, exit code and output
+truncation. Command outcomes may be **uncertain** after timeouts: never retry
+side effects blindly. This is not yet a durable task queue or an agent loop.
+See [the M4.1 end-to-end experiment](docs/m4-sandbox-task-execution.md).
