@@ -323,6 +323,11 @@ func TestUnixSocketRequiresPrivateDirectoryAndNoOverwrite(t *testing.T) {
 	if err := os.Mkdir(dir, 0755); err != nil {
 		t.Fatal(err)
 	}
+	// Mkdir's mode is filtered by the caller's umask. Set the actual fixture
+	// permission explicitly so this rejection check also works with umask 077.
+	if err := os.Chmod(dir, 0755); err != nil {
+		t.Fatal(err)
+	}
 	if _, _, err := ListenUnix(filepath.Join(dir, "fleet.sock")); err == nil {
 		t.Fatal("world-readable socket directory accepted")
 	}

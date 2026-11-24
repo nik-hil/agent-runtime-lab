@@ -187,3 +187,30 @@ RUNNING tasks become UNCERTAIN and are never automatically retried. Other
 tasks on the same VM are refused until uncertainty is investigated. This is
 not a durable queued scheduler or remote attestation of side effects.
 See [M4.2 design and live verification](docs/m4-durable-task-journal.md).
+
+## M4.3 — VM completion evidence and explicit task recovery
+
+Opt-in `e2b-taskctl --evidence` tasks use a source-built Go helper inside the
+owned E2B VM to persist a completion marker, captured output and a bounded
+artifact manifest. The host re-reads and verifies the evidence before storing
+the result. After a lost response or daemon crash, `e2b-taskctl --execute
+--task-id ID recover` can resolve an UNCERTAIN evidence task by inspecting its
+original VM, without rerunning the command. Missing or changed evidence stays
+uncertain. Configure fleetd with `--task-helper` to enable new evidence tasks.
+This is single-host observational evidence, not VM attestation or exactly-once
+external effects. See [M4.3 build, recovery experiment and limits](docs/m4-completion-evidence.md).
+
+If fleetd has already stopped, `fleetctl drain` cannot reach it. Run
+`e2b-fleet-cleanup --execute --state-file EXISTING_JOURNAL` with E2B credentials
+loaded to drain directly under the same exclusive journal lock. It confirms
+provider deletion before releasing reservations, preserves fleet/task history
+and needs no socket. See [cleanup without a daemon](docs/fleet-offline-cleanup.md).
+
+## Consolidated verification
+
+Run `./scripts/verify.sh all` on the configured lab server to verify formatting,
+vet, unit/race tests, Docker/runc + gVisor/runsc integration and the opt-in live
+E2B lifecycle/task/crash-recovery gate. The test owns its daemon and disposable
+journal and checks standalone cleanup. Use `./scripts/verify.sh e2b` for an
+Embed-only host, or `./scripts/verify.sh unit` without live infrastructure.
+See [complete commands, coverage and remaining implementation](docs/full-verification.md).

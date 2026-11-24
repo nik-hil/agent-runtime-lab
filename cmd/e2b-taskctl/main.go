@@ -15,7 +15,17 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"agent-runtime-lab/src/taskevidence"
 )
+
+type artifactFlags []string
+
+func (a *artifactFlags) String() string { return strings.Join(*a, ",") }
+func (a *artifactFlags) Set(value string) error {
+	*a = append(*a, value)
+	return nil
+}
 
 func main() {
 	if err := run(); err != nil {
@@ -42,10 +52,13 @@ func run() error {
 	workload := flag.String("id", "", "fleet workload ID (submit only)")
 	command := flag.String("command", "", "bounded sandbox command; avoid putting secrets in command arguments")
 	timeout := flag.Int("timeout", 30, "sandbox timeout in seconds (1..60)")
-	execute := flag.Bool("execute", false, "required for task submission")
+	execute := flag.Bool("execute", false, "required for task submission or explicit evidence recovery")
+	evidence := flag.Bool("evidence", false, "opt in to VM completion evidence and explicit recovery (submit only)")
+	var artifactPaths artifactFlags
+	flag.Var(&artifactPaths, "artifact", "absolute sandbox output file to hash and verify; repeat up to 8 times with --evidence")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		return errors.New("usage: e2b-taskctl [flags] submit|status|list")
+		return errors.New("usage: e2b-taskctl [flags] submit|status|list|recover")
 	}
 	action := flag.Arg(0)
 	method, endpoint := http.MethodGet, ""
@@ -56,13 +69,25 @@ func run() error {
 			len(*command) > 4000 || strings.IndexByte(*command, 0) >= 0 || *timeout < 1 || *timeout > 60 {
 			return errors.New("submit requires --execute, --task-id, --id, --command <=4000 bytes, --timeout 1..60")
 		}
+		artifacts, err := taskevidence.NormalizeArtifacts(artifactPaths)
+		if err != nil || !*evidence && len(artifacts) != 0 {
+			return errors.New("artifacts require --evidence and at most 8 distinct clean absolute file paths")
+		}
 		method, endpoint = http.MethodPost, "/v1/tasks"
 		payload = struct {
-			TaskID         string `json:"task_id"`
-			WorkloadID     string `json:"workload_id"`
-			Command        string `json:"command"`
-			TimeoutSeconds int    `json:"timeout_seconds"`
-		}{*taskID, *workload, *command, *timeout}
+			TaskID         string   `json:"task_id"`
+			WorkloadID     string   `json:"workload_id"`
+			Command        string   `json:"command"`
+			TimeoutSeconds int      `json:"timeout_seconds"`
+			Evidence       bool     `json:"evidence,omitempty"`
+			Artifacts      []string `json:"artifacts,omitempty"`
+		}{*taskID, *workload, *command, *timeout, *evidence, artifacts}
+	case "recover":
+		if !*execute || !validID(*taskID) || *command != "" || *workload != "" || *evidence || len(artifactPaths) != 0 {
+			return errors.New("recover requires --execute and --task-id only; it inspects evidence without rerunning the command")
+		}
+		method, endpoint = http.MethodPost, "/v1/tasks/"+*taskID+"/recover"
+		payload = struct{}{}
 	case "status":
 		if !validID(*taskID) {
 			return errors.New("status requires a valid --task-id")
@@ -113,7 +138,7 @@ func run() error {
 	if _, err := fmt.Fprintln(os.Stdout, formatted.String()); err != nil {
 		return err
 	}
-	if action == "submit" {
+	if action == "submit" || action == "recover" {
 		var state struct {
 			State string `json:"state"`
 		}

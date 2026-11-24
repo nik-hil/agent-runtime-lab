@@ -1,6 +1,9 @@
 package fleet
 
 import (
+	"context"
+	"errors"
+
 	"agent-runtime-lab/src/admission"
 )
 
@@ -47,4 +50,42 @@ func (c *Controller) BeginDrain() (int, error) {
 		return requested, err
 	}
 	return requested, nil
+}
+
+// DrainStep reconciles one named workload only after durable fleet-wide drain
+// intent. It never dispatches queued work, creates a VM, pauses or resumes one.
+// Naming the job lets cleanup continue past another job's provider failure.
+func (c *Controller) DrainStep(ctx context.Context, id string) (bool, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.poison {
+		return false, ErrStoreUncertain
+	}
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
+	if !c.j.Draining {
+		return false, errors.New("explicit durable drain intent required")
+	}
+	work, ok := c.j.Workloads[id]
+	if !ok {
+		return false, admission.ErrNotFound
+	}
+	entry, _ := c.sched.Get(id)
+	if entry.State == admission.Deleted {
+		return false, nil
+	}
+	if work.Desired != "deleted" {
+		return false, errors.New("workload does not have deletion intent")
+	}
+	if work.SandboxID == "" {
+		if work.CreatePending {
+			return false, ErrCreateUncertain
+		}
+		if err := c.sched.ConfirmDeleted(id); err != nil {
+			return false, err
+		}
+		return true, c.persist()
+	}
+	return c.reconcileKnown(ctx, id, entry, work)
 }
