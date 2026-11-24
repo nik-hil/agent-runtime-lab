@@ -199,3 +199,9 @@ original VM, without rerunning the command. Missing or changed evidence stays
 uncertain. Configure fleetd with `--task-helper` to enable new evidence tasks.
 This is single-host observational evidence, not VM attestation or exactly-once
 external effects. See [M4.3 build, recovery experiment and limits](docs/m4-completion-evidence.md).
+
+If fleetd has already stopped, `fleetctl drain` cannot reach it. Run
+`e2b-fleet-cleanup --execute --state-file EXISTING_JOURNAL` with E2B credentials
+loaded to drain directly under the same exclusive journal lock. It confirms
+provider deletion before releasing reservations, preserves fleet/task history
+and needs no socket. See [cleanup without a daemon](docs/fleet-offline-cleanup.md).

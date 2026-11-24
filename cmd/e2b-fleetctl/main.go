@@ -13,6 +13,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"syscall"
 	"time"
 )
 
@@ -108,6 +109,9 @@ func run() error {
 	}
 	resp, err := client.Do(req)
 	if err != nil {
+		if errors.Is(err, syscall.ECONNREFUSED) || errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("fleet daemon is unavailable at %s; VMs may still exist. For cleanup without fleetd, run e2b-fleet-cleanup --execute --state-file <matching-fleet-journal> with E2B credentials loaded: %w", *socket, err)
+		}
 		return fmt.Errorf("connect to fleet daemon socket: %w", err)
 	}
 	defer resp.Body.Close()

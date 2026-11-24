@@ -88,20 +88,7 @@ uncertain tasks and does not clear a drained fleet's admission fence.
 
 ## Build and run one bounded live experiment
 
-These steps use a new fleet journal. First finish and drain any earlier test
-daemon. For the M4.2 verification fleet from the previous run:
-
-```sh
-cd ~/src/agent-runtime-lab
-/tmp/agentlab-m42-fleetctl --socket .state/m4-2-verify.sock \
-  --execute --drain-timeout 120s drain
-/tmp/agentlab-m42-fleetctl --socket .state/m4-2-verify.sock status
-```
-
-Confirm all old journal workloads DELETED and CPU/RAM/pending zero before
-Ctrl+C in that daemon's terminal. Retain its journals; do not reuse them.
-
-Fetch and build the M4.3 branch:
+These steps use a new fleet journal. Fetch and build the M4.3 branch first:
 
 ```sh
 git fetch origin
@@ -111,18 +98,33 @@ go vet ./...
 go build -o /tmp/agentlab-m43-fleetd ./cmd/e2b-fleetd
 go build -o /tmp/agentlab-m43-fleetctl ./cmd/e2b-fleetctl
 go build -o /tmp/agentlab-m43-taskctl ./cmd/e2b-taskctl
+go build -o /tmp/agentlab-fleet-cleanup ./cmd/e2b-fleet-cleanup
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -buildvcs=false -trimpath \
   -ldflags='-s -w' -o /tmp/agentlab-m43-task-agent ./cmd/e2b-task-agent
 ```
 
-**Terminal 1:** Load the existing E2B credentials in this terminal only, then
-start fleetd. The helper path is a local build artifact, never a downloaded
-precompiled program. It is read once at startup and uploaded only to owned VMs.
+**Terminal 1:** Load the existing E2B credentials in this terminal only. If an
+older test daemon is running, stop that daemon with Ctrl+C first so its journal
+lock is released. Then clean up the M4.2 verification fleet directly:
 
 ```sh
 cd ~/e2b
 eval "$(sudo docker compose exec -T ready cat /run/e2b/sdk.env)"
 cd ~/src/agent-runtime-lab
+/tmp/agentlab-fleet-cleanup --execute \
+  --state-file .state/m4-2-verify.json --timeout 120s
+```
+
+Confirm `complete: true`, all selected jobs DELETED and CPU/RAM/pending zero.
+This cleanup works even if the old daemon/socket is absent or stale. Retain
+the old journals; do not reuse them. If cleanup reports unresolved work, inspect
+that report before proceeding. See [daemon-independent cleanup](fleet-offline-cleanup.md).
+
+Now start fleetd with a fresh journal and socket. The helper is a local build
+artifact, never a downloaded precompiled program. It is read once at startup
+and uploaded only to owned VMs.
+
+```sh
 /tmp/agentlab-m43-fleetd --execute \
   --state-file .state/m4-3-fleet.json \
   --socket .state/m4-3-fleet.sock \
@@ -248,6 +250,10 @@ Always drain the disposable fleet before stopping fleetd:
 
 Confirm DELETED and zero CPU/RAM/pending, then Ctrl+C in Terminal 1. Preserve
 the journals. A drained journal cannot be used for another new workload.
+
+If fleetd has already stopped, use `/tmp/agentlab-fleet-cleanup --execute
+--state-file .state/m4-3-fleet.json --timeout 120s` in the credential-loaded
+shell. That path needs no socket and preserves the task journal.
 
 Automated coverage includes helper execution/nonce reservation, output bounds,
 failed process exits, file bounds/symlinks, journal migration and crash recovery,
