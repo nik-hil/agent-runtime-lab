@@ -71,9 +71,9 @@ func run() error {
 		}
 		endpoint = "/v1/execute"
 		payload = struct {
-			ID string `json:"id"`
-			Command string `json:"command"`
-			TimeoutSeconds int `json:"timeout_seconds"`
+			ID             string `json:"id"`
+			Command        string `json:"command"`
+			TimeoutSeconds int    `json:"timeout_seconds"`
 		}{*id, *command, *execTimeout}
 	default:
 		return fmt.Errorf("unknown action %q", action)
@@ -135,9 +135,15 @@ func run() error {
 		return err
 	}
 	if action == "exec" {
-		var result struct { ExitCode int `json:"exit_code"` }
-		if err := json.Unmarshal(data, &result); err != nil { return err }
-		if result.ExitCode != 0 { return fmt.Errorf("sandbox command exited with code %d", result.ExitCode) }
+		var result struct {
+			ExitCode int `json:"exit_code"`
+		}
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		if result.ExitCode != 0 {
+			return fmt.Errorf("sandbox command exited with code %d", result.ExitCode)
+		}
 	}
 	return nil
 }
