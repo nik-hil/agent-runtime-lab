@@ -187,3 +187,30 @@ func (r *Runner) ReadEvidence(ctx context.Context, identity taskevidence.Identit
 	}
 	return envelope, nil
 }
+
+// ReadArtifact copies only a declared artifact whose size/hash match verified
+// completion evidence. It never executes a command or uploads a helper.
+func (r *Runner) ReadArtifact(ctx context.Context, identity taskevidence.Identity, artifact taskevidence.Artifact) ([]byte, error) {
+	if identity.Validate() != nil || artifact.Size < 0 || artifact.Size > taskevidence.MaxArtifactBytes || !taskevidence.IsHash(artifact.SHA256) {
+		return nil, errors.New("invalid artifact identity or metadata")
+	}
+	declared := false
+	for _, path := range identity.Intent.Artifacts {
+		declared = declared || path == artifact.Path
+	}
+	if !declared {
+		return nil, errors.New("artifact path is not declared in the durable intent")
+	}
+	if _, ok := ctx.Deadline(); !ok {
+		return nil, errors.New("artifact copy requires an explicit deadline")
+	}
+	connected, err := r.connect(ctx, identity.SandboxID)
+	if err != nil {
+		return nil, err
+	}
+	data, err := r.readFile(ctx, identity, connected.EnvdAccessToken, artifact.Path, taskevidence.MaxArtifactBytes)
+	if err != nil || int64(len(data)) != artifact.Size || taskevidence.Hash(data) != artifact.SHA256 {
+		return nil, errors.New("artifact changed or could not be read")
+	}
+	return data, nil
+}

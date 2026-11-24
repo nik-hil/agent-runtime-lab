@@ -2,3 +2,4 @@
 bin/
 images/probe/lab-probe
 .state/
+/results/verify-*/

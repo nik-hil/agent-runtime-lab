@@ -20,12 +20,14 @@ import (
 	"agent-runtime-lab/src/taskevidence"
 )
 
-const version = 2
+const version = 3
 const maxTasks = 128
 
 type State string
 
 const (
+	Queued    State = "queued"
+	Cancelled State = "cancelled"
 	Running   State = "running"
 	Succeeded State = "succeeded"
 	Failed    State = "failed"
@@ -43,24 +45,33 @@ var (
 // Entry contains nonsecret task identity, a command hash, and bounded output.
 // This is a local completion record, NOT third-party attestation of side effects.
 type Entry struct {
-	ID             string                 `json:"id"`
-	WorkloadID     string                 `json:"workload_id"`
-	SandboxID      string                 `json:"sandbox_id"`
-	CommandHash    string                 `json:"command_sha256"`
-	Timeout        int                    `json:"timeout_seconds"`
-	State          State                  `json:"state"`
-	StartedAt      time.Time              `json:"started_at"`
-	FinishedAt     *time.Time             `json:"finished_at,omitempty"`
-	Result         *m4exec.Result         `json:"result,omitempty"`
-	ResultHash     string                 `json:"result_sha256,omitempty"`
-	Note           string                 `json:"note,omitempty"`
-	EvidenceIntent *taskevidence.Intent   `json:"evidence_intent,omitempty"`
-	Evidence       *taskevidence.Envelope `json:"evidence,omitempty"`
+	ID              string                 `json:"id"`
+	WorkloadID      string                 `json:"workload_id"`
+	SandboxID       string                 `json:"sandbox_id"`
+	CommandHash     string                 `json:"command_sha256"`
+	Timeout         int                    `json:"timeout_seconds"`
+	State           State                  `json:"state"`
+	StartedAt       time.Time              `json:"started_at"`
+	FinishedAt      *time.Time             `json:"finished_at,omitempty"`
+	Result          *m4exec.Result         `json:"result,omitempty"`
+	ResultHash      string                 `json:"result_sha256,omitempty"`
+	Note            string                 `json:"note,omitempty"`
+	EvidenceIntent  *taskevidence.Intent   `json:"evidence_intent,omitempty"`
+	Evidence        *taskevidence.Envelope `json:"evidence,omitempty"`
+	Async           bool                   `json:"async,omitempty"`
+	DispatchedAt    *time.Time             `json:"dispatched_at,omitempty"`
+	CancelRequested bool                   `json:"cancel_requested,omitempty"`
+	ArtifactsStored bool                   `json:"artifacts_stored,omitempty"`
+	QueueSequence   uint64                 `json:"queue_sequence,omitempty"`
 }
 
 type checkpoint struct {
 	Version int              `json:"version"`
 	Tasks   map[string]Entry `json:"tasks"`
+	// Only unclaimed jobs retain command bytes. The journal is private; APIs
+	// never expose this map. Claim deletes the command before any remote call.
+	Commands map[string]string `json:"queued_commands,omitempty"`
+	NextJob  uint64            `json:"next_job_sequence,omitempty"`
 }
 
 // Store is held exclusively by fleetd. Its file is fsynced before a command
@@ -103,9 +114,10 @@ func resultHash(e Entry, result m4exec.Result) string {
 }
 
 func validate(j checkpoint) error {
-	if j.Version != version || j.Tasks == nil || len(j.Tasks) > maxTasks {
+	if j.Version != version || j.Tasks == nil || len(j.Tasks) > maxTasks || j.NextJob > maxTasks {
 		return errors.New("invalid task journal header or task count")
 	}
+	sequences := make(map[uint64]bool)
 	for id, e := range j.Tasks {
 		if !validID(id) || e.ID != id || !validID(e.WorkloadID) || !validID(e.SandboxID) ||
 			len(e.CommandHash) != 64 || e.Timeout < 1 || e.Timeout > 60 || e.StartedAt.IsZero() {
@@ -122,7 +134,30 @@ func validate(j checkpoint) error {
 				return fmt.Errorf("invalid task completion manifest: %q", id)
 			}
 		}
+		if e.Async && e.EvidenceIntent == nil || !e.Async && (e.DispatchedAt != nil || e.CancelRequested || e.ArtifactsStored) ||
+			e.ArtifactsStored && e.Evidence == nil {
+			return fmt.Errorf("invalid async task metadata: %q", id)
+		}
+		if e.Async && e.State != Queued && e.State != Cancelled && (e.DispatchedAt == nil || e.DispatchedAt.IsZero()) {
+			return fmt.Errorf("async execution lacks durable dispatch time: %q", id)
+		}
+		if e.Async {
+			if e.QueueSequence == 0 || e.QueueSequence > j.NextJob || sequences[e.QueueSequence] {
+				return fmt.Errorf("invalid job queue sequence: %q", id)
+			}
+			sequences[e.QueueSequence] = true
+		} else if e.QueueSequence != 0 {
+			return fmt.Errorf("legacy task has job sequence: %q", id)
+		}
 		switch e.State {
+		case Queued, Cancelled:
+			if !e.Async || e.DispatchedAt != nil || e.Result != nil || e.Evidence != nil || e.ResultHash != "" || e.ArtifactsStored {
+				return fmt.Errorf("invalid queued/cancelled job: %q", id)
+			}
+			if e.State == Queued && (e.FinishedAt != nil || e.CancelRequested || e.Note != "" || commandHash(j.Commands[id]) != e.CommandHash || j.Commands[id] == "" || len(j.Commands[id]) > 4000 || strings.IndexByte(j.Commands[id], 0) >= 0) ||
+				e.State == Cancelled && (e.FinishedAt == nil || !e.CancelRequested) {
+				return fmt.Errorf("invalid queued job command or cancellation: %q", id)
+			}
 		case Running:
 			if e.FinishedAt != nil || e.Result != nil || e.ResultHash != "" || e.Note != "" || e.Evidence != nil {
 				return fmt.Errorf("invalid running task: %q", id)
@@ -132,6 +167,9 @@ func validate(j checkpoint) error {
 				return fmt.Errorf("invalid uncertain task: %q", id)
 			}
 		case Succeeded, Failed:
+			if e.Async && !e.ArtifactsStored {
+				return fmt.Errorf("completed async job lacks durable artifact receipt: %q", id)
+			}
 			if e.EvidenceIntent != nil && e.Evidence == nil {
 				return fmt.Errorf("evidence task is missing its verified manifest: %q", id)
 			}
@@ -144,6 +182,11 @@ func validate(j checkpoint) error {
 			}
 		default:
 			return fmt.Errorf("unknown task state: %q", id)
+		}
+	}
+	for id := range j.Commands {
+		if entry, ok := j.Tasks[id]; !ok || entry.State != Queued || !entry.Async {
+			return fmt.Errorf("orphan queued command: %q", id)
 		}
 	}
 	return nil
@@ -175,7 +218,7 @@ func Open(path string) (*Store, error) {
 		lock.Close()
 		return nil, fmt.Errorf("another process owns task journal: %w", err)
 	}
-	s := &Store{path: abs, lock: lock, journal: checkpoint{Version: version, Tasks: make(map[string]Entry)}}
+	s := &Store{path: abs, lock: lock, journal: checkpoint{Version: version, Tasks: make(map[string]Entry), Commands: make(map[string]string)}}
 	data, err := os.ReadFile(abs)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		s.Close()
@@ -186,11 +229,13 @@ func Open(path string) (*Store, error) {
 			s.Close()
 			return nil, fmt.Errorf("corrupt task journal: %w", err)
 		}
-		changed := s.journal.Version == 1
+		changed := s.journal.Version == 1 || s.journal.Version == 2
 		if changed {
-			// M4.2 records retain their identity/results. Version 2 prevents an
-			// older daemon from silently discarding new evidence metadata.
+			// Older daemons must refuse queued commands and artifact receipts.
 			s.journal.Version = version
+		}
+		if s.journal.Commands == nil {
+			s.journal.Commands = make(map[string]string)
 		}
 		if err := validate(s.journal); err != nil {
 			s.Close()
@@ -211,6 +256,19 @@ func Open(path string) (*Store, error) {
 			}
 		}
 	} else if err := s.save(); err != nil {
+		s.Close()
+		return nil, err
+	}
+	// A process restart alone is not proof that a previously unconfirmed
+	// checkpoint rename reached disk. Sync its current name before dispatch.
+	directory, err := os.Open(dir)
+	if err != nil {
+		s.Close()
+		return nil, err
+	}
+	err = directory.Sync()
+	directory.Close()
+	if err != nil {
 		s.Close()
 		return nil, err
 	}
@@ -295,6 +353,9 @@ func (s *Store) begin(id, workloadID, sandboxID, command string, timeout int, he
 		return Entry{}, false, errors.New("invalid evidence artifact request")
 	}
 	if existing, ok := s.journal.Tasks[id]; ok {
+		if existing.Async {
+			return Entry{}, false, ErrConflict
+		}
 		if existing.WorkloadID != workloadID || existing.SandboxID != sandboxID || existing.CommandHash != hash || existing.Timeout != timeout {
 			return Entry{}, false, ErrConflict
 		}
@@ -369,6 +430,10 @@ func (s *Store) Finish(id string, result *m4exec.Result, note string) (Entry, er
 }
 
 func clone(e Entry) Entry {
+	if e.DispatchedAt != nil {
+		v := *e.DispatchedAt
+		e.DispatchedAt = &v
+	}
 	if e.Result != nil {
 		v := *e.Result
 		e.Result = &v
@@ -411,13 +476,23 @@ func evidenceResult(envelope taskevidence.Envelope) m4exec.Result {
 // may resolve an UNCERTAIN record; it never starts the original command.
 // The API must also verify current fleet ownership and every artifact's bytes.
 func (s *Store) FinishEvidence(id string, envelope taskevidence.Envelope, recovering bool) (Entry, error) {
+	return s.finishEvidence(id, envelope, recovering, false)
+}
+
+// FinishJobEvidence requires the caller to have committed a verified artifact
+// bundle durably before publishing async completion.
+func (s *Store) FinishJobEvidence(id string, envelope taskevidence.Envelope, recovering bool) (Entry, error) {
+	return s.finishEvidence(id, envelope, recovering, true)
+}
+
+func (s *Store) finishEvidence(id string, envelope taskevidence.Envelope, recovering, durableArtifacts bool) (Entry, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.poisoned || s.lock == nil {
 		return Entry{}, ErrPoisoned
 	}
 	e, ok := s.journal.Tasks[id]
-	if !ok || e.EvidenceIntent == nil || envelope.Validate(e.EvidenceIdentity()) != nil {
+	if !ok || e.Async != durableArtifacts || e.EvidenceIntent == nil || envelope.Validate(e.EvidenceIdentity()) != nil {
 		return Entry{}, ErrConflict
 	}
 	if e.State == Succeeded || e.State == Failed {
@@ -432,6 +507,7 @@ func (s *Store) FinishEvidence(id string, envelope taskevidence.Envelope, recove
 	// Clone the caller-owned slices before keeping them in the journal.
 	copyEntry := clone(Entry{Evidence: &envelope})
 	e.Evidence = copyEntry.Evidence
+	e.ArtifactsStored = durableArtifacts
 	result := evidenceResult(envelope)
 	e.Result, e.ResultHash = &result, resultHash(e, result)
 	now := time.Now().UTC()
@@ -439,6 +515,9 @@ func (s *Store) FinishEvidence(id string, envelope taskevidence.Envelope, recove
 	e.Note = ""
 	if recovering {
 		e.Note = "recovered from verified VM completion evidence; command was not rerun"
+		if durableArtifacts {
+			e.Note = "recovered from verified durable completion evidence; command was not rerun"
+		}
 	}
 	e.State = Succeeded
 	if result.ExitCode != 0 {

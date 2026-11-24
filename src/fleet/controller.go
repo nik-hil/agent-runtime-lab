@@ -168,7 +168,7 @@ func (c *Controller) Submit(tenant, id string) error {
 	if c.poison {
 		return ErrStoreUncertain
 	}
-	if c.j.Unsafe {
+	if c.j.Unsafe || c.j.Draining {
 		return ErrUnsafeCapacity
 	}
 	if _, exists := c.j.Workloads[id]; exists {

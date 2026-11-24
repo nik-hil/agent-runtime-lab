@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"agent-runtime-lab/src/admission"
+	"agent-runtime-lab/src/artifactstore"
 	"agent-runtime-lab/src/e2bapi"
 	"agent-runtime-lab/src/fleet"
 	"agent-runtime-lab/src/fleetdaemon"
@@ -46,6 +47,10 @@ func run() error {
 	execProxy := flag.String("exec-proxy", "http://127.0.0.1:3002", "E2B envd client proxy loopback HTTP origin")
 	taskHelper := flag.String("task-helper", "", "optional static Linux amd64 cmd/e2b-task-agent binary for M4.3 evidence tasks")
 	crashTask := flag.String("test-crash-after-evidence-task", "", "TEST ONLY: exit 86 after this task's VM evidence is verified, before saving its host result")
+	artifactDir := flag.String("artifact-dir", "", "private durable artifact directory (default: <task-state-file>.artifacts)")
+	artifactMiB := flag.Int64("artifact-max-mib", 128, "host artifact storage quota MiB (1..1024)")
+	jobWorkers := flag.Int("job-workers", 2, "asynchronous job workers (0..8; zero pauses dispatch)")
+	crashStored := flag.String("test-crash-after-artifacts-job", "", "TEST ONLY: exit 87 after this job's artifacts are durable, before its result is saved")
 	execute := flag.Bool("execute", false, "required to enable live E2B operations")
 	template := flag.String("template", "base", "E2B sandbox template")
 	ttl := flag.Int("ttl", 900, "E2B sandbox TTL (seconds)")
@@ -56,6 +61,19 @@ func run() error {
 	flag.Parse()
 	if !*execute || flag.NArg() != 0 {
 		return errors.New("run with --execute and no positional arguments to enable the local E2B daemon")
+	}
+	if *jobWorkers < 0 || *jobWorkers > 8 || *artifactMiB < 1 || *artifactMiB > 1024 {
+		return errors.New("job-workers must be 0..8 and artifact-max-mib 1..1024")
+	}
+	if *crashStored != "" {
+		if *taskHelper == "" || len(*crashStored) > 128 {
+			return errors.New("artifact crash requires --task-helper and safe job ID <=128 bytes")
+		}
+		for _, c := range *crashStored {
+			if !(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-' || c == '_' || c == '.') {
+				return errors.New("artifact crash job ID must use letters, digits, hyphen, underscore or dot")
+			}
+		}
 	}
 	if *crashTask != "" {
 		if *taskHelper == "" || len(*crashTask) > 128 {
@@ -146,6 +164,28 @@ func run() error {
 		return fmt.Errorf("open task journal: %w", err)
 	}
 	defer tasks.Close()
+	if *artifactDir == "" {
+		*artifactDir = *taskFile + ".artifacts"
+	}
+	artifacts, err := artifactstore.Open(*artifactDir, *artifactMiB<<20)
+	if err != nil {
+		return fmt.Errorf("open durable artifacts: %w", err)
+	}
+	defer artifacts.Close()
+	jobOpts := fleetdaemon.JobOptions{Workers: *jobWorkers, Logger: logger}
+	if *crashStored != "" {
+		logger.Warn("job_test_crash_armed", "job_id", *crashStored, "exit_code", 87)
+		jobOpts.AfterStored = func(id string) {
+			if id == *crashStored {
+				logger.Error("job_test_crash_after_artifacts", "job_id", id, "exit_code", 87)
+				os.Exit(87)
+			}
+		}
+	}
+	jobs, err := fleetdaemon.NewJobs(controller, tasks, artifacts, taskExecutor.(fleetdaemon.EvidenceExecutor), commandRunner, jobOpts)
+	if err != nil {
+		return err
+	}
 	listener, cleanup, err := fleetdaemon.ListenUnix(*socket)
 	if err != nil {
 		return err
@@ -160,6 +200,7 @@ func run() error {
 	base := fleetdaemon.DrainHandler(d)
 	base = fleetdaemon.ExecuteHandler(base, controller, commandRunner)
 	base = fleetdaemon.TaskHandler(base, controller, taskExecutor, tasks)
+	base = jobs.Handler(base)
 	server := &http.Server{
 		Handler: monitor.Handler(base), ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout: 10 * time.Second, WriteTimeout: 90 * time.Second,
@@ -174,16 +215,25 @@ func run() error {
 		defer close(monitorDone)
 		monitor.Run(ctx)
 	}()
+	jobsDone := make(chan struct{})
+	var jobsErr error
+	go func() {
+		defer close(jobsDone)
+		jobsErr = jobs.Run(ctx)
+	}()
 	serveErr := make(chan error, 1)
 	go func() { serveErr <- server.Serve(listener) }()
 	fmt.Printf("Fleet reconciler running; socket=%s journal=%s tasks=%s (Ctrl+C stops controller only; use fleetctl drain for cleanup)\n", *socket, *stateFile, *taskFile)
 	select {
 	case <-ctx.Done():
+	case <-jobsDone:
+		stop()
 	case err := <-serveErr:
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			stop()
 			<-workerDone
 			<-monitorDone
+			<-jobsDone
 			return fmt.Errorf("Unix API server: %w", err)
 		}
 	}
@@ -194,10 +244,15 @@ func run() error {
 		_ = server.Close()
 		<-workerDone
 		<-monitorDone
+		<-jobsDone
 		return fmt.Errorf("HTTP shutdown: %w", err)
 	}
 	<-workerDone
 	<-monitorDone
+	<-jobsDone
+	if jobsErr != nil {
+		return fmt.Errorf("async job worker stopped: %w", jobsErr)
+	}
 	state := controller.Status()
 	remaining := 0
 	for _, job := range state.Jobs {

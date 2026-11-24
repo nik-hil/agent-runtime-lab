@@ -1,7 +1,7 @@
 # Repository release gate
 
-M4.3 completes the current single-host VM execution foundation. It does not
-complete a multi-node agent platform.
+M4.4 adds asynchronous jobs and host-durable artifact bundles to the single-host
+VM execution foundation. Distributed orchestration remains a later milestone.
 
 | Area | Implemented in this branch |
 | --- | --- |
@@ -12,8 +12,10 @@ complete a multi-node agent platform.
 | Commands | Bounded synchronous execution, exit codes and captured output |
 | Durable tasks | Stable task IDs, persisted intent/results, replay conflicts, uncertain-outcome fence |
 | Completion evidence | VM helper, bound manifest/output/artifact hashes, explicit recovery without reexecution |
+| Async jobs | Durable queue, bounded workers, cancellation, shared VM fence, restart-safe dispatch |
+| Durable artifacts | Fsynced host bundles, verified downloads and recovery after VM deletion |
 | Cleanup | Explicit live drain and daemon-independent journal cleanup |
-| Still ahead | Actual host telemetry; asynchronous task scheduling/cancellation; agent/model loop and tools; multi-node durable ownership, leases/fencing, worker failure recovery; public tenant API/authentication |
+| Still ahead | Actual host telemetry; multi-node durable ownership, leases/fencing, worker failure recovery; off-host artifact replication; public tenant API/authentication |
 
 Reservations are configured promises, not measured host utilization. Local
 flock journals provide single-process ownership, not distributed leadership.
@@ -33,8 +35,8 @@ cd ~/e2b
 eval "$(sudo docker compose exec -T ready cat /run/e2b/sdk.env)"
 test -n "${E2B_API_KEY:-}" || { echo "E2B credentials were not loaded"; exit 1; }
 cd ~/src/agent-runtime-lab
-git switch feat/m4-3-completion-evidence
-git pull --ff-only origin feat/m4-3-completion-evidence
+git switch feat/m4-4-async-jobs
+git pull --ff-only origin feat/m4-4-async-jobs
 ~~~
 
 For every implemented code path's automated checks, including both installed
@@ -53,6 +55,11 @@ cd ~/src/agent-runtime-lab
 ~~~
 
 The e2b mode runs formatting, vet, all unit/race tests, and live E2B verification.
+It now includes both TestE2BFullLifecycle and TestE2BAsyncJobs. The M4.4 gate
+recovers a genuinely uncertain host record from committed artifact bytes after
+deleting the original VM. See [M4.4 commands and semantics](m4-async-jobs.md).
+The server's missing runsc registration is recorded in
+[verification status](verification-status.md); it is not a full all-mode pass.
 It does not claim Docker/gVisor live validation. The all mode additionally
 builds the source probe image and requires both Docker/runc and gVisor/runsc;
 missing infrastructure fails instead of producing a misleading pass.
