@@ -15,6 +15,27 @@ umask 077
 mkdir -p results
 report_dir="$(mktemp -d "$LAB_ROOT/results/verify-XXXXXXXX")"
 echo "Verification logs: $report_dir"
+if [[ "$mode" == all ]] && ! docker info >/dev/null 2>&1; then
+  if ! docker_executable="$(type -P docker)"; then
+    echo "Docker CLI is required for all mode." >&2
+    exit 1
+  fi
+  if ! sudo -n -- "$docker_executable" info >/dev/null 2>&1; then
+    echo "Docker is unavailable through both direct access and passwordless sudo; no password was requested." >&2
+    exit 1
+  fi
+  # Go tests launch Docker directly, so a shell function cannot route their
+  # subprocesses. Use a private executable wrapper inherited through PATH.
+  mkdir -m 700 "$report_dir/docker-bin"
+  cat > "$report_dir/docker-bin/docker" <<'DOCKER'
+#!/bin/sh
+exec sudo -n -- "$LAB_DOCKER_EXECUTABLE" "$@"
+DOCKER
+  chmod 700 "$report_dir/docker-bin/docker"
+  export LAB_DOCKER_EXECUTABLE="$docker_executable"
+  export PATH="$report_dir/docker-bin:$PATH"
+  echo "Using passwordless sudo for Docker commands; verification remains under your user."
+fi
 formatting="$(gofmt -l src cmd tests)"
 if [[ -n "$formatting" ]]; then
   echo "Formatting failed:" >&2

@@ -58,6 +58,14 @@ builds the source probe image and requires both Docker/runc and gVisor/runsc;
 missing infrastructure fails instead of producing a misleading pass.
 The unit mode needs no E2B credentials and skips all real-runtime tests.
 
+The all mode checks Docker access before running Go checks. If direct access
+fails but the existing passwordless `sudo -n docker` route works, it creates a
+private Docker CLI wrapper for this run. Builds and Go test subprocesses inherit
+that wrapper through PATH. Verification and journals remain under the invoking
+user; only Docker commands use sudo. It never requests a password, changes group
+membership, or changes sudoers. If both routes fail, verification stops before
+running the checks. The e2b and unit modes do not require host Docker access.
+
 ## What the live E2B gate does
 
 TestE2BFullLifecycle builds fleetd and a static Linux/amd64 task helper from
