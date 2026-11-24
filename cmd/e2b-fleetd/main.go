@@ -19,6 +19,7 @@ import (
 	"agent-runtime-lab/src/fleet"
 	"agent-runtime-lab/src/fleetdaemon"
 	"agent-runtime-lab/src/m4exec"
+	"agent-runtime-lab/src/taskjournal"
 )
 
 func main() {
@@ -30,6 +31,7 @@ func main() {
 
 func run() error {
 	stateFile := flag.String("state-file", ".state/m3-1.json", "single-host journal path; do not share with the old CLI")
+	taskFile := flag.String("task-state-file", "", "private task journal path (default: <state-file>.tasks.json)")
 	socket := flag.String("socket", ".state/m3-1.sock", "private Unix control socket path")
 	interval := flag.Duration("interval", 2*time.Second, "reconciliation interval")
 	steps := flag.Int("steps", 12, "maximum state transitions per reconciliation cycle")
@@ -55,6 +57,12 @@ func run() error {
 	}
 	if *hostCPU <= 0 || *hostMiB <= 0 || *vmCPU <= 0 || *vmMiB <= 0 {
 		return errors.New("resource reservations must be positive")
+	}
+	if *taskFile == "" {
+		*taskFile = *stateFile + ".tasks.json"
+	}
+	if *taskFile == *stateFile || *taskFile == *socket {
+		return errors.New("task state file must not be fleet journal or control socket")
 	}
 	store, err := fleet.Open(*stateFile)
 	if err != nil {
@@ -105,6 +113,13 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("configure E2B command executor: %w", err)
 	}
+	// Open after fleet validation but before the control socket. Recovery
+	// durably marks any interrupted in-flight task UNCERTAIN before admission.
+	tasks, err := taskjournal.Open(*taskFile)
+	if err != nil {
+		return fmt.Errorf("open task journal: %w", err)
+	}
+	defer tasks.Close()
 	listener, cleanup, err := fleetdaemon.ListenUnix(*socket)
 	if err != nil {
 		return err
@@ -116,8 +131,11 @@ func run() error {
 	}()
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+	base := fleetdaemon.DrainHandler(d)
+	base = fleetdaemon.ExecuteHandler(base, controller, commandRunner)
+	base = fleetdaemon.TaskHandler(base, controller, commandRunner, tasks)
 	server := &http.Server{
-		Handler: monitor.Handler(fleetdaemon.ExecuteHandler(fleetdaemon.DrainHandler(d), controller, commandRunner)), ReadHeaderTimeout: 5 * time.Second,
+		Handler: monitor.Handler(base), ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout: 10 * time.Second, WriteTimeout: 90 * time.Second,
 	}
 	workerDone := make(chan struct{})
@@ -132,7 +150,7 @@ func run() error {
 	}()
 	serveErr := make(chan error, 1)
 	go func() { serveErr <- server.Serve(listener) }()
-	fmt.Printf("Fleet reconciler running; socket=%s journal=%s (Ctrl+C stops controller only; use fleetctl drain for cleanup)\n", *socket, *stateFile)
+	fmt.Printf("Fleet reconciler running; socket=%s journal=%s tasks=%s (Ctrl+C stops controller only; use fleetctl drain for cleanup)\n", *socket, *stateFile, *taskFile)
 	select {
 	case <-ctx.Done():
 	case err := <-serveErr:

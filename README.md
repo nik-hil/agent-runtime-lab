@@ -175,3 +175,15 @@ never the host shell. The result carries stdout, stderr, exit code and output
 truncation. Command outcomes may be **uncertain** after timeouts: never retry
 side effects blindly. This is not yet a durable task queue or an agent loop.
 See [the M4.1 end-to-end experiment](docs/m4-sandbox-task-execution.md).
+
+## M4.2 — Durable execution intent and completion records
+
+`e2b-taskctl` records a stable task ID, command hash and owning sandbox in
+a private fsynced task journal **before** sending a command to E2B. Terminal
+process results are stored with exit code, bounded output and a local SHA-256
+integrity digest. Repeating a task ID returns its recorded status without
+reexecuting it; changed input is rejected. On daemon restart, interrupted
+RUNNING tasks become UNCERTAIN and are never automatically retried. Other
+tasks on the same VM are refused until uncertainty is investigated. This is
+not a durable queued scheduler or remote attestation of side effects.
+See [M4.2 design and live verification](docs/m4-durable-task-journal.md).
