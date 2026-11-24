@@ -1,5 +1,11 @@
 # Verification status
 
+M5 adds multi-server scheduling, ownership fencing, conservative failover and
+replicated artifact storage. See [the full gate and operating guide](m5-multi-server.md).
+Its live gate is `./scripts/verify.sh cluster`; M4.4's earlier operator pass is
+not evidence of an M5 live pass. The gVisor/runsc registration issue remains a
+separate prerequisite for `verify.sh all`.
+
 ## 2026-11-24: ubuntu-c-8-sfo2
 
 The operator ran `./scripts/verify.sh all` on branch
@@ -35,6 +41,11 @@ remains outstanding until `runsc` is separately installed/configured for Docker.
 See [the complete verification commands](full-verification.md).
 
 ## M4.4 additions
+
+The operator subsequently reported "everything passed" after the supplied
+M4.4 `./scripts/verify.sh e2b` command block. Record the M4.3 and M4.4 live gates
+as operator-confirmed passed on 2026-11-24. No new runsc-registration evidence
+was supplied, so the separate all-mode container blocker remains outstanding.
 
 The same e2b/all entrypoints now include `TestE2BAsyncJobs` after the M4.3 gate.
 It uses its own private journal, verifies queued restart, VM serialization,

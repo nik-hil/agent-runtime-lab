@@ -191,6 +191,12 @@ func (c *Controller) templateSize() admission.Resources {
 	return c.j.TemplateSize
 }
 
+func (c *Controller) TemplateResources() admission.Resources {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.j.TemplateSize
+}
+
 // setDesired persists user intent independently of the remote API. The next
 // Tick observes the actual VM before releasing resources or issuing retries.
 func (c *Controller) SetDesired(id string, want lifecycle.DesiredState) error {

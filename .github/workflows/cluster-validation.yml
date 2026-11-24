@@ -1,0 +1,32 @@
+name: Cluster quorum validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quorum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Real three-member etcd, mTLS, lease fencing and majority loss
+        run: ./scripts/verify.sh quorum
+      - name: Preserve verification logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cluster-quorum-logs
+          path: |
+            results/verify-*/
+            .state/m5-*/etcd-*.log
+          include-hidden-files: true
+          retention-days: 7

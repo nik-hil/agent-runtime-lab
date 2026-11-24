@@ -89,6 +89,10 @@ func (j *Jobs) submit(w http.ResponseWriter, r *http.Request) {
 
 func (j *Jobs) Handler(base http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet && r.URL.Path == "/v1/cluster-capabilities" {
+			respond(w, http.StatusOK, map[string]any{"capacity": j.controller.Status().Admission.Capacity, "template_size": j.controller.TemplateResources(), "helper_sha256": j.executor.EvidenceHelperHash(), "workers": j.opts.Workers})
+			return
+		}
 		if r.Method == http.MethodPost && r.URL.Path == "/v1/drain" {
 			j.admissionGate.Lock()
 			defer j.admissionGate.Unlock()
