@@ -205,3 +205,12 @@ If fleetd has already stopped, `fleetctl drain` cannot reach it. Run
 loaded to drain directly under the same exclusive journal lock. It confirms
 provider deletion before releasing reservations, preserves fleet/task history
 and needs no socket. See [cleanup without a daemon](docs/fleet-offline-cleanup.md).
+
+## Consolidated verification
+
+Run `./scripts/verify.sh all` on the configured lab server to verify formatting,
+vet, unit/race tests, Docker/runc + gVisor/runsc integration and the opt-in live
+E2B lifecycle/task/crash-recovery gate. The test owns its daemon and disposable
+journal and checks standalone cleanup. Use `./scripts/verify.sh e2b` for an
+Embed-only host, or `./scripts/verify.sh unit` without live infrastructure.
+See [complete commands, coverage and remaining implementation](docs/full-verification.md).
