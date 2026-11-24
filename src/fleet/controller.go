@@ -19,7 +19,7 @@ import (
 var (
 	ErrCreateUncertain = errors.New("E2B Create outcome uncertain: recover by metadata; never retry Create blindly")
 	ErrUnexpectedLoss  = errors.New("sandbox absent without delete intent: reservation retained")
-	ErrUnsafeCapacity  = errors.New("observed VM exceeds its reservation: all new admissions blocked")
+	ErrUnsafeCapacity  = errors.New("fleet is unsafe: new admissions blocked; inspect unsafe_note")
 	ErrStoreUncertain  = errors.New("fleet journal outcome uncertain: stop and reopen state")
 	ErrIdle            = errors.New("no eligible fleet transition")
 )
@@ -306,8 +306,11 @@ func (c *Controller) Tick(ctx context.Context) (bool, error) {
 			return c.reconcileKnown(ctx, id, e, work)
 		}
 	}
+	// A persisted unsafe admission fence is an expected steady state, not
+	// a reconciliation failure. Cleanup above remains allowed; do not retry
+	// the idle fence as a provider error or trigger endless backoff logs.
 	if c.j.Unsafe {
-		return false, ErrUnsafeCapacity
+		return false, nil
 	}
 	e, ok := c.sched.Dispatch()
 	if !ok {
@@ -371,7 +374,7 @@ func (c *Controller) reconcileKnown(ctx context.Context, id string, e admission.
 				return false, err
 			}
 			if w.Desired != "deleted" {
-				return false, ErrUnsafeCapacity
+				return false, fmt.Errorf("%w: %s", ErrUnsafeCapacity, c.j.UnsafeNote)
 			}
 			// Keep admission blocked, but still permit explicit VM destruction.
 		}
