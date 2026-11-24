@@ -10,8 +10,16 @@ import (
 
 	"agent-runtime-lab/src/admission"
 	"agent-runtime-lab/src/fleet"
+	"agent-runtime-lab/src/m4exec"
+	"agent-runtime-lab/src/taskevidence"
 	"agent-runtime-lab/src/taskjournal"
 )
+
+type EvidenceExecutor interface {
+	EvidenceHelperHash() string
+	RunEvidence(context.Context, taskevidence.Identity, string) (taskevidence.Envelope, error)
+	ReadEvidence(context.Context, taskevidence.Identity) (taskevidence.Envelope, error)
+}
 
 // TaskHandler provides bounded, synchronous command execution with a durable
 // write-ahead task intent and a stable task ID. It is only for the private
@@ -24,6 +32,10 @@ func TaskHandler(base http.Handler, c *fleet.Controller, executor Executor, task
 				return
 			}
 			base.ServeHTTP(w, r)
+			return
+		}
+		if r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/v1/tasks/") && strings.HasSuffix(r.URL.Path, "/recover") {
+			recoverTask(w, r, c, executor, tasks)
 			return
 		}
 		if r.Method == http.MethodGet && r.URL.Path == "/v1/tasks" {
@@ -67,12 +79,16 @@ func TaskHandler(base http.Handler, c *fleet.Controller, executor Executor, task
 			return
 		}
 		var req struct {
-			TaskID         string `json:"task_id"`
-			WorkloadID     string `json:"workload_id"`
-			Command        string `json:"command"`
-			TimeoutSeconds int    `json:"timeout_seconds"`
+			TaskID         string   `json:"task_id"`
+			WorkloadID     string   `json:"workload_id"`
+			Command        string   `json:"command"`
+			TimeoutSeconds int      `json:"timeout_seconds"`
+			Evidence       bool     `json:"evidence"`
+			Artifacts      []string `json:"artifacts"`
 		}
-		if !parse(w, r, &req) {
+		// JSON escaping and artifact paths add overhead to the 4000-byte
+		// command limit. Other fleet operations keep their 4096-byte budget.
+		if !parseBounded(w, r, &req, 64<<10) {
 			return
 		}
 		if invalidID(req.TaskID) || invalidID(req.WorkloadID) || req.Command == "" ||
@@ -81,18 +97,35 @@ func TaskHandler(base http.Handler, c *fleet.Controller, executor Executor, task
 			fail(w, http.StatusBadRequest, "task ID, workload ID, command <=4000 bytes, and timeout 1..60 required")
 			return
 		}
+		artifacts, artifactErr := taskevidence.NormalizeArtifacts(req.Artifacts)
+		if artifactErr != nil || !req.Evidence && len(artifacts) != 0 {
+			fail(w, http.StatusBadRequest, "artifacts require evidence mode and at most 8 distinct clean absolute paths")
+			return
+		}
 		// A repeated task ID is never executed again, even after a VM has been
 		// drained. The digest/binding check detects accidental ID reuse.
 		if old, err := tasks.Get(req.TaskID); err == nil {
-			entry, _, err := tasks.Begin(req.TaskID, req.WorkloadID, old.SandboxID, req.Command, req.TimeoutSeconds)
+			var entry taskjournal.Entry
+			if req.Evidence && old.EvidenceIntent != nil {
+				entry, _, err = tasks.BeginEvidence(req.TaskID, req.WorkloadID, old.SandboxID, req.Command, req.TimeoutSeconds, old.EvidenceIntent.HelperSHA256, artifacts)
+			} else if req.Evidence {
+				err = taskjournal.ErrConflict
+			} else {
+				entry, _, err = tasks.Begin(req.TaskID, req.WorkloadID, old.SandboxID, req.Command, req.TimeoutSeconds)
+			}
 			if err != nil {
-				fail(w, taskErrorStatus(err), "task ID conflict or journal unavailable")
+				writeTaskError(w, err)
 				return
 			}
 			respond(w, http.StatusOK, entry)
 			return
 		} else if !errors.Is(err, taskjournal.ErrNotFound) {
 			fail(w, http.StatusServiceUnavailable, "task journal unavailable")
+			return
+		}
+		evidenceRunner, supportsEvidence := executor.(EvidenceExecutor)
+		if req.Evidence && (!supportsEvidence || evidenceRunner.EvidenceHelperHash() == "") {
+			fail(w, http.StatusNotImplemented, "evidence mode requires fleetd --task-helper built from cmd/e2b-task-agent")
 			return
 		}
 		if c.Draining() {
@@ -106,9 +139,16 @@ func TaskHandler(base http.Handler, c *fleet.Controller, executor Executor, task
 			fail(w, http.StatusConflict, "task requires owned, healthy RUNNING workload")
 			return
 		}
-		entry, run, err := tasks.Begin(req.TaskID, req.WorkloadID, job.Workload.SandboxID, req.Command, req.TimeoutSeconds)
+		var entry taskjournal.Entry
+		var run bool
+		var err error
+		if req.Evidence {
+			entry, run, err = tasks.BeginEvidence(req.TaskID, req.WorkloadID, job.Workload.SandboxID, req.Command, req.TimeoutSeconds, evidenceRunner.EvidenceHelperHash(), artifacts)
+		} else {
+			entry, run, err = tasks.Begin(req.TaskID, req.WorkloadID, job.Workload.SandboxID, req.Command, req.TimeoutSeconds)
+		}
 		if err != nil {
-			fail(w, taskErrorStatus(err), "task ID conflict, VM busy, or task journal unavailable")
+			writeTaskError(w, err)
 			return
 		}
 		if !run {
@@ -130,12 +170,25 @@ func TaskHandler(base http.Handler, c *fleet.Controller, executor Executor, task
 		}
 		ctx, cancel := context.WithTimeout(r.Context(), time.Duration(req.TimeoutSeconds)*time.Second)
 		defer cancel()
-		result, execErr := executor.Run(ctx, job.Workload.SandboxID, req.Command)
+		var result m4exec.Result
+		var evidence taskevidence.Envelope
+		var execErr error
+		if req.Evidence {
+			evidence, execErr = evidenceRunner.RunEvidence(ctx, entry.EvidenceIdentity(), req.Command)
+			if execErr == nil {
+				execErr = evidence.Validate(entry.EvidenceIdentity())
+				result.SandboxID = evidence.Manifest.Identity.SandboxID
+			}
+		} else {
+			result, execErr = executor.Run(ctx, job.Workload.SandboxID, req.Command)
+		}
 		current = c.Status()
 		active, found = current.Jobs[req.WorkloadID]
 		if execErr != nil || ctx.Err() != nil || !found || current.Unsafe || c.Draining() || active != job ||
 			active.Entry.State != admission.Running || result.SandboxID != job.Workload.SandboxID {
 			entry, err = tasks.Finish(req.TaskID, nil, "command or workload completion unconfirmed; never retry automatically")
+		} else if req.Evidence {
+			entry, err = tasks.FinishEvidence(req.TaskID, evidence, false)
 		} else {
 			entry, err = tasks.Finish(req.TaskID, &result, "")
 		}
@@ -147,6 +200,19 @@ func TaskHandler(base http.Handler, c *fleet.Controller, executor Executor, task
 		// a process exit. Persist and return the record for operator review.
 		respond(w, http.StatusOK, entry)
 	})
+}
+
+func writeTaskError(w http.ResponseWriter, err error) {
+	message := "task journal unavailable; inspect daemon state"
+	switch {
+	case errors.Is(err, taskjournal.ErrConflict):
+		message = "task ID already exists with different command, workload, timeout or evidence options"
+	case errors.Is(err, taskjournal.ErrBusy):
+		message = "sandbox has a running or uncertain task; inspect or recover that task before new work"
+	case errors.Is(err, taskjournal.ErrFull):
+		message = "task journal has reached its 128-record capacity"
+	}
+	fail(w, taskErrorStatus(err), message)
 }
 
 func taskErrorStatus(err error) int {

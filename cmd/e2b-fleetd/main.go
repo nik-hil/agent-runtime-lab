@@ -44,6 +44,7 @@ func run() error {
 	renewTTL := flag.Bool("renew-ttl", false, "opt in to extending RUNNING sandbox TTL")
 	renewInterval := flag.Duration("renew-interval", 2*time.Minute, "TTL renewal interval when --renew-ttl is set")
 	execProxy := flag.String("exec-proxy", "http://127.0.0.1:3002", "E2B envd client proxy loopback HTTP origin")
+	taskHelper := flag.String("task-helper", "", "optional static Linux amd64 cmd/e2b-task-agent binary for M4.3 evidence tasks")
 	execute := flag.Bool("execute", false, "required to enable live E2B operations")
 	template := flag.String("template", "base", "E2B sandbox template")
 	ttl := flag.Int("ttl", 900, "E2B sandbox TTL (seconds)")
@@ -109,6 +110,7 @@ func run() error {
 	}
 	commandRunner, err := m4exec.New(m4exec.Config{
 		APIURL: apiURL, ProxyURL: *execProxy, APIKey: os.Getenv("E2B_API_KEY"), TTL: *ttl,
+		HelperPath: *taskHelper,
 	})
 	if err != nil {
 		return fmt.Errorf("configure E2B command executor: %w", err)

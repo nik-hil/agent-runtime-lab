@@ -192,8 +192,9 @@ Keep task journal as evidence; draining never erases task history.
 - **No independent in-VM completion marker** or remote proof of side effects.
   A process terminal event is evidence of process exit, not a transaction.
 - **No automatic task recovery or rerun** after ambiguity. Operators must
-  investigate side effects; M4.3 can add explicit per-task completion markers,
-  an artifact manifest and a safe, opt-in recovery procedure.
+  investigate side effects. [M4.3](m4-completion-evidence.md) adds opt-in
+  per-task VM markers, artifact manifests and explicit evidence recovery for
+  new evidence tasks. Existing M4.2 records cannot be upgraded retroactively.
 - No distributed workers, high-availability journal, tenant-facing auth,
   long-running detached tasks, globally shared VM ownership or exactly-once
   semantics. A command can still overlap an externally initiated drain.

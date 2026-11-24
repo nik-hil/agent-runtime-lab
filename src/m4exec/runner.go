@@ -25,10 +25,11 @@ const (
 )
 
 type Config struct {
-	APIURL   string
-	ProxyURL string
-	APIKey   string
-	TTL      int
+	APIURL     string
+	ProxyURL   string
+	APIKey     string
+	TTL        int
+	HelperPath string
 }
 
 type Result struct {
@@ -45,6 +46,8 @@ type Runner struct {
 	apiKey     string
 	ttl        int
 	client     *http.Client
+	helper     []byte
+	helperHash string
 }
 
 func loopbackURL(raw string) (string, error) {
@@ -73,9 +76,15 @@ func New(cfg Config) (*Runner, error) {
 	if cfg.APIKey == "" || cfg.TTL < 30 || cfg.TTL > 3600 {
 		return nil, errors.New("E2B key and TTL in [30,3600] required")
 	}
-	return &Runner{controlURL: control, proxyURL: proxy, apiKey: cfg.APIKey, ttl: cfg.TTL,
+	runner := &Runner{controlURL: control, proxyURL: proxy, apiKey: cfg.APIKey, ttl: cfg.TTL,
 		client: &http.Client{Transport: &http.Transport{Proxy: nil},
-			CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
+			CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}
+	if cfg.HelperPath != "" {
+		if err := runner.loadHelper(cfg.HelperPath); err != nil {
+			return nil, err
+		}
+	}
+	return runner, nil
 }
 
 func validID(id string) bool {
@@ -161,8 +170,12 @@ func appendBounded(dst *bytes.Buffer, data []byte, remaining *int, truncated *bo
 }
 
 func (r *Runner) Run(ctx context.Context, id, command string) (Result, error) {
-	if !validID(id) || command == "" || len(command) > maxCommandBytes || strings.IndexByte(command, 0) >= 0 {
-		return Result{}, errors.New("invalid sandbox ID or command (maximum 4096 bytes)")
+	return r.run(ctx, id, command, maxCommandBytes)
+}
+
+func (r *Runner) run(ctx context.Context, id, command string, limit int) (Result, error) {
+	if !validID(id) || command == "" || len(command) > limit || strings.IndexByte(command, 0) >= 0 {
+		return Result{}, fmt.Errorf("invalid sandbox ID or command (maximum %d bytes)", limit)
 	}
 	if _, hasDeadline := ctx.Deadline(); !hasDeadline {
 		return Result{}, errors.New("execution requires an explicit timeout")

@@ -282,11 +282,15 @@ func invalidID(id string) bool {
 }
 
 func parse(w http.ResponseWriter, r *http.Request, value any) bool {
+	return parseBounded(w, r, value, 4096)
+}
+
+func parseBounded(w http.ResponseWriter, r *http.Request, value any, limit int64) bool {
 	if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
 		fail(w, http.StatusUnsupportedMediaType, "JSON content type required")
 		return false
 	}
-	decoder := json.NewDecoder(io.LimitReader(r.Body, 4096))
+	decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, limit))
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(value); err != nil {
 		fail(w, http.StatusBadRequest, fmt.Sprintf("invalid JSON request: %v", err))

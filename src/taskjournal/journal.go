@@ -10,15 +10,17 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
 
 	"agent-runtime-lab/src/m4exec"
+	"agent-runtime-lab/src/taskevidence"
 )
 
-const version = 1
+const version = 2
 const maxTasks = 128
 
 type State string
@@ -41,17 +43,19 @@ var (
 // Entry contains nonsecret task identity, a command hash, and bounded output.
 // This is a local completion record, NOT third-party attestation of side effects.
 type Entry struct {
-	ID          string         `json:"id"`
-	WorkloadID  string         `json:"workload_id"`
-	SandboxID   string         `json:"sandbox_id"`
-	CommandHash string         `json:"command_sha256"`
-	Timeout     int            `json:"timeout_seconds"`
-	State       State          `json:"state"`
-	StartedAt   time.Time      `json:"started_at"`
-	FinishedAt  *time.Time     `json:"finished_at,omitempty"`
-	Result      *m4exec.Result `json:"result,omitempty"`
-	ResultHash  string         `json:"result_sha256,omitempty"`
-	Note        string         `json:"note,omitempty"`
+	ID             string                 `json:"id"`
+	WorkloadID     string                 `json:"workload_id"`
+	SandboxID      string                 `json:"sandbox_id"`
+	CommandHash    string                 `json:"command_sha256"`
+	Timeout        int                    `json:"timeout_seconds"`
+	State          State                  `json:"state"`
+	StartedAt      time.Time              `json:"started_at"`
+	FinishedAt     *time.Time             `json:"finished_at,omitempty"`
+	Result         *m4exec.Result         `json:"result,omitempty"`
+	ResultHash     string                 `json:"result_sha256,omitempty"`
+	Note           string                 `json:"note,omitempty"`
+	EvidenceIntent *taskevidence.Intent   `json:"evidence_intent,omitempty"`
+	Evidence       *taskevidence.Envelope `json:"evidence,omitempty"`
 }
 
 type checkpoint struct {
@@ -107,16 +111,30 @@ func validate(j checkpoint) error {
 			len(e.CommandHash) != 64 || e.Timeout < 1 || e.Timeout > 60 || e.StartedAt.IsZero() {
 			return fmt.Errorf("invalid task identity: %q", id)
 		}
+		if e.EvidenceIntent != nil {
+			if err := e.EvidenceIdentity().Validate(); err != nil {
+				return fmt.Errorf("invalid task evidence intent: %q", id)
+			}
+		}
+		if e.Evidence != nil {
+			if e.EvidenceIntent == nil || e.Evidence.Validate(e.EvidenceIdentity()) != nil ||
+				e.Result == nil || !reflect.DeepEqual(*e.Result, evidenceResult(*e.Evidence)) {
+				return fmt.Errorf("invalid task completion manifest: %q", id)
+			}
+		}
 		switch e.State {
 		case Running:
-			if e.FinishedAt != nil || e.Result != nil || e.ResultHash != "" || e.Note != "" {
+			if e.FinishedAt != nil || e.Result != nil || e.ResultHash != "" || e.Note != "" || e.Evidence != nil {
 				return fmt.Errorf("invalid running task: %q", id)
 			}
 		case Uncertain:
-			if e.Result != nil || e.ResultHash != "" || e.Note == "" {
+			if e.Result != nil || e.ResultHash != "" || e.Note == "" || e.Evidence != nil {
 				return fmt.Errorf("invalid uncertain task: %q", id)
 			}
 		case Succeeded, Failed:
+			if e.EvidenceIntent != nil && e.Evidence == nil {
+				return fmt.Errorf("evidence task is missing its verified manifest: %q", id)
+			}
 			if e.Result == nil || e.FinishedAt == nil || e.Result.SandboxID != e.SandboxID ||
 				e.ResultHash != resultHash(e, *e.Result) {
 				return fmt.Errorf("invalid terminal evidence: %q", id)
@@ -168,11 +186,16 @@ func Open(path string) (*Store, error) {
 			s.Close()
 			return nil, fmt.Errorf("corrupt task journal: %w", err)
 		}
+		changed := s.journal.Version == 1
+		if changed {
+			// M4.2 records retain their identity/results. Version 2 prevents an
+			// older daemon from silently discarding new evidence metadata.
+			s.journal.Version = version
+		}
 		if err := validate(s.journal); err != nil {
 			s.Close()
 			return nil, err
 		}
-		changed := false
 		for id, e := range s.journal.Tasks {
 			if e.State == Running {
 				e.State = Uncertain
@@ -246,6 +269,17 @@ func (s *Store) save() error {
 }
 
 func (s *Store) Begin(id, workloadID, sandboxID, command string, timeout int) (Entry, bool, error) {
+	return s.begin(id, workloadID, sandboxID, command, timeout, "", nil)
+}
+
+func (s *Store) BeginEvidence(id, workloadID, sandboxID, command string, timeout int, helperHash string, artifacts []string) (Entry, bool, error) {
+	if !taskevidence.IsHash(helperHash) {
+		return Entry{}, false, errors.New("valid evidence helper hash required")
+	}
+	return s.begin(id, workloadID, sandboxID, command, timeout, helperHash, artifacts)
+}
+
+func (s *Store) begin(id, workloadID, sandboxID, command string, timeout int, helperHash string, artifacts []string) (Entry, bool, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.poisoned || s.lock == nil {
@@ -256,8 +290,16 @@ func (s *Store) Begin(id, workloadID, sandboxID, command string, timeout int) (E
 		return Entry{}, false, errors.New("invalid bounded task request")
 	}
 	hash := commandHash(command)
+	paths, err := taskevidence.NormalizeArtifacts(artifacts)
+	if err != nil || helperHash == "" && len(paths) != 0 {
+		return Entry{}, false, errors.New("invalid evidence artifact request")
+	}
 	if existing, ok := s.journal.Tasks[id]; ok {
 		if existing.WorkloadID != workloadID || existing.SandboxID != sandboxID || existing.CommandHash != hash || existing.Timeout != timeout {
+			return Entry{}, false, ErrConflict
+		}
+		if (existing.EvidenceIntent != nil) != (helperHash != "") ||
+			existing.EvidenceIntent != nil && !reflect.DeepEqual(existing.EvidenceIntent.Artifacts, paths) {
 			return Entry{}, false, ErrConflict
 		}
 		return clone(existing), false, nil
@@ -272,6 +314,13 @@ func (s *Store) Begin(id, workloadID, sandboxID, command string, timeout int) (E
 	}
 	e := Entry{ID: id, WorkloadID: workloadID, SandboxID: sandboxID, CommandHash: hash,
 		Timeout: timeout, State: Running, StartedAt: time.Now().UTC()}
+	if helperHash != "" {
+		intent, err := taskevidence.NewIntent(helperHash, paths)
+		if err != nil {
+			return Entry{}, false, err
+		}
+		e.EvidenceIntent = &intent
+	}
 	s.journal.Tasks[id] = e
 	if err := s.save(); err != nil {
 		return Entry{}, false, err // no remote execution until fsync succeeds
@@ -290,6 +339,9 @@ func (s *Store) Finish(id string, result *m4exec.Result, note string) (Entry, er
 	e, ok := s.journal.Tasks[id]
 	if !ok || e.State != Running {
 		return Entry{}, errors.New("task is not running")
+	}
+	if e.EvidenceIntent != nil && result != nil {
+		return Entry{}, errors.New("evidence tasks require a verified completion manifest")
 	}
 	now := time.Now().UTC()
 	e.FinishedAt = &now
@@ -325,7 +377,78 @@ func clone(e Entry) Entry {
 		v := *e.FinishedAt
 		e.FinishedAt = &v
 	}
+	if e.EvidenceIntent != nil {
+		v := *e.EvidenceIntent
+		v.Artifacts = append([]string{}, v.Artifacts...)
+		e.EvidenceIntent = &v
+	}
+	if e.Evidence != nil {
+		v := *e.Evidence
+		v.Manifest.Artifacts = append([]taskevidence.Artifact{}, v.Manifest.Artifacts...)
+		v.Manifest.Identity.Intent.Artifacts = append([]string{}, v.Manifest.Identity.Intent.Artifacts...)
+		e.Evidence = &v
+	}
 	return e
+}
+
+func (e Entry) EvidenceIdentity() taskevidence.Identity {
+	identity := taskevidence.Identity{TaskID: e.ID, WorkloadID: e.WorkloadID, SandboxID: e.SandboxID,
+		CommandSHA256: e.CommandHash, Timeout: e.Timeout}
+	if e.EvidenceIntent != nil {
+		identity.Intent = *e.EvidenceIntent
+		identity.Intent.Artifacts = append([]string{}, e.EvidenceIntent.Artifacts...)
+	}
+	return identity
+}
+
+func evidenceResult(envelope taskevidence.Envelope) m4exec.Result {
+	m := envelope.Manifest
+	return m4exec.Result{SandboxID: m.Identity.SandboxID, ExitCode: m.ExitCode,
+		Stdout: m.Stdout, Stderr: m.Stderr, Truncated: m.Truncated}
+}
+
+// FinishEvidence records independently read VM completion evidence. Recovery
+// may resolve an UNCERTAIN record; it never starts the original command.
+// The API must also verify current fleet ownership and every artifact's bytes.
+func (s *Store) FinishEvidence(id string, envelope taskevidence.Envelope, recovering bool) (Entry, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.poisoned || s.lock == nil {
+		return Entry{}, ErrPoisoned
+	}
+	e, ok := s.journal.Tasks[id]
+	if !ok || e.EvidenceIntent == nil || envelope.Validate(e.EvidenceIdentity()) != nil {
+		return Entry{}, ErrConflict
+	}
+	if e.State == Succeeded || e.State == Failed {
+		if e.Evidence == nil || e.Evidence.SHA256 != envelope.SHA256 {
+			return Entry{}, ErrConflict
+		}
+		return clone(e), nil
+	}
+	if recovering && e.State != Uncertain || !recovering && e.State != Running {
+		return Entry{}, ErrConflict
+	}
+	// Clone the caller-owned slices before keeping them in the journal.
+	copyEntry := clone(Entry{Evidence: &envelope})
+	e.Evidence = copyEntry.Evidence
+	result := evidenceResult(envelope)
+	e.Result, e.ResultHash = &result, resultHash(e, result)
+	now := time.Now().UTC()
+	e.FinishedAt = &now
+	e.Note = ""
+	if recovering {
+		e.Note = "recovered from verified VM completion evidence; command was not rerun"
+	}
+	e.State = Succeeded
+	if result.ExitCode != 0 {
+		e.State = Failed
+	}
+	s.journal.Tasks[id] = e
+	if err := s.save(); err != nil {
+		return Entry{}, err
+	}
+	return clone(e), nil
 }
 
 func (s *Store) Get(id string) (Entry, error) {
