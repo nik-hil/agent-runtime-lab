@@ -131,7 +131,7 @@ type dataEvent struct {
 	Stderr []byte `json:"stderr"`
 }
 type endEvent struct {
-	ExitCode int    `json:"exitCode"`
+	ExitCode *int   `json:"exitCode"`
 	Error    string `json:"error"`
 }
 type processEventParts struct {
@@ -248,10 +248,19 @@ func (r *Runner) Run(ctx context.Context, id, command string) (Result, error) {
 		appendBounded(&out, stdout, &remaining, &result.Truncated)
 		appendBounded(&errs, stderr, &remaining, &result.Truncated)
 		if end != nil {
-			if !started || end.Error != "" {
-				return Result{}, errors.New("command failed or exited ambiguously; do not retry blindly")
+			// envd may supply an error message *alongside* a real, nonzero
+			// process exit status. That is a completed failed command, not a
+			// transport failure. The pinned E2B SDK makes the same distinction:
+			// it treats nonzero exit codes as CommandExitError with the
+			// provider's error message attached.
+			//
+			// A missing exit code, or exit code 0 with an error, cannot be
+			// attested as a completed process result. Fail closed rather than
+			// retrying a potentially side-effecting command.
+			if !started || end.ExitCode == nil || (*end.ExitCode == 0 && end.Error != "") {
+				return Result{}, errors.New("command completion ambiguous (missing exit code or terminal error); do not retry blindly")
 			}
-			result.ExitCode = end.ExitCode
+			result.ExitCode = *end.ExitCode
 			result.Stdout = strings.ToValidUTF8(out.String(), "\ufffd")
 			result.Stderr = strings.ToValidUTF8(errs.String(), "\ufffd")
 			return result, nil

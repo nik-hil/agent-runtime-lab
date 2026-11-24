@@ -105,7 +105,7 @@ func TestRunBoundsOutputAndReturnsNonzeroExitCode(t *testing.T) {
 	backend, closeServers := setup(t, []any{
 		map[string]any{"start": map[string]any{"pid": 40}},
 		map[string]any{"data": map[string]any{"stdout": []byte(strings.Repeat("a", 75<<10))}},
-		map[string]any{"end": map[string]any{"exitCode": 17}},
+		map[string]any{"end": map[string]any{"exitCode": 17, "exited": true, "error": "process exited with code 17"}},
 	})
 	defer closeServers()
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -113,6 +113,30 @@ func TestRunBoundsOutputAndReturnsNonzeroExitCode(t *testing.T) {
 	result, err := backend.Run(ctx, "vm-1", "exit 17")
 	if err != nil || result.ExitCode != 17 || len(result.Stdout) != 64<<10 || !result.Truncated {
 		t.Fatalf("output not bounded or exit code lost: %+v err=%v", result, err)
+	}
+}
+
+func TestRunRejectsTerminalErrorsWithoutAttestedExitStatus(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		end  map[string]any
+	}{
+		{name: "zero_exit_with_error", end: map[string]any{"exitCode": 0, "error": "process failed to launch"}},
+		{name: "missing_exit_code_with_error", end: map[string]any{"error": "process failed to launch"}},
+		{name: "missing_exit_code", end: map[string]any{"exited": false}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			backend, closeServers := setup(t, []any{
+				map[string]any{"event": map[string]any{"start": map[string]any{"pid": 40}}},
+				map[string]any{"event": map[string]any{"end": tc.end}},
+			})
+			defer closeServers()
+			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+			defer cancel()
+			if _, err := backend.Run(ctx, "vm-1", "exit 17"); err == nil || !strings.Contains(err.Error(), "ambiguous") {
+				t.Fatalf("unattested terminal event treated as completed command: %v", err)
+			}
+		})
 	}
 }
 

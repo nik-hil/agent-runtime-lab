@@ -16,6 +16,7 @@ type execFake struct {
 	calls       int
 	id, command string
 	onRun       func()
+	exitCode    int
 }
 
 func (f *execFake) Run(_ context.Context, id, command string) (m4exec.Result, error) {
@@ -24,7 +25,7 @@ func (f *execFake) Run(_ context.Context, id, command string) (m4exec.Result, er
 	if f.onRun != nil {
 		f.onRun()
 	}
-	return m4exec.Result{SandboxID: id, Stdout: "VM:done"}, nil
+	return m4exec.Result{SandboxID: id, Stdout: "VM:done", ExitCode: f.exitCode}, nil
 }
 
 func callExecute(t *testing.T, handler http.Handler, req any) *httptest.ResponseRecorder {
@@ -91,5 +92,15 @@ func TestExecuteRefusesDrainAndConcurrentIntent(t *testing.T) {
 	r = callExecute(t, handler, map[string]any{"id": "work", "command": "echo again", "timeout_seconds": 10})
 	if r.Code != http.StatusConflict || exec.calls != 1 {
 		t.Fatal("allowed new execution during drain")
+	}
+}
+
+func TestExecuteNonzeroProcessExitIsHTTP200WithExitCode(t *testing.T) {
+	c, _ := runnable(t)
+	exec := &execFake{exitCode: 17}
+	handler := ExecuteHandler(http.NewServeMux(), c, exec)
+	r := callExecute(t, handler, map[string]any{"id": "work", "command": "exit 17", "timeout_seconds": 10})
+	if r.Code != http.StatusOK || exec.calls != 1 || !bytes.Contains(r.Body.Bytes(), []byte(`"exit_code":17`)) {
+		t.Fatalf("nonzero VM process exit misclassified as HTTP transport failure: code=%d body=%s", r.Code, r.Body.String())
 	}
 }
