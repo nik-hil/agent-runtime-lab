@@ -23,12 +23,9 @@ jobs:
         with:
           go-version-file: go.mod
           cache: false
-      - name: Unit tests with race detector
-        run: go test -race -count=1 ./...
-      - name: Static analysis
-        run: go vet ./...
+      - name: Release gate formatting, vet and race tests
+        run: |
+          bash -n scripts/verify.sh
+          ./scripts/verify.sh unit
       - name: Build static sandbox task helper
         run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -buildvcs=false -trimpath -ldflags='-s -w' -o /tmp/agentlab-task-agent ./cmd/e2b-task-agent
-      - name: Formatting
-        run: |
-          test -z "$(gofmt -l src/durable src/e2bapi src/lifecycle cmd/e2b-crashlab cmd/e2b-durable cmd/e2b-lifecycle cmd/lifecycle-demo src/admission cmd/admission-demo src/fleet src/fleetcleanup cmd/e2b-fleet cmd/e2b-fleet-cleanup src/fleetdaemon src/m4exec src/taskjournal src/taskevidence cmd/e2b-fleetd cmd/e2b-fleetctl cmd/e2b-taskctl cmd/e2b-task-agent tests)"
