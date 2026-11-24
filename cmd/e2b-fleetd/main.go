@@ -45,6 +45,7 @@ func run() error {
 	renewInterval := flag.Duration("renew-interval", 2*time.Minute, "TTL renewal interval when --renew-ttl is set")
 	execProxy := flag.String("exec-proxy", "http://127.0.0.1:3002", "E2B envd client proxy loopback HTTP origin")
 	taskHelper := flag.String("task-helper", "", "optional static Linux amd64 cmd/e2b-task-agent binary for M4.3 evidence tasks")
+	crashTask := flag.String("test-crash-after-evidence-task", "", "TEST ONLY: exit 86 after this task's VM evidence is verified, before saving its host result")
 	execute := flag.Bool("execute", false, "required to enable live E2B operations")
 	template := flag.String("template", "base", "E2B sandbox template")
 	ttl := flag.Int("ttl", 900, "E2B sandbox TTL (seconds)")
@@ -55,6 +56,16 @@ func run() error {
 	flag.Parse()
 	if !*execute || flag.NArg() != 0 {
 		return errors.New("run with --execute and no positional arguments to enable the local E2B daemon")
+	}
+	if *crashTask != "" {
+		if *taskHelper == "" || len(*crashTask) > 128 {
+			return errors.New("test crash requires --task-helper and a safe task ID of at most 128 characters")
+		}
+		for _, c := range *crashTask {
+			if !(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-' || c == '_' || c == '.') {
+				return errors.New("test crash task ID must use letters, digits, hyphen, underscore or dot")
+			}
+		}
 	}
 	if *hostCPU <= 0 || *hostMiB <= 0 || *vmCPU <= 0 || *vmMiB <= 0 {
 		return errors.New("resource reservations must be positive")
@@ -115,6 +126,19 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("configure E2B command executor: %w", err)
 	}
+	var taskExecutor fleetdaemon.Executor = commandRunner
+	if *crashTask != "" {
+		logger.Warn("fleet_test_crash_armed", "task_id", *crashTask, "exit_code", 86)
+		taskExecutor = fleetdaemon.EvidenceHookExecutor{
+			Executor: commandRunner, EvidenceExecutor: commandRunner,
+			AfterVerified: func(taskID string) {
+				if taskID == *crashTask {
+					logger.Error("fleet_test_crash_after_evidence", "task_id", taskID, "exit_code", 86)
+					os.Exit(86)
+				}
+			},
+		}
+	}
 	// Open after fleet validation but before the control socket. Recovery
 	// durably marks any interrupted in-flight task UNCERTAIN before admission.
 	tasks, err := taskjournal.Open(*taskFile)
@@ -135,7 +159,7 @@ func run() error {
 	defer stop()
 	base := fleetdaemon.DrainHandler(d)
 	base = fleetdaemon.ExecuteHandler(base, controller, commandRunner)
-	base = fleetdaemon.TaskHandler(base, controller, commandRunner, tasks)
+	base = fleetdaemon.TaskHandler(base, controller, taskExecutor, tasks)
 	server := &http.Server{
 		Handler: monitor.Handler(base), ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout: 10 * time.Second, WriteTimeout: 90 * time.Second,

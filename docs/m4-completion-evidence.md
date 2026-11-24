@@ -181,62 +181,17 @@ intentional. It must not become UNCERTAIN merely because the command failed.
 
 ## Controlled daemon-crash recovery check
 
-This optional live check needs the daemon shell and an operator shell. The
-local process pause creates a window in which the VM can finish while fleetd
-cannot consume the terminal response or persist it. Do not pause E2B, Docker,
-the VM, or any other process. Use only the identified disposable fleetd PID.
+Use the [deterministic crash-recovery proof](m4-crash-proof.md). The previous
+manual SIGSTOP/SIGKILL timing procedure did not establish the intended window
+in the operator run: its task was already durably SUCCEEDED before inspection.
+That is stored-result retrieval, not UNCERTAIN recovery.
 
-In Terminal 2, start the task in the background so that the shell stays usable:
-
-```sh
-/tmp/agentlab-m43-taskctl --socket .state/m4-3-fleet.sock \
-  --execute --evidence --task-id m43-crash --id taskvm43 --timeout 60 \
-  --artifact /tmp/m43-crash.txt \
-  --command 'echo marker >> /tmp/m43-crash.txt; sleep 40; wc -l /tmp/m43-crash.txt' \
-  submit > /tmp/m43-crash-submit.log 2>&1 &
-```
-
-Before the 40-second sleep ends, confirm that the VM command actually started:
-
-```sh
-/tmp/agentlab-m43-fleetctl --socket .state/m4-3-fleet.sock \
-  --execute --id taskvm43 --command 'test -f /tmp/m43-crash.txt' exec
-pgrep -af /tmp/agentlab-m43-fleetd
-```
-
-If the file test has not succeeded, wait briefly and inspect again; do not infer
-that the original command failed. Once it succeeds, identify the **one correct
-fleetd PID** in the process listing. Substitute it for `FLEETD_PID` below:
-
-```sh
-kill -STOP FLEETD_PID
-sleep 45
-kill -KILL FLEETD_PID
-```
-
-The 45-second wait is intentionally bounded and allows the VM's 40-second
-command to finish while the local daemon is frozen. This does not guarantee
-the helper survived every provider-specific stream lifecycle behaviour; an
-absent marker must remain UNCERTAIN, even in this experiment.
-
-Confirm no listener remains with `ss -xlpn` before removing **only** the stale
-`.state/m4-3-fleet.sock` inode. Never remove the fleet/task journals or locks.
-Restart fleetd in Terminal 1 with the **same command and journals**. Then:
-
-```sh
-/tmp/agentlab-m43-taskctl --socket .state/m4-3-fleet.sock \
-  --task-id m43-crash status
-/tmp/agentlab-m43-taskctl --socket .state/m4-3-fleet.sock \
-  --execute --task-id m43-crash recover
-/tmp/agentlab-m43-fleetctl --socket .state/m4-3-fleet.sock \
-  --execute --id taskvm43 --command 'wc -l /tmp/m43-crash.txt' exec
-```
-
-Expected: startup shows UNCERTAIN; `recover` verifies the marker and artifact,
-records SUCCEEDED with a note saying no rerun, and the count remains **1**.
-An ordinary repeated submission must never implicitly recover or rerun an
-uncertain task. A missing/modified marker or artifact returns 409 and retains
-UNCERTAIN. Do not bypass that by editing the journal or changing task IDs.
+The explicit test-only flag `--test-crash-after-evidence-task TASK_ID` exits
+fleetd with code 86 after that named task's VM evidence has been verified,
+before the host result is committed. It is off by default, requires the
+configured helper, and must be omitted when restarting the normal daemon.
+The runbook includes credential loading, a 30-minute TTL, an immediate normal
+restart on the same journals with a fresh socket, and complete commands.
 
 ## Cleanup and verification status
 
