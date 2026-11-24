@@ -259,6 +259,19 @@ func Open(path string) (*Store, error) {
 		s.Close()
 		return nil, err
 	}
+	// A process restart alone is not proof that a previously unconfirmed
+	// checkpoint rename reached disk. Sync its current name before dispatch.
+	directory, err := os.Open(dir)
+	if err != nil {
+		s.Close()
+		return nil, err
+	}
+	err = directory.Sync()
+	directory.Close()
+	if err != nil {
+		s.Close()
+		return nil, err
+	}
 	return s, nil
 }
 

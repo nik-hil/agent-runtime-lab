@@ -135,6 +135,12 @@ func Open(root string, limit int64) (*Store, error) {
 		s.Close()
 		return nil, err
 	}
+	// A prior owner may have stopped after rename with an unconfirmed parent
+	// fsync. Re-establish durable published names before accepting receipts.
+	if err := syncDir(abs); err != nil {
+		s.Close()
+		return nil, err
+	}
 	return s, nil
 }
 

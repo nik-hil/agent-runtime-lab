@@ -338,6 +338,9 @@ func TestDrainCancelsQueuedJobsWithWorkersPaused(t *testing.T) {
 	h := f.jobs.Handler(DrainHandler(d))
 	jobHTTP(t, h, http.MethodPost, "/v1/drain", struct{}{}, http.StatusAccepted)
 	jobState(t, f.tasks, "one", taskjournal.Cancelled)
+	if err := f.c.Submit("alpha", "direct-after-drain"); !errors.Is(err, fleet.ErrUnsafeCapacity) {
+		t.Fatal("controller-level admission bypassed durable drain fence", err)
+	}
 	jobHTTP(t, h, http.MethodPost, "/v1/jobs", JobRequest{ID: "new", WorkloadID: "work", Command: "echo hi", Timeout: 30}, http.StatusConflict)
 }
 
