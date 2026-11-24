@@ -132,6 +132,7 @@ type dataEvent struct {
 }
 type endEvent struct {
 	ExitCode *int   `json:"exitCode"`
+	Exited   bool   `json:"exited"`
 	Error    string `json:"error"`
 }
 type processEventParts struct {
@@ -254,13 +255,18 @@ func (r *Runner) Run(ctx context.Context, id, command string) (Result, error) {
 			// it treats nonzero exit codes as CommandExitError with the
 			// provider's error message attached.
 			//
-			// A missing exit code, or exit code 0 with an error, cannot be
-			// attested as a completed process result. Fail closed rather than
-			// retrying a potentially side-effecting command.
-			if !started || end.ExitCode == nil || (*end.ExitCode == 0 && end.Error != "") {
-				return Result{}, errors.New("command completion ambiguous (missing exit code or terminal error); do not retry blindly")
+			// exit_code is a non-optional proto3 scalar: ProtoJSON normally
+			// omits it when zero. Accept that default only with an explicit
+			// exited=true marker and no terminal error. An empty end event
+			// still provides insufficient evidence of process completion.
+			exitCode := 0
+			if end.ExitCode != nil {
+				exitCode = *end.ExitCode
 			}
-			result.ExitCode = *end.ExitCode
+			if !started || (end.ExitCode == nil && !end.Exited) || (exitCode == 0 && end.Error != "") {
+				return Result{}, errors.New("command completion ambiguous (missing exit evidence or terminal error); do not retry blindly")
+			}
+			result.ExitCode = exitCode
 			result.Stdout = strings.ToValidUTF8(out.String(), "\ufffd")
 			result.Stderr = strings.ToValidUTF8(errs.String(), "\ufffd")
 			return result, nil

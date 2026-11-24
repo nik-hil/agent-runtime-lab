@@ -101,6 +101,31 @@ func TestRunRequiresTerminalEventAndDoesNotRetry(t *testing.T) {
 	}
 }
 
+func TestRunAcceptsOmittedZeroExitCodeAfterConfirmedExit(t *testing.T) {
+	for _, wrapped := range []bool{false, true} {
+		t.Run(fmt.Sprintf("wrapped_%t", wrapped), func(t *testing.T) {
+			// EndEvent.exit_code is an implicit-presence proto3 scalar.
+			// ProtoJSON omits its default zero value on successful exit.
+			start := map[string]any{"start": map[string]any{"pid": 40}}
+			data := map[string]any{"data": map[string]any{"stdout": []byte("1\n")}}
+			end := map[string]any{"end": map[string]any{"exited": true, "status": "exit status 0"}}
+			if wrapped {
+				start = map[string]any{"event": start}
+				data = map[string]any{"event": data}
+				end = map[string]any{"event": end}
+			}
+			backend, closeServers := setup(t, []any{start, data, end})
+			defer closeServers()
+			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+			defer cancel()
+			result, err := backend.Run(ctx, "vm-1", "wc -l /tmp/m42-once")
+			if err != nil || result.SandboxID != "vm-1" || result.ExitCode != 0 || result.Stdout != "1\n" {
+				t.Fatalf("successful ProtoJSON exit lost: %+v err=%v", result, err)
+			}
+		})
+	}
+}
+
 func TestRunBoundsOutputAndReturnsNonzeroExitCode(t *testing.T) {
 	backend, closeServers := setup(t, []any{
 		map[string]any{"start": map[string]any{"pid": 40}},
@@ -123,7 +148,9 @@ func TestRunRejectsTerminalErrorsWithoutAttestedExitStatus(t *testing.T) {
 	}{
 		{name: "zero_exit_with_error", end: map[string]any{"exitCode": 0, "error": "process failed to launch"}},
 		{name: "missing_exit_code_with_error", end: map[string]any{"error": "process failed to launch"}},
+		{name: "omitted_zero_with_error", end: map[string]any{"exited": true, "error": "process failed to launch"}},
 		{name: "missing_exit_code", end: map[string]any{"exited": false}},
+		{name: "empty_end_event", end: map[string]any{}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			backend, closeServers := setup(t, []any{

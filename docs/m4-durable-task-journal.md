@@ -41,6 +41,37 @@ The journal holds at most 128 task records; it does not prune them silently.
 Commands themselves are **not** saved, only SHA-256 digests. Output is saved
 and might contain sensitive information, so protect the task journal.
 
+### Successful command reported as UNCERTAIN
+
+The shared M4.1 executor previously required `exitCode` to be present in
+every terminal event. E2B declares it as an implicit-presence proto3 scalar,
+so a successful command can emit `exited=true` while omitting the default
+zero exit code. This made both `taskctl submit` and legacy `fleetctl exec`
+reject a valid successful completion. The parser now accepts an omitted
+zero only after a start event and with `exited=true` and no terminal error.
+Empty end events, missing terminal events and transport failures remain
+uncertain; explicit nonzero exits still produce completed failed commands.
+
+After updating, rebuild **fleetd** and restart it with the same fleet and
+task journals and the original flags. Rebuilding only the CLIs will not
+update the parser. Existing UNCERTAIN records remain unchanged, because
+their original completion evidence was discarded. Do not delete or edit
+the journal or submit the append command under another task ID.
+
+For the `m42-once` experiment, inspect the sandbox without changing it:
+
+```sh
+/tmp/agentlab-m42-fleetctl --socket .state/m4-2-fleet.sock \
+  --execute --id taskvm42 --command 'wc -l /tmp/m42-once' exec
+```
+
+This legacy read-only inspection does not resolve the task record. If the
+file exists, its count shows the current sandbox-local effect. A missing
+file is a completed nonzero command, not evidence of a transport failure.
+The uncertain task still blocks new M4.2 tasks on that sandbox. Preserve
+its journal, drain the disposable fleet when finished, and use a new VM
+and a new task ID for another durable completion experiment.
+
 ## One integrated live experiment
 
 Use a **new fleet journal** (prior test journals are intentionally drained).
