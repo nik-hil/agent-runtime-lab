@@ -18,6 +18,7 @@ import (
 	"agent-runtime-lab/src/e2bapi"
 	"agent-runtime-lab/src/fleet"
 	"agent-runtime-lab/src/fleetdaemon"
+	"agent-runtime-lab/src/m4exec"
 )
 
 func main() {
@@ -40,6 +41,7 @@ func run() error {
 	auditGlobal := flag.Bool("audit-global", false, "also scan provider-wide lab-tagged active sandboxes")
 	renewTTL := flag.Bool("renew-ttl", false, "opt in to extending RUNNING sandbox TTL")
 	renewInterval := flag.Duration("renew-interval", 2*time.Minute, "TTL renewal interval when --renew-ttl is set")
+	execProxy := flag.String("exec-proxy", "http://127.0.0.1:3002", "E2B envd client proxy loopback HTTP origin")
 	execute := flag.Bool("execute", false, "required to enable live E2B operations")
 	template := flag.String("template", "base", "E2B sandbox template")
 	ttl := flag.Int("ttl", 900, "E2B sandbox TTL (seconds)")
@@ -97,6 +99,12 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	commandRunner, err := m4exec.New(m4exec.Config{
+		APIURL: apiURL, ProxyURL: *execProxy, APIKey: os.Getenv("E2B_API_KEY"), TTL: *ttl,
+	})
+	if err != nil {
+		return fmt.Errorf("configure E2B command executor: %w", err)
+	}
 	listener, cleanup, err := fleetdaemon.ListenUnix(*socket)
 	if err != nil {
 		return err
@@ -109,7 +117,7 @@ func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	server := &http.Server{
-		Handler: monitor.Handler(fleetdaemon.DrainHandler(d)), ReadHeaderTimeout: 5 * time.Second,
+		Handler: monitor.Handler(fleetdaemon.ExecuteHandler(fleetdaemon.DrainHandler(d), controller, commandRunner)), ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout: 10 * time.Second, WriteTimeout: 90 * time.Second,
 	}
 	workerDone := make(chan struct{})

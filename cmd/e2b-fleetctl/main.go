@@ -28,11 +28,13 @@ func run() error {
 	id := flag.String("id", "", "stable workload ID")
 	tenant := flag.String("tenant", "alpha", "tenant for submit")
 	execute := flag.Bool("execute", false, "required for mutating commands")
+	command := flag.String("command", "", "shell command to run inside an owned E2B sandbox")
+	execTimeout := flag.Int("exec-timeout", 30, "sandbox command timeout in seconds (1..60)")
 	drainTimeout := flag.Duration("drain-timeout", 120*time.Second, "time to wait for confirmed drain completion")
 	drainPoll := flag.Duration("drain-poll", 500*time.Millisecond, "status polling interval during drain")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		return errors.New("usage: e2b-fleetctl [flags] status|audit|metrics|submit|pause|resume|delete|recover|drain")
+		return errors.New("usage: e2b-fleetctl [flags] status|audit|metrics|submit|pause|resume|delete|recover|drain|exec")
 	}
 	action := flag.Arg(0)
 	method, endpoint := http.MethodPost, ""
@@ -63,6 +65,16 @@ func run() error {
 		payload = struct{ ID string }{*id}
 	case "drain":
 		endpoint = "/v1/drain"
+	case "exec":
+		if *command == "" || len(*command) > 4096 || *execTimeout < 1 || *execTimeout > 60 {
+			return errors.New("exec requires --command <=4096 bytes and --exec-timeout 1..60 seconds")
+		}
+		endpoint = "/v1/execute"
+		payload = struct {
+			ID             string `json:"id"`
+			Command        string `json:"command"`
+			TimeoutSeconds int    `json:"timeout_seconds"`
+		}{*id, *command, *execTimeout}
 	default:
 		return fmt.Errorf("unknown action %q", action)
 	}
@@ -119,5 +131,19 @@ func run() error {
 		return err
 	}
 	_, err = fmt.Fprintln(os.Stdout, formatted.String())
-	return err
+	if err != nil {
+		return err
+	}
+	if action == "exec" {
+		var result struct {
+			ExitCode int `json:"exit_code"`
+		}
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		if result.ExitCode != 0 {
+			return fmt.Errorf("sandbox command exited with code %d", result.ExitCode)
+		}
+	}
+	return nil
 }
