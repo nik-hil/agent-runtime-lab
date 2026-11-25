@@ -159,8 +159,11 @@ The operator demonstrated a real named crash for m43-proof, an UNCERTAIN
 host record after restart, explicit verified recovery, and a separate wc
 observation of exactly one marker. This validates that recovery scenario.
 
-The operator subsequently reported the M4.3/M4.4 E2B gate passed. M5 live
-verification is pending its new cluster gate. Default GitHub CI has no local E2B server: it
+The operator subsequently reported the M4.3/M4.4 E2B gate passed, then
+confirmed the corrected M5 cluster gate passed on 2026-11-25. The M5 pass
+covers single-host process failover and does not establish physical-server HA.
+See verification-status.md for the operator report and evidence limits.
+Default GitHub CI has no local E2B server: it
 compiles this test, runs unit/race tests and vet, checks formatting, and builds
 the static helper. Skipped live tests are never evidence of a live pass.
 

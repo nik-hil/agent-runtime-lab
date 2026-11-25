@@ -2,13 +2,24 @@
 
 M5 adds multi-server scheduling, ownership fencing, conservative failover and
 replicated artifact storage. See [the full gate and operating guide](m5-multi-server.md).
-Its live gate is `./scripts/verify.sh cluster`; M4.4's earlier operator pass is
-not evidence of an M5 live pass. The gVisor/runsc registration issue remains a
-separate prerequisite for `verify.sh all`.
+Its live gate is `./scripts/verify.sh cluster`, now operator-confirmed passed.
+The gVisor/runsc registration issue remains a separate prerequisite for
+`verify.sh all`.
 
 M5 CI on `086eb84b1a3c68034fbfcbc1ce1702590197ecad`: all Go race tests,
 formatting/vet, inventory audit, and the real etcd quorum/TLS protocol gate
 passed. The protocol backend synthesizes results; it is not a live E2B pass.
+
+## 2026-11-25: M5 live gate passed
+
+The operator reported "test passed" after the supplied `./scripts/verify.sh
+cluster` rerun following fixture fix `8ff1be38e0203fc44982d9962fe16daeb80cad6a`.
+Record the complete M5 live gate as operator-confirmed passed, including
+pending reassignment, coordinator replacement, pinned uncertain execution,
+original-evidence recovery, surviving-replica downloads, drain and cleanup.
+The successful run's raw logs/path were not supplied for independent review.
+This is a single-host process-failover gate; physical-server HA, load testing
+and the separate Docker/runsc all-mode gate are not established by this pass.
 
 ## 2026-11-24: ubuntu-c-8-sfo2
 

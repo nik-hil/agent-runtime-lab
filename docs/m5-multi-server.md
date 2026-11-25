@@ -246,9 +246,13 @@ etcd/TLS protocol gate passed in PR #15 on commit
 `086eb84b1a3c68034fbfcbc1ce1702590197ecad`. The quorum gate includes
 server-side lease expiration, stale coordinator rejection, operation with one
 member down, fail-closed behavior with two members down, and verified replica
-access after owner loss. It does not include real E2B commands. The live M5
-gate remains pending on the operator's server; the earlier M4.4 live pass is
-recorded separately in verification-status.md.
+access after owner loss. Those CI tests do not include real E2B commands.
+After fixture fix `8ff1be38e0203fc44982d9962fe16daeb80cad6a`, the operator
+reported the complete live cluster gate passed on 2026-11-25. This is an
+operator-confirmed single-host process-failover pass; the successful run's raw
+logs were not supplied for independent review. Physical multi-server failure
+validation remains separate. See verification-status.md for the failure,
+fix and successful rerun record.
 
 References: [etcd JSON gateway](https://etcd.io/docs/v3.6/dev-guide/api_grpc_gateway/),
 [client design and failure semantics](https://etcd.io/docs/v3.6/learning/design-client/),
