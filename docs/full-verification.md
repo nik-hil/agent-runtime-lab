@@ -1,7 +1,9 @@
 # Repository release gate
 
-M4.4 adds asynchronous jobs and host-durable artifact bundles to the single-host
-VM execution foundation. Distributed orchestration remains a later milestone.
+M4.4 adds asynchronous jobs and host-durable artifacts. M5 adds distributed
+placement, fenced ownership, conservative failover and replicated artifacts.
+Use the [M5 complete command block](m5-multi-server.md#one-complete-release-gate)
+to verify the entire Embed-based implementation on the existing server.
 
 | Area | Implemented in this branch |
 | --- | --- |
@@ -15,32 +17,38 @@ VM execution foundation. Distributed orchestration remains a later milestone.
 | Async jobs | Durable queue, bounded workers, cancellation, shared VM fence, restart-safe dispatch |
 | Durable artifacts | Fsynced host bundles, verified downloads and recovery after VM deletion |
 | Cleanup | Explicit live drain and daemon-independent journal cleanup |
-| Still ahead | Actual host telemetry; multi-node durable ownership, leases/fencing, worker failure recovery; off-host artifact replication; public tenant API/authentication |
+| Multi-server | etcd-backed placement, global tenant quotas, coordinator/node leases, ownership epochs, durable node intents and safe pending reassignment |
+| Artifact failover | Verified copies on distinct node agents, surviving-replica downloads and repair |
+| Still ahead | Measured host telemetry, physical failure-domain deployment validation, production PKI lifecycle, public tenant API/authentication |
 
 Reservations are configured promises, not measured host utilization. Local
-flock journals provide single-process ownership, not distributed leadership.
+flock journals provide local process ownership; M5 adds etcd lease and CAS
+fencing for distributed leadership and dispatch.
 Evidence hashes check observed bytes; they do not attest a hostile VM or
 guarantee exactly-once changes in external systems.
 
 ## One command per verification scope
 
-Run these commands on the existing Linux lab server. No new services, Go SDKs,
-runtimes or E2B versions are installed. The current E2B Compose project must
+Run these commands on the existing Linux lab server. No system services, Go SDKs,
+runtimes or E2B versions are installed. M5 explicitly starts isolated etcd test
+containers and removes only those selected containers. The current E2B Compose project must
 already be running at ~/e2b, with API/proxy ports 3000/3002 and working credentials.
 
 Load credentials in the shell that will run verification; do not print them:
 
 ~~~bash
-cd ~/e2b
-eval "$(sudo docker compose exec -T ready cat /run/e2b/sdk.env)"
+sdk_env="$(sudo -n docker compose --project-directory "$HOME/e2b" exec -T ready cat /run/e2b/sdk.env)" || exit 1
+eval "$sdk_env"
+unset sdk_env
 test -n "${E2B_API_KEY:-}" || { echo "E2B credentials were not loaded"; exit 1; }
 cd ~/src/agent-runtime-lab
-git switch feat/m4-4-async-jobs
-git pull --ff-only origin feat/m4-4-async-jobs
+git fetch origin feat/m5-multi-server
+git switch feat/m5-multi-server
+git pull --ff-only origin feat/m5-multi-server
 ~~~
 
 For every implemented code path's automated checks, including both installed
-container runtimes and the live E2B gate:
+container runtimes, the live E2B gates and M5 cluster gates:
 
 ~~~bash
 cd ~/src/agent-runtime-lab
@@ -54,6 +62,20 @@ cd ~/src/agent-runtime-lab
 ./scripts/verify.sh e2b
 ~~~
 
+For M4 plus the whole M5 implementation without the separate gVisor requirement:
+
+~~~bash
+cd ~/src/agent-runtime-lab
+./scripts/verify.sh cluster
+~~~
+
+For real three-member etcd and TLS protocol tests without E2B credentials:
+
+~~~bash
+cd ~/src/agent-runtime-lab
+./scripts/verify.sh quorum
+~~~
+
 The e2b mode runs formatting, vet, all unit/race tests, and live E2B verification.
 It now includes both TestE2BFullLifecycle and TestE2BAsyncJobs. The M4.4 gate
 recovers a genuinely uncertain host record from committed artifact bytes after
@@ -65,7 +87,7 @@ builds the source probe image and requires both Docker/runc and gVisor/runsc;
 missing infrastructure fails instead of producing a misleading pass.
 The unit mode needs no E2B credentials and skips all real-runtime tests.
 
-The all mode checks Docker access before running Go checks. If direct access
+The all, cluster and quorum modes check Docker access before Go checks. If direct access
 fails but the existing passwordless `sudo -n docker` route works, it creates a
 private Docker CLI wrapper for this run. Builds and Go test subprocesses inherit
 that wrapper through PATH. Verification and journals remain under the invoking
@@ -137,11 +159,17 @@ The operator demonstrated a real named crash for m43-proof, an UNCERTAIN
 host record after restart, explicit verified recovery, and a separate wc
 observation of exactly one marker. This validates that recovery scenario.
 
-The new consolidated gate must also pass on the user's live server before it
-can be called live-verified. Default GitHub CI has no local E2B server: it
+The operator subsequently reported the M4.3/M4.4 E2B gate passed, then
+confirmed the corrected M5 cluster gate passed on 2026-11-25. The M5 pass
+covers single-host process failover and does not establish physical-server HA.
+See verification-status.md for the operator report and evidence limits.
+Default GitHub CI has no local E2B server: it
 compiles this test, runs unit/race tests and vet, checks formatting, and builds
 the static helper. Skipped live tests are never evidence of a live pass.
 
 A passing gate covers the implemented foundation and its regression cases.
 It is not a load/capacity benchmark, hostile-workload security certification,
-or validation of the future distributed platform.
+or validation of physical-server HA. The M5 CI quorum/protocol gate uses real
+etcd/TLS with a synthetic fleet, while the opt-in cluster gate uses real E2B
+commands and process crash injection. Neither replaces a physical multi-host
+failure test. See [M5 deployment and evidence limits](m5-multi-server.md).

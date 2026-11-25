@@ -1,5 +1,26 @@
 # Verification status
 
+M5 adds multi-server scheduling, ownership fencing, conservative failover and
+replicated artifact storage. See [the full gate and operating guide](m5-multi-server.md).
+Its live gate is `./scripts/verify.sh cluster`, now operator-confirmed passed.
+The gVisor/runsc registration issue remains a separate prerequisite for
+`verify.sh all`.
+
+M5 CI on `086eb84b1a3c68034fbfcbc1ce1702590197ecad`: all Go race tests,
+formatting/vet, inventory audit, and the real etcd quorum/TLS protocol gate
+passed. The protocol backend synthesizes results; it is not a live E2B pass.
+
+## 2026-11-25: M5 live gate passed
+
+The operator reported "test passed" after the supplied `./scripts/verify.sh
+cluster` rerun following fixture fix `8ff1be38e0203fc44982d9962fe16daeb80cad6a`.
+Record the complete M5 live gate as operator-confirmed passed, including
+pending reassignment, coordinator replacement, pinned uncertain execution,
+original-evidence recovery, surviving-replica downloads, drain and cleanup.
+The successful run's raw logs/path were not supplied for independent review.
+This is a single-host process-failover gate; physical-server HA, load testing
+and the separate Docker/runsc all-mode gate are not established by this pass.
+
 ## 2026-11-24: ubuntu-c-8-sfo2
 
 The operator ran `./scripts/verify.sh all` on branch
@@ -36,6 +57,11 @@ See [the complete verification commands](full-verification.md).
 
 ## M4.4 additions
 
+The operator subsequently reported "everything passed" after the supplied
+M4.4 `./scripts/verify.sh e2b` command block. Record the M4.3 and M4.4 live gates
+as operator-confirmed passed on 2026-11-24. No new runsc-registration evidence
+was supplied, so the separate all-mode container blocker remains outstanding.
+
 The same e2b/all entrypoints now include `TestE2BAsyncJobs` after the M4.3 gate.
 It uses its own private journal, verifies queued restart, VM serialization,
 queued/running cancellation, failed-job evidence, and named exit 87 after
@@ -47,3 +73,24 @@ This editing workspace cannot create Unix sockets (`operation not permitted`).
 Targeted in-process and filesystem tests run here; GitHub CI must run the full
 unit/race suite including existing Unix-socket tests. No socket tests are
 silently skipped to claim success.
+
+## M5 live fixture failure: pending assignment
+
+The operator's cluster run at `results/verify-tnLJQbKi` passed all unit/race,
+M4 lifecycle/async, and etcd quorum/TLS protocol gates. Its first live M5
+subtest timed out waiting for `pending-move` to succeed. Every selected fleet
+cleanup completed with CPU=0, MiB=0 and pending=0. This remains a failed M5
+live run, not a cluster verification pass.
+
+The fixture accidentally supplied `--test-hold-claim-job pending-move` to all
+three workers, preventing surviving workers from claiming the reassigned job.
+The fault is now scoped to node-a and shared with a CI pending-reassignment
+regression that verifies one admission on a survivor and no VM creation on the
+held original owner. Polling/assertion helpers now use the active subtest's
+testing.T, preventing the secondary parent-FailNow panic. Restarted worker
+processes are retained for the entire parent scenario instead of being stopped
+by a subtest's cleanup. Job progress logs include state, owner, epoch, replicas
+and the saved note without command contents.
+
+The TLS `client certificate role is not authorized` line inside the passing
+protocol test is its intentional operator-certificate rejection check.

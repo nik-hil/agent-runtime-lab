@@ -1,6 +1,6 @@
 # agent-runtime-lab
 
-An educational Go sandbox runner comparing Docker with explicit `runc` and gVisor with explicit `runsc`. Both use the same Docker lifecycle, image, workload and security settings. A small private test receiver demonstrates durable commits and safe retries; no real external business operations, orchestration platforms, AI agents or additional runtimes are included.
+An educational Go sandbox runner comparing Docker with explicit `runc` and gVisor with explicit `runsc`, extended with durable E2B task/job execution and multi-server orchestration. A small private test receiver demonstrates durable commits and safe retries. The Go application uses the standard library; M5 adds an explicitly started etcd quorum for shared ownership.
 
 ## Setup
 
@@ -229,3 +229,17 @@ See [M4.4 behavior and complete commands](docs/m4-async-jobs.md), and
 [the recorded verification status](docs/verification-status.md). The e2b
 verification mode now runs both M4.3 and M4.4 live gates; the all mode still
 requires Docker's gVisor runtime registration.
+
+## M5 — Multi-server scheduling, ownership and failover
+
+The cluster coordinator places async jobs across independent fleet servers
+using global tenant/node budgets and label matching. etcd leases and atomic
+ownership checks fence stale coordinators and workers. Only never-dispatched
+assignments move after worker loss; uncertain commands stay pinned. Completion
+requires verified artifact copies on distinct worker nodes, with download
+fallback and replica repair. API traffic uses mutual TLS.
+
+Run `./scripts/verify.sh cluster` for the complete M4 regression plus M5 live
+process-failover gate, or `./scripts/verify.sh quorum` for real etcd tests without
+E2B credentials. Both use the existing passwordless Docker sudo route and avoid
+the separate runsc prerequisite. See [M5 architecture, full commands and limits](docs/m5-multi-server.md).
